@@ -387,14 +387,14 @@ end;
 
 procedure TInventoryFormHelper.OnImgKeyDown(sender: TImageBox; var key: UInt16; shift: ELazShiftStates);
 begin
-  if key = 16 then
+  if EKeyCode(key) = EKeyCode.SHIFT then
     Self.ShiftDown := True;
   Self.OnKeyPress(nil, Int16(key), shift);
 end;
 
 procedure TInventoryFormHelper.OnImgKeyUp(sender: TImageBox; var key: UInt16; shift: ELazShiftStates);
 begin
-  if key = 16 then
+  if EKeyCode(key) = EKeyCode.SHIFT then
     Self.ShiftDown := False;
 end;
 

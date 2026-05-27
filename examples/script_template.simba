@@ -1,3 +1,4 @@
+//!PACKAGE EXAMPLE
 {$I WaspLib/osrs.simba}
 
 type

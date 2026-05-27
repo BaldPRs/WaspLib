@@ -1,3 +1,4 @@
+//!PACKAGE SCRIPT
 const
   ENDPOINT = 'https://oldschool.runescape.wiki/api.php?';
   SILENT: Boolean = False;

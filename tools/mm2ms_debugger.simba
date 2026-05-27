@@ -1,3 +1,4 @@
+//!PACKAGE SCRIPT
 {.$DEFINE WL_DISABLE_FAKE_INPUT}
 {$I WaspLib/osrs.simba}
 

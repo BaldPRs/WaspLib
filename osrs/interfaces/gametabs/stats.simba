@@ -304,6 +304,19 @@ when a goal has been reached.
 *)
 
 (*
+### Stats.GoalCompleted
+```pascal
+function TRSStats.GoalCompleted(skill: ERSSkill): Boolean;
+```
+Returns true when the specified `skill` has reached it's goal level.
+*)
+function TRSStats.GoalCompleted(skill: ERSSkill): Boolean;
+begin
+  Result := (Self.Goals[skill] > 0) and
+            (Self.GetLevel(skill) >= Self.Goals[skill]);
+end;
+
+(*
 ### Stats.AnyGoalsCompleted
 ```pascal
 function TRSStats.AnyGoalsCompleted(): Boolean;
@@ -331,7 +344,7 @@ var
   skill: ERSSkill;
 begin
   for skill := Low(ERSSkill) to High(ERSSkill) do
-    if (Self.Goals[skill] > 0) and (Self.GetLevel(skill) >= Self.Goals[skill]) then
+    if Self.GoalCompleted(skill) then
       Exit(True);
 end;
 
@@ -364,7 +377,8 @@ var
   skill: ERSSkill;
 begin
   for skill := Low(ERSSkill) to High(ERSSkill) do
-    if (Self.Goals[skill] > 0) and (Self.GetLevel(skill) < Self.Goals[skill]) then
+    if (Self.Goals[skill] > 0) and
+       (Self.GetLevel(skill) < Self.Goals[skill]) then
       Exit;
 
   Result := True;

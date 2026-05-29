@@ -79,8 +79,7 @@ Enum representing 2 core actions you can perform on the {ref}`Bank` interface.
 Helper record to cache items positions on the {ref}`Bank` interface.
 *)
   TBankPosition = record
-    Tab: Integer;
-    Scroll: Integer;
+    Tab, Scroll: Integer;
     Slot: TBox;
   end;
 
@@ -107,13 +106,11 @@ Record responsible to handle the {ref}`Bank` interface.
     MiscButtons: array [ERSBankMiscButton] of TRSButton;
     DepositButtons: array [ERSBankDepositButton] of TRSButton;
 
-    ButtonsOffset: Boolean;
-
     JagexAccountAd: record
       NotNow, MoreInfo: TBox;
     end;
 
-    Depleted: Boolean;
+    ButtonsOffset, Depleted: Boolean;
 
     _Cache: record
       Quantity: Integer;

@@ -234,22 +234,25 @@ WriteLn Inventory.Combine('Coins', 'Asgarnian ale');
 *)
 function TRSInventory.Combine(slotA, slotB: Integer): Boolean;
 begin
-  if not Self.Open() then Exit;
-  Result := Self.Select(slotA);
-  if Result then
-  begin
-    Sleep(0, 500, ERandomDir.LEFT);
-    Self.Slots.Click(slotB, EMouseButton.LEFT);
-  end;
+  if not Self.Open() then
+    Exit;
+
+  if not Self.Select(slotA) then
+    Exit;
+
+  Sleep(0, TICK, ERandomDir.LEFT);
+  Self.Slots.Click(slotB, EMouseButton.LEFT);
+
+  Result := SleepUntil(Self.GetSelected() = -1, 200, TICK);
 end;
 
 function TRSInventory.Combine(itemA, itemB: TRSItem): Boolean; overload;
 var
   slotsA, slotsB: TIntegerArray;
-  selected, bestA, bestB: Integer;
+  a, b, selected, bestA, bestB: Integer;
   dist, best: Double;
   centers: TPointArray;
-  i, j: Integer;
+  centerA: TPoint;
 begin
   if not Self.Open() then
     Exit;
@@ -274,17 +277,20 @@ begin
   best := $FFFFFF;
   centers := Self.Slots.Boxes().Centers();
 
-  for i := 0 to High(slotsA) do
-    for j := 0 to High(slotsB) do
+  for a in slotsA do
+  begin
+    centerA := centers[a];
+    for b in slotsB do
     begin
-      dist := centers[slotsA[i]].DistanceTo(centers[slotsB[j]]);
+      dist := centerA.DistanceTo(centers[b]);
       if dist < best then
       begin
         best := dist;
-        bestA := slotsA[i];
-        bestB := slotsB[j];
+        bestA := a;
+        bestB := b;
       end;
     end;
+  end;
 
   Result := Self.Combine(bestA, bestB);
 end;

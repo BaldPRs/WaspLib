@@ -25,6 +25,23 @@ Enum reprensenting the {ref}`XPBar` available positions.
 *)
   ERSXPBarPosition = enum(UNKNOWN, LEFT, CENTER, RIGHT);
 
+  TXPTracker = record
+    Start, Current, Previous: UInt64;
+  end;
+
+procedure TXPTracker.Reset();
+begin
+  Self.Start := 0;
+  Self.Current := 0;
+  Self.Previous := 0;
+end;
+
+function TXPTracker.Earned(): UInt64;
+begin
+  Result := Self.Current-Self.Previous;
+end;
+
+type
 (*
 ## TRSXPBar
 Record responsible with interacting with the {ref}`XPBar`.
@@ -42,11 +59,7 @@ Record responsible with interacting with the {ref}`XPBar`.
 
     SetupAttempts: Integer;
 
-    Tracker: record
-      Start: UInt64;
-      Current: UInt64;
-      Previous: UInt64;
-    end;
+    Tracker: TXPTracker;
   end;
 
 (*
@@ -285,7 +298,7 @@ end;
 (*
 ## XPBar.Read
 ```pascal
-function TRSXPBar.Read(): Integer;
+function TRSXPBar.Read(): UInt64;
 ```
 Reads the XP in the XPBar.
 
@@ -294,23 +307,31 @@ Example:
 WriteLn XPBar.Read();
 ```
 *)
-function TRSXPBar.Read: UInt64;
+function TRSXPBar.Read(): UInt64;
 var
   str: String;
   count: Integer;
 begin
-  if not Self.Setup() then Exit;
+  if not Self.Setup() then
+    Exit;
 
   str := OCR.Recognize(Self.Bounds, Self.Font, [$FFFFFF], 0);
 
   Result := str.ExtractInteger(0);
-  if Result = 0 then Exit;
+  if Result = 0 then
+    Exit;
   count := Target.CountColor($010000, 0, Self.Bounds);
 
   if ((count <> 45) and (not InRange(count, 141, 150))) then
   begin
     WriteLn GetDebugLn('XPBar', 'Your XPBar doesn''t seem to be set to count "Total Experience"', ELogLevel.WARN);
     WriteLn GetDebugLn('XPBar', 'XP Tracking won''t be used and this can cause issues.', ELogLevel.WARN);
+  end;
+
+  if Result < Self.Tracker.Previous then
+  begin
+    Self.Tracker.Reset();
+    Exit(0);
   end;
 
   if Self.Tracker.Start = 0 then
@@ -337,12 +358,15 @@ while True do
 ```
 *)
 function TRSXPBar.EarnedXP(): Boolean;
+var
+  read: UInt64;
 begin
-  Result := Self.Read() > Self.Tracker.Previous;
+  read := Self.Read();
+  Result := read > Self.Tracker.Previous;
 
   if Result then
   begin
-    if WaspClient.UpdatePayload(Self.Tracker.Current-Self.Tracker.Previous, 0) then
+    if WaspClient.UpdatePayload(Self.Tracker.Earned(), 0) then
       Self.Tracker.Previous := Self.Tracker.Current;
     Activity.Restart();
   end;

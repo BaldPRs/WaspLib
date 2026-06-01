@@ -148,19 +148,25 @@ end;
 function GetDebugLn(text: String; level: ELogLevel; log: Boolean = True): String; overload;
 begin
   case level of
-    ELogLevel.SUCCESS: Result := #0#0'000008' + GetDebugLn(text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000008');
-    ELogLevel.WARN:    Result := #0#0'000002' + GetDebugLn(text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000002');
-    ELogLevel.ERROR:   Result := #0#0'000004' + GetDebugLn(text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000004');
+    ELogLevel.SUCCESS: SetWriteColor($00FF00);
+    ELogLevel.WARN:    SetWriteColor($00FFFF);
+    ELogLevel.ERROR:   SetWriteColor($0000FF);
   end;
+
+  Result := GetDebugLn(text, log);
+  ResetWriteColor();
 end;
 
 function GetDebugLn(name, text: String; level: ELogLevel; log: Boolean = True): String; overload;
 begin
   case level of
-    ELogLevel.SUCCESS: Result := #0#0'000008' + GetDebugLn(name, text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000008');
-    ELogLevel.WARN:    Result := #0#0'000002' + GetDebugLn(name, text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000002');
-    ELogLevel.ERROR:   Result := #0#0'000004' + GetDebugLn(name, text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000004');
+    ELogLevel.SUCCESS: SetWriteColor($00FF00);
+    ELogLevel.WARN:    SetWriteColor($00FFFF);
+    ELogLevel.ERROR:   SetWriteColor($0000FF);
   end;
+
+  GetDebugLn(name, text, log);
+  ResetWriteColor();
 end;
 
 (*
@@ -173,7 +179,7 @@ Show an error dialog and then raises an exception.
 procedure ErrorDialog(name, text: String; log: Boolean = True);
 begin
   ShowDialog(EDialogIcon.ERROR, [EDialogButton.ABORT], name, text);
-  raise GetDebugLn(name, text, log).Replace(LINE_SEP, LINE_SEP + #0#0'000004');
+  raise GetDebugLn(name, text, log);
 end;
 
 (*

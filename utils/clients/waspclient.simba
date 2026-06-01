@@ -276,8 +276,10 @@ function TWaspClient.UpdatePayload(xp, gp: Integer): Boolean;
 var
   item: TJSONItem;
 begin
-  if not Self.IsSetup then Exit;
-  if not Self.Lock.TryEnter() then Exit;
+  if not Self.IsSetup then
+    Exit;
+  if not Self.Lock.TryEnter() then
+    Exit;
 
   item := Self.Payload.Item['experience'];
   item.AsInt := item.AsInt + xp;

@@ -99,7 +99,7 @@ begin
     House.Loader.DrawMap(room, [offset + (i mod 7), offset + (i div 7)]);
   end;
 
-  WriteLn GetDebugLn('HouseViewer', 'Took ' + ToStr(Round(PerformanceTime()-t, 3)) + 'ms to load the house.', ELogLevel.SUCCESS);
+  DebugLn('HouseViewer', 'Took ' + ToStr(Round(PerformanceTime()-t, 3)) + 'ms to load the house.', ELogLevel.SUCCESS);
 end;
 
 var

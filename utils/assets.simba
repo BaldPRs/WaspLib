@@ -29,20 +29,20 @@ begin
   try
     response := HTTPClient.Get(Self.URL + 'hashes.json');
   except
-    WriteLn GetDebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
+    DebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
     Exit(nil);
   end;
 
   if not InRange(HTTPClient.ResponseStatus.AsInteger, 200, 299) then
   begin
-    WriteLn GetDebugLn('WLAssets', response, ELogLevel.WARN);
+    DebugLn('WLAssets', response, ELogLevel.WARN);
     Exit(nil);
   end;
 
   try
     parser.Parse(response);
   except
-    WriteLn GetDebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
+    DebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
     Exit(nil);
   end;
 
@@ -53,13 +53,13 @@ function TWLAssets.LoadJSON(): TJSONObject;
 var
   parser: TJSONParser;
 begin
-  WriteLn GetDebugLn('WLAssets', 'Couldn''t get assets information. WaspLib will attempt to run with whatever it has available.', ELogLevel.WARN);
+  DebugLn('WLAssets', 'Couldn''t get assets information. WaspLib will attempt to run with whatever it has available.', ELogLevel.WARN);
   parser := new TJSONParser();
 
   try
     parser.Load(WLEnv.AssetsDir + 'hashes.json');
   except
-    WriteLn GetDebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
+    DebugLn('WLAssets', GetExceptionMessage(), ELogLevel.WARN);
     Exit;
   end;
 
@@ -73,7 +73,7 @@ var
 begin
   if not InRange(result.Response.AsInteger, 200, 299) then
   begin
-    WriteLn GetDebugLn('WLAssets', result.Exception, ELogLevel.ERROR);
+    DebugLn('WLAssets', result.Exception, ELogLevel.ERROR);
     raise GetDebugLn('WLAssets', 'If you keep having issues please delete your Assets and Cache folders.');
   end;
 
@@ -124,7 +124,7 @@ begin
       if HashFile(EHashAlgo.CRC32, path) <> Self.JSON.Item[i].AsString then
       begin
         key := key.Replace('\', '/');
-        WriteLn GetDebugLn('WLAssets', 'Updating ' + key, ELogLevel.WARN);
+        DebugLn('WLAssets', 'Updating ' + key, ELogLevel.WARN);
         FileDelete(path);
         DirCreate(PathExtractDir(path));
         Self.Queue += path;
@@ -140,8 +140,8 @@ begin
 
       if timer.IsFinished then
       begin
-        WriteLn GetDebugLn('WLAssets', 'Downloading files. ' + ToStr(Length(Self.Queue)) + ' files left, please wait.');
-        WriteLn GetDebugLn('WLAssets', 'Files left: ' + ToStr(Self.Queue).Replace(WLEnv.AssetsDir, ''));
+        DebugLn('WLAssets', 'Downloading files. ' + ToStr(Length(Self.Queue)) + ' files left, please wait.');
+        DebugLn('WLAssets', 'Files left: ' + ToStr(Self.Queue).Replace(WLEnv.AssetsDir, ''));
         timer.Restart();
       end;
 

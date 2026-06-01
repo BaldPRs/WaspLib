@@ -290,8 +290,8 @@ begin
   end;
 
   if Self.SetupAttempts < 3 then Exit;
-  WriteLn GetDebugLn('XPBar', 'Something seems to be wrong with your XPBar.', ELogLevel.WARN);
-  WriteLn GetDebugLn('XPBar', 'If you keep seeing this message fix your XPBar settings!', ELogLevel.WARN);
+  DebugLn('XPBar', 'Something seems to be wrong with your XPBar.', ELogLevel.WARN);
+  DebugLn('XPBar', 'If you keep seeing this message fix your XPBar settings!', ELogLevel.WARN);
 end;
 
 
@@ -324,8 +324,8 @@ begin
 
   if ((count <> 45) and (not InRange(count, 141, 150))) then
   begin
-    WriteLn GetDebugLn('XPBar', 'Your XPBar doesn''t seem to be set to count "Total Experience"', ELogLevel.WARN);
-    WriteLn GetDebugLn('XPBar', 'XP Tracking won''t be used and this can cause issues.', ELogLevel.WARN);
+    DebugLn('XPBar', 'Your XPBar doesn''t seem to be set to count "Total Experience"', ELogLevel.WARN);
+    DebugLn('XPBar', 'XP Tracking won''t be used and this can cause issues.', ELogLevel.WARN);
   end;
 
   if Result < Self.Tracker.Previous then

@@ -235,7 +235,7 @@ begin
     Sleep(100);
     if timer.IsFinished then
     begin
-      WriteLn GetDebugLn('GoalsForm', 'Unzipping files, please wait.');
+      DebugLn('GoalsForm', 'Unzipping files, please wait.');
       timer.Restart();
     end;
 
@@ -387,7 +387,7 @@ begin
   end;
   name := PathExtractName(result.ZipFile);
   msg := 'Finished async unzip of ' +  name + ' in ' + ToStr(Round(result.TimeUsed, 2)) + 'ms.';
-  WriteLn GetDebugLn('GoalsForm', msg, ELogLevel.SUCCESS);
+  DebugLn('GoalsForm', msg, ELogLevel.SUCCESS);
   Self.Unzipping := False;
 end;
 

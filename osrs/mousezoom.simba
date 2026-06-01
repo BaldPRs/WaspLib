@@ -259,9 +259,9 @@ begin
   Result := Self.ZoomLevel;
 
   if Result = -1 then
-    WriteLn GetDebugLn('RSMouseZoom', 'Failed to read zoom!', ELogLevel.ERROR)
+    DebugLn('RSMouseZoom', 'Failed to read zoom!', ELogLevel.ERROR)
   else
-    WriteLn GetDebugLn('RSMouseZoom', 'Current zoom level: ' + ToStr(Options.ZoomLevel), ELogLevel.SUCCESS);
+    DebugLn('RSMouseZoom', 'Current zoom level: ' + ToStr(Options.ZoomLevel), ELogLevel.SUCCESS);
 end;
 
 
@@ -313,9 +313,9 @@ begin
   Result := InRange(Options.ZoomLevel, level-4, level+4);
 
   if Result then
-    WriteLn GetDebugLn('RSMouseZoom', 'Current zoom level set to: ' + ToString(Options.ZoomLevel), ELogLevel.SUCCESS)
+    DebugLn('RSMouseZoom', 'Current zoom level set to: ' + ToString(Options.ZoomLevel), ELogLevel.SUCCESS)
   else
-    WriteLn GetDebugLn('RSMouseZoom', 'Failed to set zoom! Current level: ' + ToString(Options.ZoomLevel), ELogLevel.ERROR);
+    DebugLn('RSMouseZoom', 'Failed to set zoom! Current level: ' + ToString(Options.ZoomLevel), ELogLevel.ERROR);
 end;
 
 var

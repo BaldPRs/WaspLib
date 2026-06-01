@@ -79,14 +79,14 @@ begin
       Self._Hash += Random(256);
 
     hashStr := String.CreateFromBytes(Self._Hash);
-    WriteLn GetDebugLn('Biometrics', 'Random hash created: ' + hashStr, ELogLevel.WARN);
-    WriteLn GetDebugLn('Biometrics', 'Add an account for a permanent one.', ELogLevel.WARN);
+    DebugLn('Biometrics', 'Random hash created: ' + hashStr, ELogLevel.WARN);
+    DebugLn('Biometrics', 'Add an account for a permanent one.', ELogLevel.WARN);
 
     Exit(Self._Hash);
   end;
 
   hashStr := HashString(EHashAlgo.SHA1, Profiles[ProfileIndex].Name + Profiles[ProfileIndex].Username);
-  WriteLn GetDebugLn('Biometrics', 'Current profile seed: ' + hashStr);
+  DebugLn('Biometrics', 'Current profile seed: ' + hashStr);
 
   Self.Index := ProfileIndex;
   Self._Hash := hashStr.ToBytes();

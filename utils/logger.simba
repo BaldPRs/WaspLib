@@ -14,7 +14,7 @@ ELogLevel = enum(SUCCESS, WARN, ERROR);
 ```
 Enum representing log message severity levels.
 *)
-  ELogLevel = enum(SUCCESS, WARN, ERROR);
+  ELogLevel = enum(INFO, SUCCESS, WARN, ERROR);
 
 (*
 ## TLogger
@@ -125,11 +125,9 @@ Global {ref}`TLogger` variable.
 ```pascal
 function GetDebugLn(text: String; log: Boolean = True): String;
 function GetDebugLn(name, text: String; log: Boolean = True): String; overload;
-function GetDebugLn(text: String; level: ELogLevel; log: Boolean = True): String; overload;
-function GetDebugLn(name, text: String; level: ELogLevel; log: Boolean = True): String; overload;
 ```
 Returns a formatted debug string with timestamp.
-Optionally logs to file and applies color formatting based on `level`.
+Optionally logs to file.
 *)
 function GetDebugLn(text: String; log: Boolean = True): String;
 begin
@@ -145,19 +143,33 @@ begin
     Logger.AddLine(Result);
 end;
 
-function GetDebugLn(text: String; level: ELogLevel; log: Boolean = True): String; overload;
+(*
+## DebugLn
+```pascal
+procedure DebugLn(text: String; level: ELogLevel = ELogLevel.INFO; log: Boolean = True);
+procedure DebugLn(
+  name, text: String; level: ELogLevel = ELogLevel.INFO; log: Boolean = True
+); overload;
+```
+Prints a formatted debug string with timestamp.
+Optionally logs to file and applies color formatting based on `level`.
+*)
+procedure DebugLn(text: String; level: ELogLevel = ELogLevel.INFO; log: Boolean = True);
 begin
   case level of
+    ELogLevel.INFO:    begin WriteLn(GetDebugLn(text, log)); Exit; end;
     ELogLevel.SUCCESS: SetWriteColor($00FF00);
     ELogLevel.WARN:    SetWriteColor($00FFFF);
     ELogLevel.ERROR:   SetWriteColor($0000FF);
   end;
 
-  Result := GetDebugLn(text, log);
+  WriteLn(GetDebugLn(text, log));
   ResetWriteColor();
 end;
 
-function GetDebugLn(name, text: String; level: ELogLevel; log: Boolean = True): String; overload;
+procedure DebugLn(
+  name, text: String; level: ELogLevel = ELogLevel.INFO; log: Boolean = True
+); overload;
 begin
   case level of
     ELogLevel.SUCCESS: SetWriteColor($00FF00);
@@ -165,7 +177,7 @@ begin
     ELogLevel.ERROR:   SetWriteColor($0000FF);
   end;
 
-  GetDebugLn(name, text, log);
+  WriteLn(GetDebugLn(name, text, log));
   ResetWriteColor();
 end;
 
@@ -215,7 +227,10 @@ var
 begin
   formatted := Format(text, vars);
   Self.AddLine(Format('%s:[Success]: %s', [GetTimeStamp(), formatted]));
-  WriteLn(GetDebugLn(Self.Name, formatted, ELogLevel.SUCCESS, False));
+
+  SetWriteColor($00FF00);
+  WriteLn(GetDebugLn(Self.Name, formatted, False));
+  ResetWriteColor();
 end;
 
 (*
@@ -231,7 +246,10 @@ var
 begin
   formatted := Format(text, vars);
   Self.AddLine(Format('%s:[Warn]: %s', [GetTimeStamp(), formatted]));
-  WriteLn(GetDebugLn(Self.Name, formatted, ELogLevel.WARN, False));
+
+  SetWriteColor($00FFFF);
+  WriteLn(GetDebugLn(Self.Name, formatted, False));
+  ResetWriteColor();
 end;
 
 (*
@@ -247,7 +265,10 @@ var
 begin
   formatted := Format(text, vars);
   Self.AddLine(Format('%s:[ERROR]: %s', [GetTimeStamp(), formatted]));
-  WriteLn(GetDebugLn(Self.Name, formatted, ELogLevel.ERROR, False));
+
+  SetWriteColor($0000FF);
+  WriteLn(GetDebugLn(Self.Name, formatted, False));
+  ResetWriteColor();
 end;
 
 (*

@@ -318,7 +318,7 @@ begin
 
   if status > 299 then
     logLevel := ELogLevel.WARN;
-  WriteLn GetDebugLn('WaspClient', '[' + ToStr(status) + ']: ' + response, logLevel);
+  DebugLn('WaspClient', '[' + ToStr(status) + ']: ' + response, logLevel);
 end;
 
 procedure TWaspClient.SubmitStats();

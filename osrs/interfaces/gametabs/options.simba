@@ -248,14 +248,14 @@ begin
   Result := Self.Sliders[ERSOptionsSlider.ZOOM].GetLevel();
   if Result = -1 then
   begin
-    WriteLn GetDebugLn('Options', 'Failed to read zoom!', ELogLevel.ERROR);
+    DebugLn('Options', 'Failed to read zoom!', ELogLevel.ERROR);
     Exit;
   end;
 
   if Result <> Self.ZoomLevel then
   begin
     Self.ZoomLevel := Result;
-    WriteLn GetDebugLn('Options', 'Current zoom level: ' + ToStr(Result), ELogLevel.SUCCESS);
+    DebugLn('Options', 'Current zoom level: ' + ToStr(Result), ELogLevel.SUCCESS);
   end;
 end;
 
@@ -279,7 +279,7 @@ begin
   if useCache and (Self.ZoomLevel > -1) then
     Exit(Self.ZoomLevel);
 
-  WriteLn GetDebugLn('Options', 'Unknown zoom level, reading from the gametab...');
+  DebugLn('Options', 'Unknown zoom level, reading from the gametab...');
 
   //Self.Zoom level is checked on TRSOptions.GetTab() override
   Self.OpenTab(ERSOptionsTab.DISPLAY);
@@ -307,12 +307,12 @@ begin
   if Result then
   begin
     Self.ZoomLevel := level;
-    WriteLn GetDebugLn('Options', 'Current zoom level set to: ' + ToString(Self.ZoomLevel), ELogLevel.SUCCESS);
+    DebugLn('Options', 'Current zoom level set to: ' + ToString(Self.ZoomLevel), ELogLevel.SUCCESS);
   end
   else
   begin
     Self.ZoomLevel := -1;
-    WriteLn GetDebugLn('Options', 'Failed to set zoom!', ELogLevel.ERROR);
+    DebugLn('Options', 'Failed to set zoom!', ELogLevel.ERROR);
   end;
 end;
 
@@ -449,7 +449,7 @@ begin
 
   if Self.GetRoofsState() then Exit(True);
 
-  WriteLn GetDebugLn('Options', 'TODO: Finish HideRoofs with All Settings menu...', ELogLevel.ERROR);
+  DebugLn('Options', 'TODO: Finish HideRoofs with All Settings menu...', ELogLevel.ERROR);
 
   Result := SleepUntil(Self.GetRoofsState(), 100, 1200);
 
@@ -475,7 +475,7 @@ begin
 
   if not Self.GetRoofsState() then Exit(True);
 
-  WriteLn GetDebugLn('Options', 'TODO: Finish ShowRoofs with All Settings menu...', ELogLevel.ERROR);
+  DebugLn('Options', 'TODO: Finish ShowRoofs with All Settings menu...', ELogLevel.ERROR);
 
   Result := SleepUntil(not Self.GetRoofsState(), 100, 1200);
 

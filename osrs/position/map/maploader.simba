@@ -22,7 +22,7 @@ Credits: Torwent
 
 {$IFDEF RANGECHECKS}
 begin
-  WriteLn GetDebugLn('MapLoader', 'Range checks are enabled for MapLoader, these should be disabled in production!', ELogLevel.WARN);
+  DebugLn('MapLoader', 'Range checks are enabled for MapLoader, these should be disabled in production!', ELogLevel.WARN);
 end;
 {$ENDIF}
 
@@ -255,7 +255,7 @@ begin
   end;
   name := PathExtractName(result.ZipFile);
   msg := 'Finished async unzip of ' +  name + ' in ' + ToStr(Round(result.TimeUsed, 2)) + 'ms.';
-  WriteLn GetDebugLn('MapLoader', msg, ELogLevel.SUCCESS);
+  DebugLn('MapLoader', msg, ELogLevel.SUCCESS);
   Self.Unzipping := False;
 end;
 
@@ -303,7 +303,7 @@ begin
     Sleep(100);
     if timer.IsFinished then
     begin
-      WriteLn GetDebugLn('MapLoader', 'Unzipping files, please wait.');
+      DebugLn('MapLoader', 'Unzipping files, please wait.');
       timer.Restart();
     end;
 

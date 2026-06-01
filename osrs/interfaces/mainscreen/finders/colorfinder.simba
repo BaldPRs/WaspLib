@@ -80,7 +80,7 @@ CTS2(5526875, 15, 0.19, 0.06), // grey
 
 {$IFDEF RANGECHECKS}
 begin
-  WriteLn GetDebugLn('TColorFinder', 'Range checks are enabled for TColorFinder, these should be disabled in production!', ELogLevel.WARN);
+  DebugLn('TColorFinder', 'Range checks are enabled for TColorFinder, these should be disabled in production!', ELogLevel.WARN);
 end;
 {$ENDIF}
 
@@ -286,7 +286,7 @@ begin
   begin
     if Self.ColorClusters[i].Distance <= 0 then
     begin
-      WriteLn GetDebugLn('TColorFinder', 'Skipping cluster with 0 distance, make it higher than 0!', ELogLevel.WARN);
+      DebugLn('TColorFinder', 'Skipping cluster with 0 distance, make it higher than 0!', ELogLevel.WARN);
       Continue;
     end;
 

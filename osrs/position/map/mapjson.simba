@@ -28,7 +28,7 @@ begin
   end;
   name := PathExtractName(result.ZipFile);
   msg := 'Finished async unzip of ' +  name + ' in ' + ToStr(Round(result.TimeUsed, 2)) + 'ms.';
-  WriteLn GetDebugLn('MapJSON', msg, ELogLevel.SUCCESS);
+  DebugLn('MapJSON', msg, ELogLevel.SUCCESS);
   Self.Unzipping := False;
 end;
 

@@ -196,7 +196,7 @@ begin
       if not parser.GetString('pin', pin) then raise 'pin error';
       if not parser.GetArray('worlds', worldsJSON) then raise 'worlds error';
     except
-      WriteLn GetDebugLn('Profiles', 'Error loading profile ' + ToStr(i) + ': ' + GetExceptionMessage(), ELogLevel.ERROR);
+      DebugLn('Profiles', 'Error loading profile ' + ToStr(i) + ': ' + GetExceptionMessage(), ELogLevel.ERROR);
       FileDelete(path + ToStr(i) + '.json');
       Continue;
     end;

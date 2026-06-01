@@ -408,7 +408,7 @@ begin
       if Self.CapeTab <> ERSGameTab.NONE then
         GameTabs.Open(Self.CapeTab);
       //TODO... GEARHANDLER;
-      WriteLn GetDebugLn('TRSHouse', '"Enter" method is missing gear handler to handle capes: ' + ToStr(CAPES), ELogLevel.WARN);
+      DebugLn('TRSHouse', '"Enter" method is missing gear handler to handle capes: ' + ToStr(CAPES), ELogLevel.WARN);
       //if not CAPES.Interact(Self.HouseTeleportItem, 'Tele to POH') then Exit;
       Self.CapeTab := GameTabs.GetCurrent();
     end;

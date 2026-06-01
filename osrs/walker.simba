@@ -12,7 +12,7 @@ iterations made by Olly.
 
 {$IFDEF RANGECHECKS}
 begin
-  WriteLn GetDebugLn('TRSWalker', 'Range checks are enabled for TRSWalker, these should be disabled in production!', ELogLevel.WARN);
+  DebugLn('TRSWalker', 'Range checks are enabled for TRSWalker, these should be disabled in production!', ELogLevel.WARN);
 end;
 {$ENDIF}
 
@@ -929,7 +929,7 @@ begin
   end;
 
   if fails = 10 then
-    WriteLn GetDebugLn(Self.Name, 'Failed to advance path', ELogLevel.WARN);
+    DebugLn(Self.Name, 'Failed to advance path', ELogLevel.WARN);
 end;
 
 (*

@@ -133,8 +133,8 @@ begin
 
   if Minimap.Radius = 0 then
   begin
-    WriteLn GetDebugLn('Map', 'Minimap.Radius is 0, did you target the client? Using 65 for now.', ELogLevel.WARN);
-    WriteLn GetDebugLn('Map', 'If you are botting focus the client and restart or you will have issues.', ELogLevel.WARN);
+    DebugLn('Map', 'Minimap.Radius is 0, did you target the client? Using 65 for now.', ELogLevel.WARN);
+    DebugLn('Map', 'If you are botting focus the client and restart or you will have issues.', ELogLevel.WARN);
     img := new TImage(131,131);
     img.ReplaceColor($0, $FFFFFF);
     sample := Minimap.ScaleMinimap(img, Self.Loader.Downscale, 65);

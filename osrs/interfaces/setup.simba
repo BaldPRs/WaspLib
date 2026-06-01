@@ -67,7 +67,7 @@ begin
   CargoHold.SetupInterface();
 
   {$IFDEF WL_DEBUG_INTERFACES}
-  WriteLn GetDebugLn('RSClient', 'Interface setup took ' + ToStr(Time()-t) + 'ms to calculate.');
+  DebugLn('RSClient', 'Interface setup took ' + ToStr(Time()-t) + 'ms to calculate.');
   {$ENDIF}
 end;
 
@@ -76,7 +76,7 @@ procedure TargetResized(sender: TTarget; data: TTargetEventData);
 var
   rads: Single;
 begin
-  WriteLn(GetDebugLn('RSClient', 'Client was resized, updating coordinates.'));
+  DebugLn('RSClient', 'Client was resized, updating coordinates.');
   RSClient.Mode := ERSMode.UNKNOWN;
   RSClient.Clear();
 
@@ -124,7 +124,7 @@ var
 begin
   if mode <> sender^.Mode then
   begin
-    WriteLn(GetDebugLn('RSClient', 'Client mode changed: ' + ToStr(mode), ELogLevel.SUCCESS));
+    DebugLn('RSClient', 'Client mode changed: ' + ToStr(mode), ELogLevel.SUCCESS);
     sender^.Mode := mode;
     SetupInterfaces();
   end;

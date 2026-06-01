@@ -89,7 +89,7 @@ jobs:
     steps:
       #Simba
       - name: Check Simba64 cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         id: simba-cache
         with:
           path: |
@@ -110,7 +110,7 @@ jobs:
 
       #Plugins
       - name: Cache wasp-plugins
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         id: wasp-plugins-cache
         with:
           path: ./Plugins/wasp-plugins
@@ -125,7 +125,7 @@ jobs:
 
       #Assets
       - name: Cache wasp-assets
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         id: wasp-assets-cache
         with:
           path: ./Data/Assets

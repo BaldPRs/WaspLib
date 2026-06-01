@@ -294,7 +294,7 @@ begin
       end;
   end;
   {$ELSE}
-  WriteLn(GetDebugLn('RSClient', 'DisableRealInput method is not implemented without a fake input tool.', ELogLevel.WARN));
+  DebugLn('RSClient', 'DisableRealInput method is not implemented without a fake input tool.', ELogLevel.WARN);
   {$ENDIF}
 end;
 
@@ -325,7 +325,7 @@ begin
       end;
   end;
   {$ELSE}
-  WriteLn(GetDebugLn('RSClient', 'EnableRealInput method is not implemented without a fake input tool.', ELogLevel.WARN));
+  DebugLn('RSClient', 'EnableRealInput method is not implemented without a fake input tool.', ELogLevel.WARN);
   {$ENDIF}
 end;
 
@@ -356,7 +356,7 @@ begin
   AddOnTerminate(@Self.Clear);
   AddOnTerminate(@Self.EnableRealInput);
   {$ELSE}
-  WriteLn(GetDebugLn('RSClient', 'InjectInput method is not implemented without a fake input tool.', ELogLevel.WARN));
+  DebugLn('RSClient', 'InjectInput method is not implemented without a fake input tool.', ELogLevel.WARN);
   {$ENDIF}
 end;
 

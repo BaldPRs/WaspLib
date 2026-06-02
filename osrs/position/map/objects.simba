@@ -96,6 +96,9 @@ var
   color: TColor;
   best: TBestColor;
 begin
+  if json = nil then
+    raise GetDebugLn('TRSObject', 'JSON is nil.');
+
   if json.Typ <> EJSONType.OBJ then
     raise GetDebugLn('TRSObject', 'JSON Object expected, got ' + ToStr(json.Typ) + '.');
 

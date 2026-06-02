@@ -158,7 +158,7 @@ begin
     end;
 
   if ids = [] then
-    raise GetDebugLn('MapJSON', 'Entry with name ' + name + ' doesn''t exist on the loaded maps.');
+    Exit;
 
   if amount = 0 then
     Exit;
@@ -191,7 +191,7 @@ begin
     end;
 
   if idx = -1 then
-    raise GetDebugLn('MapJSON', 'Entry with ID ' + ToStr(id) + ' doesn''t exist on the loaded maps.');
+    Exit;
 
   Result := Self.Data.Item[idx].Clone();
 
@@ -243,7 +243,66 @@ begin
       end;
 
   if ids = [] then
-    raise GetDebugLn('MapJSON', 'Entry with action ' + action + ' doesn''t exist on the loaded maps.');
+    Exit;
+
+  if amount = 0 then
+    Exit;
+
+  for i := idx+1 to Self.Data.Count - 1 do
+    if Self.Data.Item[i].Item['id'].AsInt in ids then
+      Result.AddObject('result', Self.Data.Item[i].Clone());
+end;
+
+(*
+## MapJSON.GetByAllActions
+```pascal
+function TMapJSON.GetByAllActions(actions: TStringArray; amount: Integer = 0): TJSONArray;
+```
+Returns a `TJSONArray` of `JSONObjects` of a map object or npc that has all the specified
+`actions`.
+
+By default you get all entries that match the `actions`, however, if you want
+you can specify how many unique IDs you want through `amount`.
+*)
+function TMapJSON.GetByAllActions(actions: TStringArray; amount: Integer = 0): TJSONArray;
+var
+  i, j, l, idx, id: Integer;
+  ids: TIntegerArray;
+  tmp: TStringArray;
+begin
+  if Self.Data.Count = 0 then
+    Self.Load();
+
+  Result := new TJSONArray();
+
+  for i := 0 to Self.Data.Count-1 do
+  begin
+    tmp := actions.Copy();
+
+    for j := 0 to Self.Data.Item[i].Item['actions'].Count-1 do
+    begin
+      for l := High(tmp) downto 0 do
+        if tmp[l] = Self.Data.Item[i].Item['actions'].Item[j].AsString then
+          Delete(tmp, l, 1);
+
+      if tmp <> [] then
+        Continue;
+
+      idx := i;
+      Result.AddObject('result', Self.Data.Item[idx].Clone());
+      id := Self.Data.Item[idx].Item['id'].AsInt;
+      if not ids.Contains(id) then
+      begin
+        ids += id;
+        if Length(ids) = amount then
+          Break(2);
+      end;
+      Break;
+    end;
+  end;
+
+  if ids = [] then
+    Exit;
 
   if amount = 0 then
     Exit;
@@ -258,7 +317,7 @@ procedure TMapJSON.Print();
 begin
   if Self.Data.Count = 0 then
     Self.Load();
-  WriteLn Self.Data.Format([EJSONFormatOption.NO_QUOTE_MEMBERS, EJSONFormatOption.SINGLE_LINE_ARR]);
+  WriteLn Self.Data.Format([EJSONFormatOption.SINGLE_LINE_ARR]);
 end;
 
 var

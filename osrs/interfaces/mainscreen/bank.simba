@@ -1537,10 +1537,10 @@ end.
 *)
 function TRSBank.IsSlotLocked(slot: Integer): Boolean;
 var
-  box: TBox;
+  bounds: TBox;
 begin
-  box := Inventory.Slots.Box(slot);
-  Result := Target.FindColor($0000ff, 4, box.Expand(2, 1)).Intersection(box.Expand(1, 0).Corners()).Length = 4;
+  bounds := Inventory.Slots.Box(slot);
+  Result := Target.FindColor($0000FF, 4, bounds.Expand(2, 1)).Intersection(bounds.Expand(1, 0).Corners()).Length = 4;
 end;
 
 (*
@@ -1586,7 +1586,7 @@ end.
 function TRSBank.LockSlot(slot: Integer): Boolean;
 begin
   if Self.IsSlotLocked(slot) then Exit(True);
-  Result := Self.Slots.Interact(slot, 'Lock-slot') and SleepUntil(Self.IsSlotLocked(slot), Random(100, 300), 1200);
+  Result := Inventory.Slots.Interact(slot, 'Lock-slot') and SleepUntil(Self.IsSlotLocked(slot), Random(100, 300), 2*TICK);
 end;
 
 (*
@@ -1608,7 +1608,7 @@ end.
 function TRSBank.UnlockSlot(slot: Integer): Boolean;
 begin
   if not Self.IsSlotLocked(slot) then Exit(True);
-  Result := Self.Slots.Interact(slot, 'Unlock-slot') and SleepUntil(not Self.IsSlotLocked(slot), Random(100, 300), 1200);
+  Result := Inventory.Slots.Interact(slot, 'Unlock-slot') and SleepUntil(not Self.IsSlotLocked(slot), Random(100, 300), 2*TICK);
 end;
 
 var

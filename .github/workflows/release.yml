@@ -114,14 +114,15 @@ jobs:
 
       - name: Download Simba 2.0 (${{ matrix.target.arch }})
         if: steps.simba-cache.outputs.cache-hit != 'true'
+        shell: bash
         run: |
-          $baseUrl = "${{ needs.setup.outputs.base_url }}"
-          $downloadUrl = "$baseUrl" + "${{ matrix.target.arch }}.zip?raw=true"
-          Write-Output "Download ${{ matrix.target.arch }} URL: $downloadUrl"
-          $outputFile = ".\download.zip"
-          Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFile
-          Expand-Archive -Path $outputFile -DestinationPath . -Force
-          Remove-Item -Path $outputFile -Force
+          base_url="${{ needs.setup.outputs.base_url }}"
+          download_url="${base_url}${{ matrix.target.arch }}.zip?raw=true"
+          echo "Download ${{ matrix.target.arch }} URL: $download_url"
+          output_file="download.zip"
+          curl -L "$download_url" -o "$output_file"
+          unzip -o "$output_file" -d .
+          rm -f "$output_file"
 
       #Plugins
       - name: Cache wasp-plugins

@@ -86,16 +86,16 @@ jobs:
         target:
           - os: windows-latest
             arch: Win32
-            exec: Win32.exe
+            exec: ./Simba-Win32.exe
           - os: windows-latest
             arch: Win64
-            exec: Win64.exe
+            exec: ./Simba-Win64.exe
           - os: ubuntu-latest
             arch: Linux64
-            exec: Linux64
+            exec: xvfb-run -a ./Simba-Linux64
           - os: ubuntu-latest-arm
             arch: Linux arm64
-            exec: Linux
+            exec: xvfb-run -a ./Simba-Linux
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}
@@ -161,16 +161,17 @@ jobs:
           path: ./Includes/WaspLib
 
       - name: Install GTK2
-        if: startsWith(matrix.target.arch, 'Linux')
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
+          sudo apt-get install -y xvfb
           sudo apt-get install -y gtk2.0
 
       - name: Run tests
         shell: bash
         run: |
           echo "Running test ${{ matrix.file }} on ${{ matrix.target.arch }}"
-          ./Simba-${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+          ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
 
   release:
     needs: tests

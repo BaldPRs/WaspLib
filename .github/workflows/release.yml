@@ -117,7 +117,9 @@ jobs:
         shell: bash
         run: |
           base_url="${{ needs.setup.outputs.base_url }}"
-          download_url="${base_url}${{ matrix.target.arch }}.zip?raw=true"
+          arch="${{ matrix.target.arch }}"
+          arch="${arch// /%20}"
+          download_url="${base_url}${arch}.zip?raw=true"
           echo "Download ${{ matrix.target.arch }} URL: $download_url"
           output_file="download.zip"
           curl -L "$download_url" -o "$output_file"

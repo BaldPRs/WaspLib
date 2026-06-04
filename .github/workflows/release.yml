@@ -100,7 +100,7 @@ jobs:
             arch: Mac arm64
             exec: Mac arm64
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.target.os }}
     steps:
       #Simba
       - name: Check Simba64 cache

@@ -193,26 +193,26 @@ function TRSMake.GetQuantityButtons(): array of TRSMakeQuantityButton;
 var
   boxes: TBoxArray;
   i: Integer;
-  quantityStr: String;
+  str: String;
 begin
   boxes := Self.GetQuantityBoxes();
   SetLength(Result, Length(boxes));
 
   for i := 0 to High(boxes) do
   begin
-    quantityStr := OCR.Recognize(boxes[i], RSFonts.PLAIN_11, [Self.TEXT_COLOR, RSFonts.WHITE], 0);
+    str := OCR.Recognize(boxes[i], RSFonts.PLAIN_11, [Self.TEXT_COLOR, RSFonts.WHITE], 0);
 
-    Result[i].Quantity := ERSItemQuantity.String2Quantity(quantityStr);
+    Result[i].Quantity := ERSItemQuantity.String2Quantity(str);
     Result[i].Button := new TRSButton(boxes[i], [[RSFonts.WHITE, 0]]);
 
-    if quantityStr.Equals('X', True) then
+    if str.Equals('X', True) then
     begin
       Result[i].UpText := 'Other';
       Continue;
     end;
 
-    RSFonts.PLAIN_11.NormalizeGlyphs(quantityStr, '0123456789');
-    Result[i].UpText := quantityStr;
+    str := RSFonts.PLAIN_11.NormalizeGlyphs(str, '0123456789');
+    Result[i].UpText := str;
   end;
 end;
 

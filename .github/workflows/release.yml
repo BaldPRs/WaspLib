@@ -176,8 +176,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gtk2.0
-          export DISPLAY=:1
-          Xvfb :1 & sleep 2
 
       - name: Run tests
         shell: bash
@@ -185,15 +183,11 @@ jobs:
           echo "Running test ${{ matrix.file }} on ${{ matrix.target.arch }}"
 
           if [ "$RUNNER_OS" = "macOS" ]; then
-            APP=$(find /Volumes -name Simba.app -type d | head -n1)
-
-            "$APP/Contents/MacOS/Simba" \
-              --extractopenssl \
-              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+            "$APP_PATH/Contents/MacOS/Simba" --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+          else if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           else
-            ${{ matrix.target.exec }} \
-              --extractopenssl \
-              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+            ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           fi
 
   release:

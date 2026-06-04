@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gtk2.0
-          ls ./Plugins/wasp-plugins/libtpaex
+          mv ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex.so.aarch64
 
       - name: Run tests
         shell: bash

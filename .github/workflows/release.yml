@@ -80,22 +80,27 @@ jobs:
 
   tests:
     needs: setup
-    runs-on: windows-latest
     strategy:
       fail-fast: true
       matrix:
         target:
-          - arch: Win32
+          - os: windows-latest
+            arch: Win32
             exec: Win32.exe
-          - arch: Win64
+          - os: windows-latest
+            arch: Win64
             exec: Win64.exe
-          - arch: Linux64
+          - os: ubuntu-latest
+            arch: Linux64
             exec: Linux64
-          - arch: Linux arm64
+          - os: ubuntu-latest-arm
+            arch: Linux arm64
             exec: Linux arm64
-          - arch: Mac arm64
+          - os: macos-latest
+            arch: Mac arm64
             exec: Mac arm64
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
+    runs-on: ${{ matrix.os }}
     steps:
       #Simba
       - name: Check Simba64 cache

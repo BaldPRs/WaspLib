@@ -84,8 +84,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        arch: [Win32, Win64, Linux64, "Linux arm64", "Mac arm64"]
-        exec: [Win32.exe, Win64.exe, Linux64, "Linux arm64", "Mac arm64"]
+        target:
+          - arch: Win32
+            exec: Win32.exe
+          - arch: Win64
+            exec: Win64.exe
+          - arch: Linux64
+            exec: Linux64
+          - arch: Linux arm64
+            exec: Linux arm64
+          - arch: Mac arm64
+            exec: Mac arm64
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     steps:
       #Simba
@@ -94,16 +103,16 @@ jobs:
         id: simba-cache
         with:
           path: |
-            ./Simba-${{ matrix.arch }}.exe
-          key: simba-cache-${{ matrix.arch }}-${{ needs.setup.outputs.build_hash }}
+            ./Simba-${{ matrix.target.arch }}.exe
+          key: simba-cache-${{ matrix.target.arch }}-${{ needs.setup.outputs.build_hash }}
           enableCrossOsArchive: true
 
-      - name: Download Simba 2.0 (${{ matrix.arch }})
+      - name: Download Simba 2.0 (${{ matrix.target.arch }})
         if: steps.simba-cache.outputs.cache-hit != 'true'
         run: |
           $baseUrl = "${{ needs.setup.outputs.base_url }}"
-          $downloadUrl = "$baseUrl" + "${{ matrix.arch }}.zip?raw=true"
-          Write-Output "Download ${{ matrix.arch }} URL: $downloadUrl"
+          $downloadUrl = "$baseUrl" + "${{ matrix.target.arch }}.zip?raw=true"
+          Write-Output "Download ${{ matrix.target.arch }} URL: $downloadUrl"
           $outputFile = ".\download.zip"
           Invoke-WebRequest -Uri $downloadUrl -OutFile $outputFile
           Expand-Archive -Path $outputFile -DestinationPath . -Force
@@ -148,8 +157,8 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          echo "Running test ${{ matrix.file }} on ${{ matrix.arch }}"
-          ./Simba-${{ matrix.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+          echo "Running test ${{ matrix.file }} on ${{ matrix.target.arch }}"
+          ./Simba-${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
 
   release:
     needs: tests

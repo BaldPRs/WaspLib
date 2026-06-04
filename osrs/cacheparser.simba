@@ -46,10 +46,10 @@ Internal method responsible for setting up the {ref}`TRSCacheParser`.
 This is automatically called for you on the {ref}`RSCacheParser variable`.
 *)
 procedure TRSCacheParser.Setup();
+{$IFDEF WINDOWS}
 var
-  {$IFDEF WINDOWS}
   paths: TStringArray;
-  {$ENDIF}
+{$ENDIF}
 begin
   case RSClient.Client of
     ERSClient.LEGACY:

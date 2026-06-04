@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        arch: [Win32, Win64]
+        arch: [Win32, Win64, Linux64, "Linux arm64", "Mac arm64"]
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     steps:
       #Simba

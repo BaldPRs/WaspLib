@@ -98,7 +98,7 @@ jobs:
           #   exec: xvfb-run -a ./Simba-Linux
           - os: macos-latest
             arch: Mac arm64
-            exec: Mac-Arm.dmg
+            exec: ./Simba-Mac-Arm.dmg
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}

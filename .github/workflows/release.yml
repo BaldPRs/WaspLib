@@ -93,7 +93,7 @@ jobs:
           - os: ubuntu-latest
             arch: Linux64
             exec: xvfb-run -a ./Simba-Linux64
-          - os: ubuntu-latest-arm
+          - os: ubuntu-24.04-arm
             arch: Linux arm64
             exec: xvfb-run -a ./Simba-Linux
 

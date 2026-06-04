@@ -300,6 +300,7 @@ begin
   if current.UpText.Equals('All', True) then
     Exit(-1);
 
+  WriteLn('Text is: ', current.UpText);
   Result := StrToInt(current.UpText);
 end;
 

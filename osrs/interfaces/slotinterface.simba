@@ -173,6 +173,47 @@ begin
 end;
 
 
+function TRSSlotInterface._Near(slot: Integer; slots: TIntegerArray; out weights: TDoubleArray; maxDist: Single; removeSlot: Boolean): TIntegerArray;
+var
+  tmp: TIntegerArray;
+  slt: Integer;
+  boxes: TBoxArray;
+  center: TPoint;
+  dist: Double;
+  i: Integer;
+begin
+  tmp := slots.Copy();
+  if removeSlot then
+    tmp.Remove(slot);
+
+  if tmp = [] then
+    raise GetDebugLn(Self.Name, 'RandomSlotNearby: No slots to choose from');
+
+  boxes := Self.Boxes();
+  center := boxes[slot].Center;
+
+  //over allocate memory
+  SetLength(weights, Length(tmp));
+  SetLength(Result, Length(tmp));
+
+  for slt in tmp do
+  begin
+    dist := center.DistanceTo(boxes[slt].Center);
+    if dist <= maxDist then
+    begin
+      weights[i] := dist;
+      Result[i] := slt;
+      Inc(i);
+    end;
+  end;
+
+  //downsize over allocated memory
+  SetLength(weights, i);
+  SetLength(Result, i);
+
+  Result := Result.Sorted(weights, True);
+end;
+
 (*
 ## Slots.Near
 ```pascal
@@ -196,28 +237,15 @@ end.
 *)
 function TRSSlotInterface.Near(slot: Integer; slots: TIntegerArray; maxDist: Single = 60; removeSlot: Boolean = True): TIntegerArray;
 var
-  slt: Integer;
-  boxes: TBoxArray;
-  center: TPoint;
+  weights: TDoubleArray;
 begin
-  if removeSlot then
-    slots.Remove(slot);
-
-  if slots = [] then
-    raise GetDebugLn(Self.Name, 'RandomSlotNearby: No slots to choose from');
-
-  boxes := Self.Boxes();
-  center := boxes[slot].Center;
-
-  for slt in slots do
-    if center.InRange(boxes[slt].Center, maxDist) then
-      Result += slt;
+  Result := Self._Near(slot, slots, weights, maxDist, removeSlot);
 end;
 
 (*
 ## Slots.RandomNear
 ```pascal
-function TRSSlotInterface.RandomNear(slot: Integer; slots: TIntegerArray; maxDist: Single = 60; distribution: ERandomDistribution = ERandomDistribution.GAUSS): Integer;
+function TRSSlotInterface.RandomNear(slot: Integer; slots: TIntegerArray; maxDist: Single = 800; distribution: ERandomDistribution = ERandomDistribution.GAUSS): Integer;
 ```
 From the `slots` array which should be an array of indices for `Slots.Boxes`,
 return a random index that is "near" `slot` based on the `maxDist` value.
@@ -239,32 +267,34 @@ end.
 ```{figure} ../../images/slotsrandomnear.gif
 ```
 *)
-function TRSSlotInterface.RandomNear(slot: Integer; slots: TIntegerArray; maxDist: Single = 60; removeSlot: Boolean = True; distribution: ERandomDistribution = ERandomDistribution.GAUSS): Integer;
+function TRSSlotInterface.RandomNear(slot: Integer; slots: TIntegerArray; maxDist: Single = 800; removeSlot: Boolean = True; distribution: ERandomDistribution = ERandomDistribution.GAUSS): Integer;
 var
-  near, weights: TIntegerArray;
-  slt: Integer;
-  boxes: TBoxArray;
-  center: TPoint;
+  near: TIntegerArray;
+  distances: TDoubleArray;
+  i, limit: Integer;
 begin
   case Length(slots) of
-    0: Exit;
+    0: Exit(-1);
     1: Exit(slots.First);
   end;
 
-  near := Self.Near(slot, slots, maxDist, removeSlot);
+  near := Self._Near(slot, slots, distances, maxDist, removeSlot);
   if near = [] then
-    Exit;
+    Exit(-1);
 
   if distribution = ERandomDistribution.RANDOM then
     Exit(near.Random());
 
-  boxes := Self.Boxes();
-  center := boxes[slot].Center;
+  limit := Round(distances[0]) div 60;
 
-  for slt in near do
-    weights += Round(center.DistanceTo(boxes[slt].Center));
+  for i := 1 to High(distances) do
+    if (Round(distances[i]) div 60) > limit then
+    begin
+      SetLength(near, i);
+      Break;
+    end;
 
-  Result := near.Sorted(weights, True)[RandomLeft(0, High(near))];
+  Result := near.Random();
 end;
 
 

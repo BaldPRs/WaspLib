@@ -1543,9 +1543,12 @@ end.
 function TRSBank.IsSlotLocked(slot: Integer): Boolean;
 var
   bounds: TBox;
+  tpa: TPointArray;
 begin
   bounds := Inventory.Slots.Box(slot);
-  Result := Target.FindColor($0000FF, 4, bounds.Expand(2, 1)).Intersection(bounds.Expand(1, 0).Corners()).Length = 4;
+  tpa := Target.FindColor($0000FF, 4, bounds.Expand(2, 1));
+  tpa := tpa.ExcludeBox(bounds);
+  Result := Length(tpa) >= 100;
 end;
 
 (*

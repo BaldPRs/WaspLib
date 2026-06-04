@@ -184,7 +184,7 @@ jobs:
 
           if [ "$RUNNER_OS" = "macOS" ]; then
             "$APP_PATH/Contents/MacOS/Simba" --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
-          else if [ "$RUNNER_OS" = "Linux" ]; then
+          elif [ "$RUNNER_OS" = "Linux" ]; then
             xvfb-run -a ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           else
             ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"

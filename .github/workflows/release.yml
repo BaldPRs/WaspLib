@@ -90,12 +90,12 @@ jobs:
           - os: windows-latest
             arch: Win64
             exec: ./Simba-Win64.exe
-          # - os: ubuntu-latest
-          #   arch: Linux64
-          #   exec: xvfb-run -a ./Simba-Linux64
-          # - os: ubuntu-latest-arm
-          #   arch: Linux arm64
-          #   exec: xvfb-run -a ./Simba-Linux
+          - os: ubuntu-latest
+            arch: Linux64
+            exec: xvfb-run -a ./Simba-Linux64
+          - os: ubuntu-latest-arm
+            arch: Linux arm64
+            exec: xvfb-run -a ./Simba-Linux
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}

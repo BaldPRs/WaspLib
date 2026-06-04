@@ -6,6 +6,54 @@ This page is about WaspLib's OCR.
 {$DEFINE WL_OCR_INCLUDED}
 {$INCLUDE_ONCE WaspLib/utils.simba}
 
+function TPixelFont.SameGlyph(const a, b: Char): Boolean;
+var
+  aN, bN: Integer;
+begin
+  for aN := 0 to High(Self.Glyphs) do
+    if Self.Glyphs[aN].Value = a then
+      Break;
+  for bN := 0 to High(Self.Glyphs) do
+    if Self.Glyphs[bN].Value = b then
+      Break;
+
+  Result := Self.GlyphSimilarities[aN, bN] = $FF;
+end;
+
+function TPixelFont.SameText(const s1, s2: String): Boolean;
+var
+  i: Integer;
+begin
+  if Length(s1) <> Length(s2) then
+     Exit(False);
+  for i := 1 to Length(s1) do
+     if not Self.SameGlyph(s1[i], s2[i]) then
+        Exit(False);
+  Result := True;
+end;
+
+procedure TPixelFont.ReplaceAlignedGlyphs(var s1: String; const s2: String);
+var
+  i: Integer;
+begin
+  for i := 1 to Min(Length(s1), Length(s2)) do
+    if Self.SameGlyph(s1[i], s2[i]) then
+      s1[i] := s2[i];
+end;
+
+procedure TPixelFont.NormalizeGlyphs(var s1: String; const s2: String);
+var
+  i, j: Integer;
+begin
+  for i := 1 to Length(s1) do
+    for j := 1 to Length(s2) do
+      if Self.SameGlyph(s1[i], s2[j]) then
+      begin
+        s1[i] := s2[j];
+        Continue(2);
+      end;
+end;
+
 var
   TEXT_SHADOW: TColor = $000000;
 

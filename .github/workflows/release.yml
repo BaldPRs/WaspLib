@@ -92,13 +92,13 @@ jobs:
             exec: ./Simba-Win64.exe
           - os: ubuntu-latest
             arch: Linux64
-            exec: xvfb-run -a ./Simba-Linux64
-          # - os: ubuntu-24.04-arm
-          #   arch: Linux arm64
-          #   exec: xvfb-run -a ./Simba-Linux
-          - os: macos-latest
-            arch: Mac arm64
-            exec: ./Simba-Mac-Arm.dmg
+            exec: ./Simba-Linux64
+          - os: ubuntu-24.04-arm
+            arch: Linux arm64
+            exec: ./Simba-Linux
+          # - os: macos-latest
+          #   arch: Mac arm64
+          #   exec: ./Simba-Mac-Arm.dmg
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}
@@ -108,8 +108,7 @@ jobs:
         uses: actions/cache@v5
         id: simba-cache
         with:
-          path: |
-            ./Simba-${{ matrix.target.arch }}.exe
+          path: ${{ matrix.target.exec }}
           key: simba-cache-${{ matrix.target.arch }}-${{ needs.setup.outputs.build_hash }}
           enableCrossOsArchive: true
 
@@ -126,6 +125,15 @@ jobs:
           curl -L "$download_url" -o "$output_file"
           unzip -o "$output_file" -d .
           rm -f "$output_file"
+
+      - name: Mount on macOS
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          hdiutil attach "./Simba-Mac-Arm.dmg"
+          APP=$(find /Volumes -name Simba.app -type d | head -n1)
+          echo "APP_PATH=$APP" >> $GITHUB_ENV
+          echo "Mounted app at: $APP"
 
       #Plugins
       - name: Cache wasp-plugins
@@ -167,34 +175,21 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb
           sudo apt-get install -y gtk2.0
-
-      - name: Mount on macOS
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          hdiutil attach "./Simba-Mac-Arm.dmg"
-          APP=$(find /Volumes -name Simba.app -type d | head -n1)
-          echo "APP_PATH=$APP" >> $GITHUB_ENV
-          echo "Mounted app at: $APP"
+          export DISPLAY=:1
+          Xvfb :1 & sleep 2
 
       - name: Run tests
         shell: bash
         run: |
           echo "Running test ${{ matrix.file }} on ${{ matrix.target.arch }}"
-
           if [ "$RUNNER_OS" = "macOS" ]; then
-            APP=$(find /Volumes -name Simba.app -type d | head -n1)
-
-            "$APP/Contents/MacOS/Simba" \
-              --extractopenssl \
-              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+              "$APP_PATH/Contents/MacOS/Simba"
           else
-            ./${{ matrix.target.exec }} \
-              --extractopenssl \
-              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
-          fi
+            ./${{ matrix.target.exec }}
+          fi \
+            --extractopenssl \
+            --run "./Includes/WaspLib/tests/${{ matrix.file }}"
 
   release:
     needs: tests

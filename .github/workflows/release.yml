@@ -183,13 +183,18 @@ jobs:
         shell: bash
         run: |
           echo "Running test ${{ matrix.file }} on ${{ matrix.target.arch }}"
+
           if [ "$RUNNER_OS" = "macOS" ]; then
-              "$APP_PATH/Contents/MacOS/Simba"
+            APP=$(find /Volumes -name Simba.app -type d | head -n1)
+
+            "$APP/Contents/MacOS/Simba" \
+              --extractopenssl \
+              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           else
-            ./${{ matrix.target.exec }}
-          fi \
-            --extractopenssl \
-            --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+            ${{ matrix.target.exec }} \
+              --extractopenssl \
+              --run "./Includes/WaspLib/tests/${{ matrix.file }}"
+          fi
 
   release:
     needs: tests

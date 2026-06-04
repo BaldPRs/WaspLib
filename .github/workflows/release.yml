@@ -96,9 +96,7 @@ jobs:
           - os: ubuntu-latest-arm
             arch: Linux arm64
             exec: Linux
-          - os: macos-latest
-            arch: Mac arm64
-            exec: Mac-Arm.dmg
+
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}
     steps:

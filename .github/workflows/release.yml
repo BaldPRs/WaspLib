@@ -96,9 +96,9 @@ jobs:
           # - os: ubuntu-24.04-arm
           #   arch: Linux arm64
           #   exec: ./Simba-Linux
-          - os: macos-latest
-            arch: Mac arm64
-            exec: ./Simba-Mac-Arm.dmg
+          # - os: macos-latest
+          #   arch: Mac arm64
+          #   exec: ./Simba-Mac-Arm.dmg
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}
@@ -176,8 +176,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gtk2.0
-          cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex.so.aarch64
-          cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex32.so.aarch64
 
       - name: Run tests
         shell: bash

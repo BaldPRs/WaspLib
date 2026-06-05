@@ -93,12 +93,12 @@ jobs:
           - os: ubuntu-latest
             arch: Linux64
             exec: ./Simba-Linux64
-          - os: ubuntu-24.04-arm
-            arch: Linux arm64
-            exec: ./Simba-Linux
-          # - os: macos-latest
-          #   arch: Mac arm64
-          #   exec: ./Simba-Mac-Arm.dmg
+          # - os: ubuntu-24.04-arm
+          #   arch: Linux arm64
+          #   exec: ./Simba-Linux
+          - os: macos-latest
+            arch: Mac arm64
+            exec: ./Simba-Mac-Arm.dmg
 
         file: ${{ fromJSON(needs.setup.outputs.test_files) }}
     runs-on: ${{ matrix.target.os }}
@@ -178,6 +178,14 @@ jobs:
           sudo apt-get install -y gtk2.0
           cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex.so.aarch64
           cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex32.so.aarch64
+
+      - name: Move files on macOS
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mv ./Plugins $APP_PATH/Contents/MacOS/Plugins
+          mv ./Includes $APP_PATH/Contents/MacOS/Includes
+          mv ./Data $APP_PATH/Contents/MacOS/Data
 
       - name: Run tests
         shell: bash

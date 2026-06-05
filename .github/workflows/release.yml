@@ -176,7 +176,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gtk2.0
-          mv ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex.so.aarch64
+          cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex.so.aarch64
+          cp ./Plugins/wasp-plugins/libtpaex/libtpaex64.so.aarch64 ./Plugins/wasp-plugins/libtpaex/libtpaex32.so.aarch64
 
       - name: Run tests
         shell: bash
@@ -186,6 +187,7 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then
             "$APP_PATH/Contents/MacOS/Simba" --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           elif [ "$RUNNER_OS" = "Linux" ]; then
+            ls ./Plugins/wasp-plugins/libtpaex
             xvfb-run -a ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"
           else
             ${{ matrix.target.exec }} --extractopenssl --run "./Includes/WaspLib/tests/${{ matrix.file }}"

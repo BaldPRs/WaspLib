@@ -63,8 +63,8 @@ var
 begin
   for i := 0 to High(other) do
     for j := 0 to High(Self) do
-      if Self[i].Item.Before('(') = other[i] then
-        Result += Self[i];
+      if Self[j].Item.Before('(') = other[i] then
+        Result += Self[j];
 end;
 
 function TRSConsumableItemArray.SortByPoints(lowToHigh: Boolean = False): TRSConsumableItemArray;
@@ -163,8 +163,8 @@ var
 begin
   for i := 0 to High(other) do
     for j := 0 to High(Self) do
-      if Self[i].Item.Before('(') = other[i] then
-        Result += Self[i];
+      if Self[j].Item.Before('(') = other[i] then
+        Result += Self[j];
 end;
 
 function TRSBoostItemArray.SortByPoints(lowToHigh: Boolean = False): TRSBoostItemArray;

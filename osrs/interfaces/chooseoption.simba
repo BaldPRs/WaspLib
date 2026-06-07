@@ -30,6 +30,29 @@ Core record responsible with interacting with the {ref}`ChooseOption` context me
     const TitleImg: TImage = ImageFromString('IMG:AQAAAGYAAAASAAAAAAAAAP21aQABAAAAIKprAAEAAADI5D8BAAAAAM0CAQABAAAAOIe7BgAAAAAApLsGAAAAADQBAACYAQAAOIe7BgAAAAABAAAAZgAAABIAAAAYAAAAAAAAAAAAAAAAAAAAAwAAABgIEAgICAAAAAEAAAIAAAAAAAAAAAAAAAAAAAAAiVBORw0KGgoAAAANSUhEUgAAAGYAAAASCAIAAAAmDjziAAAAzUlEQVR4nO2U0Q2AMAhE3c4F/HX/NYzxo9oWvAO0mkBqoqTA9Qmd1mXORa1pf9IoS2S0JTLaWmRlaK+ed3X1rdU2RkT1eXjOysarvMoA9TwlG+mmLyAzNH4iC0AWcxAcWfce8fjb0sqRdGSenEpUP5BCVu3xvEs4wE63lcOjtEuTHUwnJuXH4hpspf3iSxZJVkglPCcyRGZJkeKlpFGYPMMohRjwRYpvXdTgSN2hDODtfgUfG1s5EfEWZL8zsEkj671X7BlLZLQNQJaLWhvxdfuwwsTSHQAAAABJRU5ErkJggg==');
   end;
 
+
+property TRSChooseOption.Header(clientBounds: TBox): TBox;
+var
+  pt: TPoint;
+  tpa: TPointArray;
+begin
+  //clientBounds should be RSClient.Bounds
+  with clientBounds do
+    pt := Target.FindImage(Self.TitleImg, 0, [X1, Y1, Target.Bounds.X2, Target.MouseY+30]);
+  if pt = [-1,-1] then
+    Exit;
+
+  Result.X1 := pt.X+1;
+  Result.Y1 := pt.Y+1;
+
+  with Result do
+    tpa := Target.FindColor($47545D, 0, [X1+Self.TitleImg.Width-2, Y1, clientBounds.Width-1, Y1+1]);
+
+  Result.X2 := tpa.Bounds().X2-1;
+  Result.Y2 := Result.Y1 + Self.TitleImg.Height - 3;
+end;
+
+
 (*
 ## ChooseOption.IsOpen
 ```pascal
@@ -44,39 +67,23 @@ WriteLn ChooseOption.IsOpen();
 *)
 function TRSChooseOption.IsOpen(): Boolean;
 var
-  header, body: TPointArray;
-  pt: TPoint;
-  clntBounds, trgtBounds, bounds: TBox;
-  w, h: Integer;
+  tpa: TPointArray;
+  bounds, header: TBox;
 begin
-  trgtBounds := Target.Bounds;
-  clntBounds := RSClient.Bounds;
-
-  pt := Target.FindImage(Self.TitleImg, 0, [clntBounds.X1, clntBounds.Y1, trgtBounds.X2, Target.MouseY+30]);
-  if pt = [-1,-1] then
+  bounds := RSClient.Bounds;
+  header := Self.Header[bounds];
+  if header = Default(TBox) then
     Exit;
 
-  w := clntBounds.Width - 1;
-  h := clntBounds.Height - 1;
+  Self.Bounds.X1 := header.X1+1;
+  Self.Bounds.Y1 := header.Y2+3;
+  Self.Bounds.X2 := header.X2-1;
 
-  header := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, w, h]);
+  with Self.Bounds do
+    tpa := Target.FindColor($47545D, 0, [X1, Y1+15, X1+1, bounds.Height-1]);
 
-  if header = [] then
-    Exit;
-
-  bounds := header.Cluster(1.5, 1.5).SortFromFirstPoint(pt)[0].Bounds().Expand(-1);
-
-  pt.X += 1;
-  pt.Y += Self.TitleImg.Height;
-
-  body := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, w, h]);
-
-  Result := body <> [];
-  if Result then
-    Self.Bounds := body.Cluster(1.5, 1.5).SortFromFirstPoint(pt)[0].Bounds().Expand(-1);
-
-  Self.Bounds.X1 := bounds.X1;
-  Self.Bounds.X2 := bounds.X2;
+  Self.Bounds.Y2 := tpa.Bounds().Y2-2;
+  Result := True;
 end;
 
 (*

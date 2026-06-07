@@ -46,13 +46,20 @@ function TRSChooseOption.IsOpen(): Boolean;
 var
   header, body: TPointArray;
   pt: TPoint;
-  bounds: TBox;
+  clntBounds, trgtBounds, bounds: TBox;
+  w, h: Integer;
 begin
-  pt := Target.FindImage(Self.TitleImg, 0);
-  if pt = [-1,-1] then Exit;
+  trgtBounds := Target.Bounds;
+  clntBounds := RSClient.Bounds;
 
-  with RSClient.Bounds do
-    header := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, Width - 1, Height - 1]);
+  pt := Target.FindImage(Self.TitleImg, 0, [clntBounds.X1, clntBounds.Y1, trgtBounds.X2, Target.MouseY+30]);
+  if pt = [-1,-1] then
+    Exit;
+
+  w := clntBounds.Width - 1;
+  h := clntBounds.Height - 1;
+
+  header := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, w, h]);
 
   if header = [] then
     Exit;
@@ -62,8 +69,7 @@ begin
   pt.X += 1;
   pt.Y += Self.TitleImg.Height;
 
-  with RSClient.Bounds do
-    body := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, Width - 1, Height - 1]);
+  body := Target.FindColor(Colors.BLACK, 0, [pt.X, pt.Y, w, h]);
 
   Result := body <> [];
   if Result then
@@ -105,7 +111,8 @@ WriteLn ChooseOption.Open();
 *)
 function TRSChooseOption.Open(): Boolean;
 begin
-  if Self.IsOpen() then Exit(True);
+  if Self.IsOpen() then
+    Exit(True);
 
   Mouse.Click(EMouseButton.RIGHT);
   Result := Self.WaitOpen(600);
@@ -122,28 +129,45 @@ This is a internal method, you probably don't need to call it.
 *)
 function TRSChooseOption.GetOptions(): TRSOptionArray;
 var
-  i: Int32;
-  b: TBox;
+  i, y1, y2: Integer;
+  img: TImage;
 begin
-  if not Self.Open() then Exit;
-  if Self.Bounds.Height < 15 then Exit;
+  if not Self.Open() then
+    Exit;
+  if Self.Bounds.Height < 15 then
+    Exit;
 
   SetLength(Result, Self.Bounds.Height div 15);
 
-  b.X1 := Self.Bounds.X1;
-  b.X2 := Self.Bounds.X2;
+  img := Target.GetImage(Self.Bounds);
 
-  for i := 0 to Result.High do
+  if RSClient.Client = ERSClient.OFFICIAL then
   begin
-    b.Y1 := Self.Bounds.Y1 + (i * 15);
-    if RSClient.Client = ERSClient.OFFICIAL then
-      Inc(b.Y1, 2);
-    b.Y2 := b.Y1 + 15;
-    if (RSClient.Client = ERSClient.OFFICIAL) and (i = Result.High) then
-      Dec(b.Y2);
-    if b.Y2 > Self.Bounds.Y2 then Exit;
-    Result[i].Text := OCR.RecognizeShadow(b, RSFonts.BOLD_SHADOW, 0);
-    Result[i].Bounds := b;
+    for i := 0 to High(Result) do
+    begin
+      y1 := Self.Bounds.Y1 + (i * 15) + 2;
+      y2 := y1 + 15;
+      if i = High(Result) then
+        Dec(y2);
+
+      if y2 > Self.Bounds.Y2 then
+      begin
+        SetLength(Result, i);
+        Exit;
+      end;
+
+      Result[i].Bounds := [Self.Bounds.X1, y1, Self.Bounds.X2, y2];
+      Result[i].Text := OCR.RecognizeShadow(Result[i].Bounds, RSFonts.BOLD_SHADOW, 0);
+    end;
+    Exit;
+  end;
+
+  for i := 0 to High(Result) do
+  begin
+    y1 := Self.Bounds.Y1 + (i * 15);
+    y2 := y1 + 15;
+    Result[i].Bounds := [Self.Bounds.X1, y1, Self.Bounds.X2, y2];
+    Result[i].Text := OCR.RecognizeShadow(Result[i].Bounds, RSFonts.BOLD_SHADOW, 0);
   end;
 end;
 

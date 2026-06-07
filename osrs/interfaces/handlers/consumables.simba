@@ -59,12 +59,12 @@ end;
 
 function TRSConsumableItemArray.Intersection(other: TRSItemArray): TRSConsumableItemArray;
 var
-  i, j: Integer;
+  a, b: Integer;
 begin
-  for i := 0 to High(other) do
-    for j := 0 to High(Self) do
-      if Self[j].Item.Before('(') = other[i] then
-        Result += Self[j];
+  for a := 0 to High(other) do
+    for b := 0 to High(Self) do
+      if Self[b].Item.Before('(') = other[a] then
+        Result += Self[b];
 end;
 
 function TRSConsumableItemArray.SortByPoints(lowToHigh: Boolean = False): TRSConsumableItemArray;
@@ -159,12 +159,12 @@ end;
 
 function TRSBoostItemArray.Intersection(other: TRSItemArray): TRSBoostItemArray;
 var
-  i, j: Integer;
+  a, b: Integer;
 begin
-  for i := 0 to High(other) do
-    for j := 0 to High(Self) do
-      if Self[j].Item.Before('(') = other[i] then
-        Result += Self[j];
+  for a := 0 to High(other) do
+    for b := 0 to High(Self) do
+      if Self[b].Item.Before('(') = other[a] then
+        Result += Self[b];
 end;
 
 function TRSBoostItemArray.SortByPoints(lowToHigh: Boolean = False): TRSBoostItemArray;

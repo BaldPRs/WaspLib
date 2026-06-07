@@ -140,13 +140,16 @@ end.
 *)
 function TRSItemInterface.IndicesOf(items: TRSItemArray): TIntegerArray;
 var
-  match: TImageMatch;
+  matches: TImageMatchArray;
+  i: Integer;
 begin
   if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
     Exit;
 
-  for match in ItemFinder.FindAll(items, Self.Slots^.Boxes()) do
-    Result += match.Index;
+  matches := ItemFinder.FindAll(items, Self.Slots^.Boxes());
+  SetLength(Result, Length(matches));
+  for i := 0 to High(matches) do
+    Result[i] := matches[i].Index;
 end;
 
 

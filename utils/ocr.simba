@@ -270,10 +270,10 @@ var
   colors: TColorArray;
 begin
   img := Target.GetImage(bounds);
-  shadows := img.FindColor(TEXT_SHADOW, 0, [1, 1, img.Width - 1, img.Height - 1]);
-  shadows := shadows.Offset([-1,-1]).ExcludePoints(shadows);
+  shadows := img.FindColor(TEXT_SHADOW, 0, [1, 1, img.Width - 1, img.Height - 1]).Offset([-1,-1]);
 
   colors := img.GetColors(shadows).Unique();
+  colors.Remove(TEXT_SHADOW);
   img.ReplaceColorBinary(False, colors, tolerance);
 
   Result := Self.Engine.Recognize(img, font);

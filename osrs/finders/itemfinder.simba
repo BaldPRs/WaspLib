@@ -306,7 +306,8 @@ begin
     for img in Self.GetImages(item) do
       for i := 0 to High(boxes) do
       begin
-        if skip[i] then Continue;
+        if skip[i] then
+          Continue;
         if not TRSItem.InBounds(boxes[i]) then
         begin
           skip[i] := True;
@@ -317,7 +318,8 @@ begin
         if Self.ImageCompare.Compare(img, boxes[i], match) then
         begin
           Result += [i, boxes[i], match];
-          if (maxToFind > 0) and (Length(Result) >= maxToFind) then Break(3);
+          if (maxToFind > 0) and (Length(Result) >= maxToFind) then
+            Break(3);
           skip[i] := True;
         end;
       end;

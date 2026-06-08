@@ -739,7 +739,7 @@ begin
   begin
     if MainScreen.Bounds.Contains(Mouse.Position) then
       if ((Self.UpText <> []) or (action <> [])) then
-        if ChooseOption.Find(Self.UpText + action) then
+        if ChooseOption.ContainsAny(Self.UpText + action) then
           Exit(True);
     ChooseOption.Close();
   end;
@@ -826,7 +826,7 @@ begin
   begin
     if MainScreen.Bounds.Contains(Mouse.Position) then
       if ((Self.UpText <> []) or (action <> [])) then
-        if ChooseOption.Find(Self.UpText + action) then
+        if ChooseOption.ContainsAny(Self.UpText + action) then
           Exit(True);
     ChooseOption.Close();
   end;

@@ -16,7 +16,7 @@ Helper record to interact with {ref}`ChooseOption`.
   TRSOption = record
     Text: String;
     Bounds: TBox;
-    StringIndex: Integer;
+    Index: Integer;
   end;
 
   TRSOptionArray = array of TRSOption;
@@ -136,46 +136,43 @@ This is a internal method, you probably don't need to call it.
 *)
 function TRSChooseOption.GetOptions(): TRSOptionArray;
 var
-  i, y1, y2: Integer;
+  i, y, offset: Integer;
   img: TImage;
+  tpa: TPointArray;
+  b: TBox;
 begin
   if not Self.Open() then
     Exit;
   if Self.Bounds.Height < 15 then
     Exit;
 
-  SetLength(Result, Self.Bounds.Height div 15);
-
   img := Target.GetImage(Self.Bounds);
+  tpa := img.FindColor($47545D, 0) + img.FindColor(Colors.BLACK, 0);
+  img.Fill(Colors.WHITE);
+  img.DrawColor := Colors.BLACK;
+  img.DrawTPA(tpa);
+
+  b.X1 := 0;
+  b.X2 := Self.Bounds.Width-1;
 
   if RSClient.Client = ERSClient.OFFICIAL then
-  begin
-    for i := 0 to High(Result) do
-    begin
-      y1 := Self.Bounds.Y1 + (i * 15) + 2;
-      y2 := y1 + 15;
-      if i = High(Result) then
-        Dec(y2);
+    offset := 2
+  else
+    offset := 0;
 
-      if y2 > Self.Bounds.Y2 then
-      begin
-        SetLength(Result, i);
-        Exit;
-      end;
-
-      Result[i].Bounds := [Self.Bounds.X1, y1, Self.Bounds.X2, y2];
-      Result[i].Text := OCR.RecognizeShadow(Result[i].Bounds, RSFonts.BOLD_SHADOW, 0);
-    end;
-    Exit;
-  end;
-
+  SetLength(Result, Self.Bounds.Height div 15);
   for i := 0 to High(Result) do
   begin
-    y1 := Self.Bounds.Y1 + (i * 15);
-    y2 := y1 + 15;
-    Result[i].Bounds := [Self.Bounds.X1, y1, Self.Bounds.X2, y2];
-    Result[i].Text := OCR.RecognizeShadow(Result[i].Bounds, RSFonts.BOLD_SHADOW, 0);
+    b.Y1 := i * 15 + offset;
+    b.Y2 := b.Y1+15;
+    y := Self.Bounds.Y1 + b.Y1;
+    Result[i].Bounds := [Self.Bounds.X1, y, Self.Bounds.X2, y + 15];
+    Result[i].Text := OCR.Engine.Recognize(img.Copy(b), RSFonts.BOLD_SHADOW, [0,0]);
+    Result[i].Index := i;
   end;
+
+  if RSClient.Client = ERSClient.OFFICIAL then
+    Result[High(Result)].Bounds.Y2 -= 1;
 end;
 
 (*
@@ -190,7 +187,8 @@ var
   atpa: T2DPointArray;
   tpa: TPointArray;
 begin
-  if not Self.IsOpen() then Exit;
+  if not Self.IsOpen() then
+    Exit;
   tpa := Target.FindColor($47545D, 0, RSClient.Bounds).ExcludeBox(Self.Bounds.Expand(2, 20));
   atpa := tpa.Cluster(2).ExcludeSize(100, __LT__).SortFrom(Mouse.Position);
 
@@ -235,47 +233,70 @@ end;
 
 
 (*
-## ChooseOption.HasOption
+## ChooseOption.Find
 ```pascal
-function TRSChooseOption.Find(text: TStringArray; out option: TRSOption; caseSensitive: Boolean = True; closeIfNotFound: Boolean = True): Boolean;
-function TRSChooseOption.Find(text: TStringArray; caseSensitive: Boolean = True; closeIfNotFound: Boolean = True): Boolean; overload;
+function TRSChooseOption.Find(strings: TStringArray; out option: TRSOption; caseSensitive: Boolean = True; closeOnFalse: Boolean = True): Boolean;
 ```
-Methods to check if an option is available in the {ref}`ChooseOption` context menu.
-Returns true if the option specified is available.
+Check if an option is available in the {ref}`ChooseOption` context menu.
+Returns true if any of the specified `strings` is available and the `option` parameter will
+return the `TRSOption` data.
 
 Example:
 ```pascal
-WriteLn ChooseOption.Find('Take');
+{$I WaspLib/osrs.simba}
+var
+  option: TRSOption;
+begin
+  if ChooseOption.Find(['Take'], option) then
+    ShowOnTarget(option.Bounds);
+end.
 ```
 *)
-function TRSChooseOption.Find(text: TStringArray; out option: TRSOption; caseSensitive: Boolean = True; closeOnFalse: Boolean = True): Boolean;
+function TRSChooseOption.Find(strings: TStringArray; out option: TRSOption; caseSensitive: Boolean = True; closeOnFalse: Boolean = True): Boolean;
 var
-  i: Int32;
+  i, y, offset: Integer;
+  img: TImage;
+  tpa: TPointArray;
   b: TBox;
-  s: String;
+  str: String;
 begin
-  if not Self.Open() then Exit;
-  if Self.Bounds.Height < 15 then Exit;
+  if not Self.Open() then
+    Exit;
+  if Self.Bounds.Height < 15 then
+  begin
+    if closeOnFalse then
+    begin
+      Sleep(250, 600);
+      Self.Close();
+    end;
+    Exit;
+  end;
 
-  b.X1 := Self.Bounds.X1;
-  b.X2 := Self.Bounds.X2;
+  img := Target.GetImage(Self.Bounds);
+  tpa := img.FindColor($47545D, 0) + img.FindColor(Colors.BLACK, 0);
+  img.Fill(Colors.WHITE);
+  img.DrawColor := Colors.BLACK;
+  img.DrawTPA(tpa);
+
+  b.X1 := 0;
+  b.X2 := Self.Bounds.Width-1;
+
+  if RSClient.Client = ERSClient.OFFICIAL then
+    offset := 2
+  else
+    offset := 0;
 
   for i := 0 to Self.Bounds.Height div 15 do
   begin
-    b.Y1 := Self.Bounds.Y1 + (i * 15);
-    if RSClient.Client = ERSClient.OFFICIAL then
-      Inc(b.Y1, 2);
-    b.Y2 := b.Y1 + 15;
-    if (RSClient.Client = ERSClient.OFFICIAL) and (i = (Self.Bounds.Height div 15) - 1) then
-      Dec(b.Y2);
-    if b.Y2 > Self.Bounds.Y2 then Exit;
-    s := OCR.RecognizeShadow(b, RSFonts.BOLD_SHADOW, 0);
-
-    if s.ContainsAny(text, caseSensitive) then
+    b.Y1 := i * 15 + offset;
+    b.Y2 := b.Y1+15;
+    str := OCR.Engine.Recognize(img.Copy(b), RSFonts.BOLD_SHADOW, [0,0]);
+    if str.ContainsAny(strings, caseSensitive) then
     begin
-      option.Text := s;
-      option.Bounds := b;
-      option.StringIndex := i;
+      y := Self.Bounds.Y1 + b.Y1;
+      option.Text := str;
+      option.Bounds := [Self.Bounds.X1, y, Self.Bounds.X2, y + 15];
+      option.Index := i;
       Exit(True);
     end;
   end;
@@ -287,11 +308,28 @@ begin
   end;
 end;
 
-function TRSChooseOption.Find(text: TStringArray; caseSensitive, closeOnFalse: Boolean = True): Boolean; overload;
+
+(*
+## ChooseOption.ContainsAny
+```pascal
+function TRSChooseOption.ContainsAny(strings: TStringArray; caseSensitive, closeOnFalse: Boolean = True): Boolean;
+```
+Checks if an option is available in the {ref}`ChooseOption` context menu.
+Returns true if any of the specified `strings` is available.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn ChooseOption.ContainsAny(['Take']);
+end.
+```
+*)
+function TRSChooseOption.ContainsAny(strings: TStringArray; caseSensitive, closeOnFalse: Boolean = True): Boolean;
 var
   option: TRSOption;
 begin
-  Result := Self.Find(text, option, caseSensitive, closeOnFalse);
+  Result := Self.Find(strings, option, caseSensitive, closeOnFalse);
 end;
 
 
@@ -371,7 +409,7 @@ Returns True if the {ref}`ChooseOption` context menu has a submenu (indicated by
 *)
 function TRSChooseOption.HasSubmenu(): Boolean;
 begin
-  Result := Self.IsOpen() and Self.Find([' >']);
+  Result := Self.IsOpen() and Self.ContainsAny([' >']);
 end;
 
 (*

@@ -617,7 +617,7 @@ begin
     if not upText.ContainsAny(Self.WalkUpText) then
     begin
       if not ChooseOption.Open() then Exit;
-      if not ChooseOption.Find(Self.TargetUpText, True, False) then
+      if not ChooseOption.ContainsAny(Self.TargetUpText, True, False) then
         Exit(ChooseOption.Select(Self.WalkUpText + ['Walk here']));
 
       if Self.ActionUpText <> [] then

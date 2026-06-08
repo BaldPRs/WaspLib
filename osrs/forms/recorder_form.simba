@@ -34,7 +34,7 @@ begin
   FormUtils.OnCheckboxToggleParent(sender);
 
   checkbox := TLazCheckBox(sender);
-  checked := checkbox.IsChecked();
+  checked := checkbox.Checked;
 
   SimbaRecorder.Enabled := checked;
 

@@ -451,32 +451,32 @@ begin
   Result.MinPlayers := StrToInt(Self.MinPlayersEdit.Text, 0);
   Result.MaxPlayers := StrToInt(Self.MaxPlayersEdit.Text, 2000);
 
-  if not Self.F2PCheckbox.IsChecked() or not Self.MembersCheckbox.IsChecked() then
+  if not Self.F2PCheckbox.Checked or not Self.MembersCheckbox.Checked then
   begin
-    if not Self.F2PCheckbox.IsChecked() then
+    if not Self.F2PCheckbox.Checked then
       Result.ExcludeTypes += [EWorldType.FREE_TO_PLAY];
-    if not Self.MembersCheckbox.IsChecked() then
+    if not Self.MembersCheckbox.Checked then
       Result.ExcludeTypes += [EWorldType.MEMBERS];
   end;
 
-  if not Self.GermanyCheckbox.IsChecked() then
+  if not Self.GermanyCheckbox.Checked then
     Result.ExcludeLocations += [EWorldLocation.GERMANY];
-  if not Self.UKCheckbox.IsChecked() then
+  if not Self.UKCheckbox.Checked then
     Result.ExcludeLocations += [EWorldLocation.UNITED_KINGDOM];
-  if not Self.USCheckbox.IsChecked() then
+  if not Self.USCheckbox.Checked then
     Result.ExcludeLocations += [EWorldLocation.UNITED_STATES];
-  if not Self.AustraliaCheckbox.IsChecked() then
+  if not Self.AustraliaCheckbox.Checked then
     Result.ExcludeLocations += [EWorldLocation.AUSTRALIA];
-  if not Self.BrazilCheckbox.IsChecked() then
+  if not Self.BrazilCheckbox.Checked then
     Result.ExcludeLocations += [EWorldLocation.BRAZIL];
 
-  if not Self.NormalCheckbox.IsChecked() then
+  if not Self.NormalCheckbox.Checked then
     Result.ExcludeActivities += [EWorldActivity.NORMAL];
-  if not Self.DangerousCheckbox.IsChecked() then
+  if not Self.DangerousCheckbox.Checked then
     Result.ExcludeActivities += [EWorldActivity.DANGEROUS];
-  if not Self.RestrictedCheckbox.IsChecked() then
+  if not Self.RestrictedCheckbox.Checked then
     Result.ExcludeActivities += [EWorldActivity.RESTRICTED];
-  if not Self.SkillTotalCheckbox.IsChecked() then
+  if not Self.SkillTotalCheckbox.Checked then
     Result.ExcludeActivities += [EWorldActivity.SKILL_TOTAL];
 
   if Self.ExcludeWorldsEdit.Text <> '' then
@@ -509,7 +509,7 @@ begin
   // Check if ANY activity checkbox is selected
   anyChecked := False;
   for i := 0 to High(Self.ActivityCheckboxes) do
-    if Self.ActivityCheckboxes[i].IsChecked() then
+    if Self.ActivityCheckboxes[i].Checked then
     begin
       anyChecked := True;
       Break;
@@ -528,7 +528,7 @@ begin
     begin
       for checkboxIndex := 0 to High(Self.ActivityCheckboxes) do
         if (Self.ActivityCheckboxes[checkboxIndex].Hint = '') and
-           Self.ActivityCheckboxes[checkboxIndex].IsChecked() then
+           Self.ActivityCheckboxes[checkboxIndex].Checked then
         begin
           Self.FilteredWorlds[j] := Self.FilteredWorlds[i];
           Inc(j);
@@ -539,7 +539,7 @@ begin
 
     for checkboxIndex := 0 to High(Self.ActivityCheckboxes) do
       if (Self.ActivityCheckboxes[checkboxIndex].Hint = Self.FilteredWorlds[i].ActivityString) and
-         Self.ActivityCheckboxes[checkboxIndex].IsChecked() then
+         Self.ActivityCheckboxes[checkboxIndex].Checked then
       begin
         Self.FilteredWorlds[j] := Self.FilteredWorlds[i];
         Inc(j);
@@ -663,7 +663,7 @@ begin
     if Assigned(Self.ActivityCheckboxes[i]) then
     begin
       previousStates[i].Activity := Self.ActivityCheckboxes[i].Hint;
-      previousStates[i].Checked := Self.ActivityCheckboxes[i].IsChecked();
+      previousStates[i].Checked := Self.ActivityCheckboxes[i].Checked;
     end;
 
   for i := 0 to High(Self.ActivityCheckboxes) do
@@ -673,7 +673,7 @@ begin
 
   tempWorlds := Copy(Self.AllWorldsCache);
 
-  if not Self.F2PCheckbox.IsChecked() then
+  if not Self.F2PCheckbox.Checked then
   begin
     j := 0;
     for i := 0 to High(tempWorlds) do
@@ -685,7 +685,7 @@ begin
     SetLength(tempWorlds, j);
   end;
 
-  if not Self.MembersCheckbox.IsChecked() then
+  if not Self.MembersCheckbox.Checked then
   begin
     j := 0;
     for i := 0 to High(tempWorlds) do
@@ -701,11 +701,11 @@ begin
   for i := 0 to High(tempWorlds) do
   begin
     case tempWorlds[i].Location of
-      EWorldLocation.GERMANY: if not Self.GermanyCheckbox.IsChecked() then Continue;
-      EWorldLocation.UNITED_KINGDOM: if not Self.UKCheckbox.IsChecked() then Continue;
-      EWorldLocation.UNITED_STATES: if not Self.USCheckbox.IsChecked() then Continue;
-      EWorldLocation.AUSTRALIA: if not Self.AustraliaCheckbox.IsChecked() then Continue;
-      EWorldLocation.BRAZIL: if not Self.BrazilCheckbox.IsChecked() then Continue;
+      EWorldLocation.GERMANY: if not Self.GermanyCheckbox.Checked then Continue;
+      EWorldLocation.UNITED_KINGDOM: if not Self.UKCheckbox.Checked then Continue;
+      EWorldLocation.UNITED_STATES: if not Self.USCheckbox.Checked then Continue;
+      EWorldLocation.AUSTRALIA: if not Self.AustraliaCheckbox.Checked then Continue;
+      EWorldLocation.BRAZIL: if not Self.BrazilCheckbox.Checked then Continue;
     end;
     tempWorlds[j] := tempWorlds[i];
     Inc(j);
@@ -716,10 +716,10 @@ begin
   for i := 0 to High(tempWorlds) do
   begin
     case tempWorlds[i].Activity of
-      EWorldActivity.NORMAL: if not Self.NormalCheckbox.IsChecked() then Continue;
-      EWorldActivity.DANGEROUS: if not Self.DangerousCheckbox.IsChecked() then Continue;
-      EWorldActivity.RESTRICTED: if not Self.RestrictedCheckbox.IsChecked() then Continue;
-      EWorldActivity.SKILL_TOTAL: if not Self.SkillTotalCheckbox.IsChecked() then Continue;
+      EWorldActivity.NORMAL: if not Self.NormalCheckbox.Checked then Continue;
+      EWorldActivity.DANGEROUS: if not Self.DangerousCheckbox.Checked then Continue;
+      EWorldActivity.RESTRICTED: if not Self.RestrictedCheckbox.Checked then Continue;
+      EWorldActivity.SKILL_TOTAL: if not Self.SkillTotalCheckbox.Checked then Continue;
     end;
     tempWorlds[j] := tempWorlds[i];
     Inc(j);
@@ -766,11 +766,11 @@ begin
     );
     
     // Check if this activity had a previous state
-    checkbox.SetChecked(Self.SelectAllActivitiesCheckbox.IsChecked()); // Default
+    checkbox.Checked := Self.SelectAllActivitiesCheckbox.Checked; // Default
     for j := 0 to High(previousStates) do
       if previousStates[j].Activity = activities[i].Activity then
       begin
-        checkbox.SetChecked(previousStates[j].Checked);
+        checkbox.Checked := previousStates[j].Checked;
         Break;
       end;
     
@@ -784,11 +784,11 @@ begin
     Self.SpecificActivityPanel, 'Normal (no activity)', '',
     5, 25 + (Length(activities) * 20), 180, 18
   );
-  checkbox.SetChecked(Self.SelectAllActivitiesCheckbox.IsChecked());
+  checkbox.Checked := Self.SelectAllActivitiesCheckbox.Checked;
   for j := 0 to High(previousStates) do
     if previousStates[j].Activity = '' then
     begin
-      checkbox.SetChecked(previousStates[j].Checked);
+      checkbox.Checked := previousStates[j].Checked;
       Break;
     end;
   checkbox.Hint := '';
@@ -931,10 +931,10 @@ var
   i: Integer;
   newState: Boolean;
 begin
-  newState := Self.SelectAllActivitiesCheckbox.IsChecked();
+  newState := Self.SelectAllActivitiesCheckbox.Checked;
 
   for i := 0 to High(Self.ActivityCheckboxes) do
-    Self.ActivityCheckboxes[i].SetChecked(newState);
+    Self.ActivityCheckboxes[i].Checked := newState;
 end;
 
 (*
@@ -970,13 +970,13 @@ begin
   Self.F2PCheckbox := TLazCheckBox.CreateEx(
     Self.TypePanel, 'Free-to-play', '', 10, typeY, 130, checkboxHeight
   );
-  Self.F2PCheckbox.SetChecked(True);
+  Self.F2PCheckbox.Checked := True;
 
   typeY += checkboxHeight + 3;
   Self.MembersCheckbox := TLazCheckBox.CreateEx(
     Self.TypePanel, 'Members', '', 10, typeY, 130, checkboxHeight
   );
-  Self.MembersCheckbox.SetChecked(True);
+  Self.MembersCheckbox.Checked := True;
 end;
 
 (*
@@ -997,32 +997,32 @@ begin
   Self.GermanyCheckbox := TLazCheckBox.CreateEx(
     Self.LocationPanel, 'Germany', '', 10, locY, 100, checkboxHeight
   );
-  Self.GermanyCheckbox.SetChecked(True);
+  Self.GermanyCheckbox.Checked := True;
 
   locY += checkboxHeight + 3;
   Self.UKCheckbox := TLazCheckBox.CreateEx(
     Self.LocationPanel, 'UK', '', 10, locY, 100, checkboxHeight
   );
-  Self.UKCheckbox.SetChecked(True);
+  Self.UKCheckbox.Checked := True;
 
   locY += checkboxHeight + 3;
   Self.USCheckbox := TLazCheckBox.CreateEx(
     Self.LocationPanel, 'USA', '', 10, locY, 100, checkboxHeight
   );
-  Self.USCheckbox.SetChecked(True);
+  Self.USCheckbox.Checked := True;
 
   locY += checkboxHeight + 3;
   Self.AustraliaCheckbox := TLazCheckBox.CreateEx(
     Self.LocationPanel, 'Australia', '', 10, locY, 100, checkboxHeight
   );
-  Self.AustraliaCheckbox.SetChecked(True);
+  Self.AustraliaCheckbox.Checked := True;
 
   locY += checkboxHeight + 3;
   Self.BrazilCheckbox := TLazCheckBox.CreateEx(
     Self.LocationPanel, 'Brazil', '', 10, locY, 100, checkboxHeight
 
   );
-  Self.BrazilCheckbox.SetChecked(True);
+  Self.BrazilCheckbox.Checked := True;
 end;
 
 (*
@@ -1043,25 +1043,25 @@ begin
   Self.NormalCheckbox := TLazCheckBox.CreateEx(
     Self.ActivityPanel, 'Normal', '', 10, actY, 130, checkboxHeight
   );
-  Self.NormalCheckbox.SetChecked(True);
+  Self.NormalCheckbox.Checked := True;
 
   actY += checkboxHeight + 3;
   Self.DangerousCheckbox := TLazCheckBox.CreateEx(
     Self.ActivityPanel, 'Dangerous', '', 10, actY, 130, checkboxHeight
   );
-  Self.DangerousCheckbox.SetChecked(False);
+  Self.DangerousCheckbox.Checked := False;
 
   actY += checkboxHeight + 3;
   Self.RestrictedCheckbox := TLazCheckBox.CreateEx(
     Self.ActivityPanel, 'Restricted', '', 10, actY, 130, checkboxHeight
   );
-  Self.RestrictedCheckbox.SetChecked(False);
+  Self.RestrictedCheckbox.Checked := False;
 
   actY += checkboxHeight + 3;
   Self.SkillTotalCheckbox := TLazCheckBox.CreateEx(
     Self.ActivityPanel, 'Skill Total', '', 10, actY, 130, checkboxHeight
   );
-  Self.SkillTotalCheckbox.SetChecked(True);
+  Self.SkillTotalCheckbox.Checked := True;
 end;
 
 (*
@@ -1077,7 +1077,7 @@ begin
     Self.SpecificActivityPanel, 'Select/Deselect All', '',
     5, 5, 200, 18
   );
-  Self.SelectAllActivitiesCheckbox.SetChecked(True);
+  Self.SelectAllActivitiesCheckbox.Checked := True;
   Self.SelectAllActivitiesCheckbox.OnClick := @Self.OnSelectAllActivitiesClick;
 end;
 
@@ -1117,26 +1117,27 @@ Loads saved world numbers and displays them. Unchecks filter checkboxes but keep
 *)
 procedure TProfileForm.LoadSavedWorlds(worlds: TIntegerArray);
 begin
-  if worlds = [] then Exit;
+  if worlds = [] then
+    Exit;
 
   WorldFetcher.Setup();
-  if WorldFetcher.Fetch(worlds) then
-  begin
-    Self.FilteredWorlds := WorldFetcher.Worlds;
-    Self.DisplayResults();
+  if not WorldFetcher.Fetch(worlds) then
+    Exit;
 
-    Self.F2PCheckbox.SetChecked(False);
-    Self.MembersCheckbox.SetChecked(False);
-    Self.GermanyCheckbox.SetChecked(False);
-    Self.UKCheckbox.SetChecked(False);
-    Self.USCheckbox.SetChecked(False);
-    Self.AustraliaCheckbox.SetChecked(False);
-    Self.NormalCheckbox.SetChecked(False);
-    Self.DangerousCheckbox.SetChecked(False);
-    Self.RestrictedCheckbox.SetChecked(False);
-    Self.SkillTotalCheckbox.SetChecked(False);
-    Self.SelectAllActivitiesCheckbox.SetChecked(False);
-  end;
+  Self.FilteredWorlds := WorldFetcher.Worlds;
+  Self.DisplayResults();
+
+  Self.F2PCheckbox.Checked := False;
+  Self.MembersCheckbox.Checked := False;
+  Self.GermanyCheckbox.Checked := False;
+  Self.UKCheckbox.Checked := False;
+  Self.USCheckbox.Checked := False;
+  Self.AustraliaCheckbox.Checked := False;
+  Self.NormalCheckbox.Checked := False;
+  Self.DangerousCheckbox.Checked := False;
+  Self.RestrictedCheckbox.Checked := False;
+  Self.SkillTotalCheckbox.Checked := False;
+  Self.SelectAllActivitiesCheckbox.Checked := False;
 end;
 
 

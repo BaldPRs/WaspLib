@@ -41,7 +41,7 @@ var
 begin
   FormUtils.OnCheckboxToggleParent(sender);
   checkbox := TLazCheckBox(sender);
-  checked := checkbox.IsChecked();
+  checked := checkbox.Checked;
   Self.Stats^ := checked;
 
   if checked then
@@ -209,9 +209,9 @@ begin
   edit.OnChange := @Self.OnLevelChange;
 
   if Self.Config.Data.Assert('stats', EJSONType.BOOL) then
-    checkbox.SetChecked(Self.Config.Data.Item['stats'].AsBool);
+    checkbox.Checked := Self.Config.Data.Item['stats'].AsBool;
 
-  if not checkbox.IsChecked() then
+  if not checkbox.Checked then
     Self.OnStatsToggle(checkbox)
   else
   begin

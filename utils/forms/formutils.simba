@@ -180,7 +180,7 @@ begin
   else if ELazAnchorKind.Left in caption.Anchors then
     checkbox := TLazCheckbox(caption.AnchorSideLeft.Control);
 
-  checkbox.Toggle();
+  checkbox.Checked := not checkbox.Checked;
   if checkbox.OnChange <> nil then
     Lapify(checkbox.OnChange)(checkbox);
 end;
@@ -202,7 +202,7 @@ var
   control: TLazComponent;
 begin
   checkbox := TLazCheckBox(sender);
-  checked := checkbox.IsChecked();
+  checked := checkbox.Checked;
   parent := checkbox.Parent;
 
   for i := 0 to parent.ComponentCount-1 do
@@ -1185,49 +1185,6 @@ begin
   limg.Stretch := True;
   limg.Proportional := True;
   limg.Align := ELazAlign.Client;
-end;
-
-
-(*
-## CheckBox.SetChecked
-```pascal
-procedure TLazCheckBox.SetChecked(value: Boolean);
-```
-Sets the checkbox checked or unchecked with a boolean.
-*)
-procedure TLazCheckBox.SetChecked(value: Boolean);
-begin
-  if value then
-    Self.State := ELazCheckBoxState.Checked
-  else
-    Self.State := ELazCheckBoxState.Unchecked;
-end;
-
-(*
-## CheckBox.IsChecked
-```pascal
-function TLazCheckBox.IsChecked(): Boolean;
-```
-Gets the checkbox state, checked or unchecked with a boolean.
-*)
-function TLazCheckBox.IsChecked(): Boolean;
-begin
-  Result := Self.State = ELazCheckBoxState.Checked;
-end;
-
-(*
-## CheckBox.Toggle
-```pascal
-procedure TLazCheckBox.Toggle();
-```
-Inverts the checkbox.
-*)
-procedure TLazCheckBox.Toggle();
-begin
-  case Self.State of
-    ELazCheckBoxState.Checked: Self.State := ELazCheckBoxState.Unchecked;
-    ELazCheckBoxState.Unchecked: Self.State := ELazCheckBoxState.Checked;
-  end;
 end;
 
 

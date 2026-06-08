@@ -363,7 +363,7 @@ begin
       );
     end;
 
-    Self.TaskCheckbox.SetChecked(obj.Item['enabled'].AsBool);
+    Self.TaskCheckbox.Checked := obj.Item['enabled'].AsBool;
     Exit;
   end;
 
@@ -409,7 +409,7 @@ begin
       );
     end;
 
-    Self.BreaksCheckbox.SetChecked(obj.Item['enabled'].AsBool);
+    Self.BreaksCheckbox.Checked := obj.Item['enabled'].AsBool;
     Exit;
   end;
 
@@ -434,7 +434,7 @@ begin
     Self.SleepVariationSpinner.OnChange := nil;
     Self.SleepLogoutSpinner.OnChange    := nil;
 
-    Self.SleepCheckbox.SetChecked(obj.Item['enabled'].AsBool);
+    Self.SleepCheckbox.Checked := obj.Item['enabled'].AsBool;
     Self.SleepTimeEdit.Text          := obj.Item['time'].AsString;
     Self.SleepLengthSpinner.Value    := obj.Item['length'].AsFloat;
     Self.SleepVariationSpinner.Value := Round(obj.Item['variation'].AsFloat * 100);
@@ -456,13 +456,13 @@ var
 begin
   if obj.Has('walk_adjustments') then
   begin
-    Self.WalkAdjustmentsCheckbox.SetChecked(obj.Item['walk_adjustments'].AsBool);
+    Self.WalkAdjustmentsCheckbox.Checked := obj.Item['walk_adjustments'].AsBool;
     Antiban.WalkCameraAdjustments := obj.Item['walk_adjustments'].AsBool;
   end
   else
   begin
     obj.AddBool('walk_adjustments', True);
-    Self.WalkAdjustmentsCheckbox.SetChecked(obj.Item['walk_adjustments'].AsBool);
+    Self.WalkAdjustmentsCheckbox.Checked := obj.Item['walk_adjustments'].AsBool;
     Antiban.WalkCameraAdjustments := True;
   end;
 
@@ -492,7 +492,7 @@ begin
       );
     end;
 
-    Self.WalkCheckbox.SetChecked(obj.Item['enabled'].AsBool);
+    Self.WalkCheckbox.Checked := obj.Item['enabled'].AsBool;
     Exit;
   end;
 
@@ -563,7 +563,7 @@ var
   control: TLazComponent;
 begin
   checkbox := TLazCheckBox(sender);
-  checked := checkbox.IsChecked();
+  checked := checkbox.Checked;
 
   parent := checkbox.Parent;
 
@@ -622,7 +622,7 @@ procedure TAntibanFormHelper.OnAdjustementsCheckboxToggle(sender: TLazObject);
 var
   checked: Boolean;
 begin
-  checked := TLazCheckBox(sender).IsChecked();
+  checked := TLazCheckBox(sender).Checked;
   if not Self.Config.Data.Item['walk'].Has('camera_adjustments') then
     Self.Config.Data.Item['walk'].AddBool('camera_adjustments', checked)
   else
@@ -863,7 +863,7 @@ procedure TAntibanFormHelper.OnSleepChange(sender: TLazObject);
 var
   str: String;
 begin
-  if not Self.SleepCheckbox.IsChecked() then
+  if not Self.SleepCheckbox.Checked then
     Exit;
   str := Self.SleepTimeEdit.Text;
 

@@ -162,31 +162,31 @@ end;
 
 procedure TMapDebugger.GraphOnChange(sender: TLazObject);
 begin
-  Self.ShowGraph := TLazCheckBox(sender).IsChecked();
+  Self.ShowGraph := TLazCheckBox(sender).Checked;
   Self.ImageBox.Repaint();
 end;
 
 procedure TMapDebugger.WalkableSpaceOnChange(sender: TLazObject);
 begin
-  Self.ShowWalkableSpace := TLazCheckBox(sender).IsChecked();
+  Self.ShowWalkableSpace := TLazCheckBox(sender).Checked;
   Self.ImageBox.Repaint();
 end;
 
 procedure TMapDebugger.WalkableClustersOnChange(sender: TLazObject);
 begin
-  Self.ShowWalkableClusters := TLazCheckBox(sender).IsChecked();
+  Self.ShowWalkableClusters := TLazCheckBox(sender).Checked;
   Self.ImageBox.Repaint();
 end;
 
 procedure TMapDebugger.ObjectClustersOnChange(sender: TLazObject);
 begin
-  Self.ShowObjectClusters := TLazCheckBox(sender).IsChecked();
+  Self.ShowObjectClusters := TLazCheckBox(sender).Checked;
   Self.ImageBox.Repaint();
 end;
 
 procedure TMapDebugger.NormalizeCoordinatesOnChange(sender: TLazObject);
 begin
-  Self.Normalize := TLazCheckBox(sender).IsChecked();
+  Self.Normalize := TLazCheckBox(sender).Checked;
 end;
 
 (*
@@ -250,7 +250,7 @@ begin
   checkbox.BorderSpacing.Left  := 10;
   checkbox.BorderSpacing.Right := 4;
   checkbox.OnChange := @Self.NormalizeCoordinatesOnChange;
-  checkbox.SetChecked(True);
+  checkbox.Checked := True;
   lbl.AnchorSideTop.Control := checkbox;
   lbl.OnClick := @FormUtils.OnCheckboxAnchorClick;
 

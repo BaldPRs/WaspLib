@@ -47,64 +47,18 @@ type
 Record responsible with interacting with the {ref}`XPBar`.
 *)
   TRSXPBar = record
-    Size: ERSXPBarSize;
-    Position: ERSXPBarPosition;
-
+    Button: TCircle;
     Bounds: TBox;
     Font: TPixelFont;
 
-    AvailableBounds: TBoxArray;
-
-    Button: TCircle;
+    Tracker: TXPTracker;
 
     SetupAttempts: Integer;
+    IsSetup: Boolean;
 
-    Tracker: TXPTracker;
+    const INNER_BORDER: TColor = $45525A;
+    const OUTER_BORDER: TColor = $233038;
   end;
-
-(*
-## XPBar.UpdateSize
-```pascal
-procedure TRSXPBar.UpdateSize();
-```
-Internal method used to update the {ref}`TRSXPBar` coordinates.
-
-This is automatically called for you on the {ref}`XPBar variable`.
-*)
-procedure TRSXPBar.UpdateSize();
-begin
-  case Self.Size of
-    ERSXPBarSize.UNKNOWN: Exit;
-    ERSXPBarSize.SMALL:
-    begin
-      with Self.AvailableBounds[ERSXPBarPosition.LEFT-1] do X2 := X1 + 118;
-      with Self.AvailableBounds[ERSXPBarPosition.RIGHT-1] do X1 := X2 - 118;
-      with Self.AvailableBounds[ERSXPBarPosition.CENTER-1] do
-      begin
-        X1 += 10;
-        X2 -= 11;
-      end;
-    end;
-
-    ERSXPBarSize.MEDIUM:
-    begin
-      with Self.AvailableBounds[ERSXPBarPosition.LEFT-1] do X2 := X1 + 128;
-      with Self.AvailableBounds[ERSXPBarPosition.RIGHT-1] do X1 := X2 - 128;
-      with Self.AvailableBounds[ERSXPBarPosition.CENTER-1] do
-      begin
-        X1 += 5;
-        X2 -= 6;
-      end;
-    end;
-  end;
-
-  if Self.Position <> ERSXPBarPosition.UNKNOWN then
-    Self.Bounds := Self.AvailableBounds[Self.Position-1];
-
-  MainScreen.Mask.DrawColor := $00FF00;
-  with Self.Bounds do
-    MainScreen.Mask.DrawBoxFilled([X1, Y1, X2, Y2+1]);
-end;
 
 (*
 ## XPBar.SetupInterface
@@ -126,33 +80,7 @@ begin
 
   MainScreen.Mask.DrawColor := $FFFFFF;
   MainScreen.Mask.DrawCircleFilled(Self.Button.Expand(2));
-
-  SetLength(Self.AvailableBounds, 3);
-  with Self.AvailableBounds[ERSXPBarPosition.LEFT-1] do
-  begin
-    X1 := MainScreen.Bounds.X1 + 2;
-    X2 := X1 + 139;
-    Y1 := MainScreen.Bounds.Y1 + 25;
-    Y2 := Y1 + 27;
-  end;
-
-  with Self.AvailableBounds[ERSXPBarPosition.CENTER-1] do
-  begin
-    X1 := MSInterface.Bounds.X1 + (MSInterface.Width) div 2 - 69;
-    Y1 := MainScreen.Bounds.Y1 + 25;
-    X2 := X1 + 139;
-    Y2 := Y1 + 27;
-  end;
-
-  with Self.AvailableBounds[ERSXPBarPosition.RIGHT-1] do
-  begin
-    X2 := MSInterface.Bounds.X2 - 2;
-    X1 := X2 - 139;
-    Y1 := MainScreen.Bounds.Y1 + 2;
-    Y2 := Y1 + 27;
-  end;
-
-  Self.UpdateSize();
+  Self.IsSetup := False;
 end;
 
 
@@ -178,7 +106,7 @@ end;
 (*
 ## XPBar.WaitOpen
 ```pascal
-function TRSXPBar.WaitOpen(): Boolean;
+function TRSXPBar.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Waits for the XPBar to be open.
 This does not mean that the XPBar is actually visible, simply that according to the
@@ -189,7 +117,7 @@ Example:
 WriteLn XPBar.WaitOpen();
 ```
 *)
-function TRSXPBar.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSXPBar.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval = -1 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.IsOpen(), interval, time);
@@ -210,7 +138,8 @@ if not XPBar.IsOpen() then
 *)
 function TRSXPBar.Open(): Boolean;
 begin
-  if Self.IsOpen() then Exit(True);
+  if Self.IsOpen() then
+    Exit(True);
   Mouse.Click(Self.Button, EMouseButton.LEFT);
   Result := Self.WaitOpen();
 end;
@@ -246,52 +175,37 @@ Should only ever run once.
 *)
 function TRSXPBar.Setup(): Boolean;
 var
-  position: ERSXPBarPosition;
-  tpa: TPointArray;
+  border: TPointArray;
 begin
-  if not Self.Open() then Exit;
-  if (Self.Size <> ERSXPBarSize.UNKNOWN) and (Self.Position <> ERSXPBarPosition.UNKNOWN) then
+  if Self.IsSetup then
     Exit(True);
+  if not Self.Open() then
+    Exit;
 
-  Self.SetupAttempts += 1;
-
-  for position := ERSXPBarPosition.LEFT to ERSXPBarPosition.RIGHT do
+  if Inc(Self.SetupAttempts) > 3 then
   begin
-    tpa := Target.FindColor($FFFFFF, 0, Self.AvailableBounds[position-1]);
-    if tpa = [] then Continue;
-    if not Target.HasColor($233038, 0, 30, Self.AvailableBounds[position-1]) then Continue;
-
-    case tpa.Bounds().Height of
-      8:
-      begin
-        Self.Size := ERSXPBarSize.SMALL;
-        Self.Font := RSFonts.PLAIN_11;
-      end;
-
-      11:
-      begin
-        Self.Size := ERSXPBarSize.MEDIUM;
-        Self.Font := RSFonts.PLAIN_12;
-      end;
-
-      10:
-      begin
-        Self.Size := ERSXPBarSize.LARGE;
-        Self.Font := RSFonts.BOLD;
-      end;
-
-      else Continue;
-    end;
-
-    Self.Position := position;
-    Self.UpdateSize();
-
-    Exit(True);
+    DebugLn('XPBar', 'Something seems to be wrong with your Experience Bar.', ELogLevel.WARN);
+    DebugLn('XPBar', 'If you keep seeing this message fix your Experience Bar settings!', ELogLevel.WARN);
   end;
 
-  if Self.SetupAttempts < 3 then Exit;
-  DebugLn('XPBar', 'Something seems to be wrong with your XPBar.', ELogLevel.WARN);
-  DebugLn('XPBar', 'If you keep seeing this message fix your XPBar settings!', ELogLevel.WARN);
+  border := Target.FindColor(Self.OUTER_BORDER, 0, MSInterface.Bounds);
+  if border = [] then
+    Exit;
+
+  Self.Bounds := border.Bounds();
+
+  if Self.Bounds.Height <> 29 then
+    Exit;
+
+  case Self.Bounds.Width of
+    119: Self.Font := RSFonts.PLAIN_11;
+    129: Self.Font := RSFonts.PLAIN_12;
+    140: Self.Font := RSFonts.BOLD;
+    else Exit;
+  end;
+
+  Result := Target.HasColor(Self.INNER_BORDER, 0, 280, Self.Bounds);
+  Self.IsSetup := Result;
 end;
 
 
@@ -314,14 +228,16 @@ var
 begin
   if not Self.Setup() then
     Exit;
+  if not Target.HasColor(Self.INNER_BORDER, 0, 280, Self.Bounds) then
+    Exit;
 
   str := OCR.Recognize(Self.Bounds, Self.Font, [$FFFFFF], 0);
 
   Result := str.ExtractInteger(0);
   if Result = 0 then
     Exit;
-  count := Target.CountColor($010000, 0, Self.Bounds);
 
+  count := Target.CountColor($010000, 0, Self.Bounds);
   if ((count <> 45) and (not InRange(count, 141, 150))) then
   begin
     DebugLn('XPBar', 'Your XPBar doesn''t seem to be set to count "Total Experience"', ELogLevel.WARN);
@@ -375,11 +291,11 @@ end;
 (*
 ## XPBar.WaitXP
 ```pascal
-function TRSXPBar.WaitXP(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSXPBar.WaitXP(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Waits a set amount of time until XPBar.EarnedXP() is true.
 *)
-function TRSXPBar.WaitXP(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSXPBar.WaitXP(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.EarnedXP(), interval, time);

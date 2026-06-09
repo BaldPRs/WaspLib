@@ -7,24 +7,6 @@ Methods to interact with the XP bar.
 {$INCLUDE_ONCE WaspLib/osrs.simba}
 
 type
-(*
-## ERSXPBarSize
-```pascal
-ERSXPBarSize = enum(UNKNOWN, SMALL, MEDIUM, LARGE);
-```
-Enum reprensenting the {ref}`XPBar` available sizes.
-*)
-  ERSXPBarSize = enum(UNKNOWN, SMALL, MEDIUM, LARGE);
-
-(*
-## ERSXPBarPosition
-```pascal
-ERSXPBarPosition = enum(UNKNOWN, LEFT, CENTER, RIGHT);
-```
-Enum reprensenting the {ref}`XPBar` available positions.
-*)
-  ERSXPBarPosition = enum(UNKNOWN, LEFT, CENTER, RIGHT);
-
   TXPTracker = record
     Start, Current, Previous: UInt64;
   end;

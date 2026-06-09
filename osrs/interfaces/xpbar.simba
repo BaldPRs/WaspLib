@@ -176,7 +176,7 @@ begin
 
   Self.Bounds := border.Bounds();
 
-  if Self.Bounds.Height <> 29 then
+  if (Self.Bounds.Height <> 29) and (Self.Bounds.Height <> 38) then
     Exit;
 
   case Self.Bounds.Width of
@@ -187,7 +187,11 @@ begin
   end;
 
   Result := Target.HasColor(Self.INNER_BORDER, 0, 280, Self.Bounds);
-  Self.IsSetup := Result;
+  if Result then
+  begin
+    Self.IsSetup := True;
+    Self.SetupAttempts := 0;
+  end;
 end;
 
 

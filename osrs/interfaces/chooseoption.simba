@@ -28,6 +28,7 @@ Core record responsible with interacting with the {ref}`ChooseOption` context me
   TRSChooseOption = record
     Bounds: TBox;
     MinDelay, MaxDelay: Integer;
+    const BACKGROUND: TColor = $47545D;
     const TitleImg: TImage = ImageFromString('IMG:AQAAAGYAAAASAAAAAAAAAP21aQABAAAAIKprAAEAAADI5D8BAAAAAM0CAQABAAAAOIe7BgAAAAAApLsGAAAAADQBAACYAQAAOIe7BgAAAAABAAAAZgAAABIAAAAYAAAAAAAAAAAAAAAAAAAAAwAAABgIEAgICAAAAAEAAAIAAAAAAAAAAAAAAAAAAAAAiVBORw0KGgoAAAANSUhEUgAAAGYAAAASCAIAAAAmDjziAAAAzUlEQVR4nO2U0Q2AMAhE3c4F/HX/NYzxo9oWvAO0mkBqoqTA9Qmd1mXORa1pf9IoS2S0JTLaWmRlaK+ed3X1rdU2RkT1eXjOysarvMoA9TwlG+mmLyAzNH4iC0AWcxAcWfce8fjb0sqRdGSenEpUP5BCVu3xvEs4wE63lcOjtEuTHUwnJuXH4hpspf3iSxZJVkglPCcyRGZJkeKlpFGYPMMohRjwRYpvXdTgSN2hDODtfgUfG1s5EfEWZL8zsEkj671X7BlLZLQNQJaLWhvxdfuwwsTSHQAAAABJRU5ErkJggg==');
   end;
 
@@ -47,7 +48,7 @@ begin
   Result.Y1 := pt.Y+1;
 
   with Result do
-    tpa := Target.FindColor($47545D, 0, [X1+Self.TitleImg.Width-2, Y1, clientBounds.Width-1, Y1+1]);
+    tpa := Target.FindColor(Self.BACKGROUND, 0, [X1+Self.TitleImg.Width-2, Y1, clientBounds.Width-1, Y1+1]);
 
   Result.X2 := tpa.Bounds().X2-1;
   Result.Y2 := Result.Y1 + Self.TitleImg.Height - 3;
@@ -80,7 +81,7 @@ begin
   Self.Bounds.X2 := header.X2-1;
 
   with Self.Bounds do
-    tpa := Target.FindColor($47545D, 0, [X1, Y1+15, X1+1, bounds.Height-1]);
+    tpa := Target.FindColor(Self.BACKGROUND, 0, [X1, Y1+15, X1+1, bounds.Height-1]);
 
   Self.Bounds.Y2 := tpa.Bounds().Y2-2;
   Result := True;
@@ -158,7 +159,7 @@ begin
     Exit;
 
   img := Target.GetImage(Self.Bounds);
-  tpa := img.FindColor($47545D, 0) + img.FindColor(Colors.BLACK, 0);
+  tpa := img.FindColor(Self.BACKGROUND, 0) + img.FindColor(Colors.BLACK, 0);
   img.Fill(Colors.WHITE);
   img.DrawColor := Colors.BLACK;
   img.DrawTPA(tpa);
@@ -192,7 +193,7 @@ var
 begin
   if not Self.IsOpen() then
     Exit;
-  tpa := Target.FindColor($47545D, 0, RSClient.Bounds).ExcludeBox(Self.Bounds.Expand(2, 20));
+  tpa := Target.FindColor(Self.BACKGROUND, 0, RSClient.Bounds).ExcludeBox(Self.Bounds.Expand(2, 20));
   atpa := tpa.Cluster(2).ExcludeSize(100, __LT__).SortFrom(Mouse.Position);
 
   for tpa in atpa do
@@ -274,8 +275,8 @@ begin
     Exit;
   end;
 
-  img := Target.GetImage(Self.Bounds);
-  tpa := img.FindColor($47545D, 0) + img.FindColor(Colors.BLACK, 0);
+  img := Target.GetImage(Self.Bounds.Expand(0,1));
+  tpa := img.FindColor(Self.BACKGROUND, 0) + img.FindColor(Colors.BLACK, 0);
   img.Fill(Colors.WHITE);
   img.DrawColor := Colors.BLACK;
   img.DrawTPA(tpa);

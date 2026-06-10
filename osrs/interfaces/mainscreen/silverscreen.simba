@@ -81,7 +81,9 @@ begin
     Self.Bounds.BottomLeft.Offset(134, -45), 5, 1, 36, 36, [14,0]
   );
   for i := 0 to 4 do
-    Self.Buttons[i] := new TRSButton(boxes[i], [[$25323B, 1.30]]);
+    Self.Buttons[i] := new TRSButton(
+      boxes[i], [[$25323B, 1.30, EColorSpace.RGB, [1,1,1]]]
+    );
 end;
 
 (*

@@ -88,7 +88,9 @@ begin
     b := tpa.Bounds();
     if b.Height <= 5 then Continue;
 
-    Result += TBoxArray.Create([Self.SlotsArea.X1, b.Y1], 8, 1, 31, Min(Self.SlotsArea.Y2-b.Y1, 31), [16, 1]);
+    Result += TBoxArray.Create(
+      [Self.SlotsArea.X1, b.Y1], 8, 1, 31, Min(Self.SlotsArea.Y2-b.Y1, 31), [16, 1]
+    );
   end;
 end;
 
@@ -118,19 +120,34 @@ begin
   with Self.Bounds do
   begin
     Self._IsOpenHelper := TBox.Create(X1 + 30, Y2 - 35, X1 + 100, Y2 - 12);
-    Self.ValueButton := new TRSButton([X1+110, Y2-37, X1+139, Y2-8], [[$0F1043, 0], [$23269F, 0.227]]);
+    Self.ValueButton := new TRSButton(
+      [X1+110, Y2-37, X1+139, Y2-8],
+      [
+        [$0F1043, 0, EColorSpace.RGB, [1,1,1]],
+        [$23269F, 0.227, EColorSpace.RGB, [1,1,1]]
+      ]
+    );
   end;
 
-  Self.SlotBoxes := TBoxArray.Create(Self.Bounds.TopLeft.Offset(61, 40), 8, 5, 35, 32, [12,15]);
+  Self.SlotBoxes := TBoxArray.Create(
+    Self.Bounds.TopLeft.Offset(61, 40), 8, 5, 35, 32, [12,15]
+  );
   Self.SlotsArea := Self.SlotBoxes.Merge();
   Self.Slots.Setup('Shop.Slots', Self.SlotBoxes, @Self.FindItemBoundaries);
   Self.Items.Setup('Shop.Items', @Self.Slots, [0, 1], @Self.IsOpen);
 
-  with Self.Bounds do
-    boxes := TBoxArray.Create([X2-196, Y2-37], 4, 1, 29, 29, [11,0]); // This is the whole button
+
+  with Self.Bounds do // This is the whole button
+    boxes := TBoxArray.Create([X2-196, Y2-37], 4, 1, 29, 29, [11,0]);
 
   for quantity := Low(ERSShopQuantity) to High(ERSShopQuantity) do
-    Self.QuantityButtons[quantity] := new TRSButton(boxes[quantity], [[$0F1043, 0], [$23269F, 0.227]]);
+    Self.QuantityButtons[quantity] := new TRSButton(
+      boxes[quantity],
+      [
+        [$0F1043, 0, EColorSpace.RGB, [1,1,1]],
+        [$23269F, 0.227, EColorSpace.RGB, [1,1,1]]
+      ]
+    );
 end;
 
 (*
@@ -147,7 +164,10 @@ WriteLn Shop.IsOpen();
 *)
 function TRSShop.IsOpen(): Boolean;
 begin
-  Result := OCR.Recognize(Self._IsOpenHelper, RSFonts.PLAIN_12, [RSFonts.ORANGE], 0).ContainsAny(['Value','check'], True);
+  Result := OCR.Recognize(
+      Self._IsOpenHelper, RSFonts.PLAIN_12, [RSFonts.ORANGE], 0
+    ).ContainsAny(['Value','check'], True
+  );
 end;
 
 (*
@@ -195,7 +215,9 @@ end;
 (*
 ## Shop.Buy
 ```pascal
-function TRSShop.Buy(item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE): Boolean;
+function TRSShop.Buy(
+  item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE
+): Boolean;
 ```
 Attempts to buy the specified item from the shop.
 With the proper quantity button enabled.
@@ -205,7 +227,9 @@ Example:
 WriteLn Shop.Buy('Gold ore', ERSShopQuantity.FIFTY);
 ```
 *)
-function TRSShop.Buy(item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE): Boolean;
+function TRSShop.Buy(
+  item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE
+): Boolean;
 begin
   Result := False;
   if not Self.IsOpen() then Exit;
@@ -231,7 +255,9 @@ end;
 (*
 ## Shop.Sell
 ```pascal
-function TRSShop.Sell(item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE): Boolean;
+function TRSShop.Sell(
+  item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE
+): Boolean;
 ```
 Attempts to sell the specified item to the shop from your inventory.
 With the proper quantity button enabled.
@@ -241,7 +267,9 @@ Example:
 WriteLn Shop.Sell('Bones', ERSShopQuantity.FIVE);
 ```
 *)
-function TRSShop.Sell(item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE): Boolean;
+function TRSShop.Sell(
+  item: TRSItem; quantity: ERSShopQuantity = ERSShopQuantity.ONE
+): Boolean;
 begin
   Result := False;
   if not Self.IsOpen() then Exit;
@@ -314,8 +342,13 @@ end;
 
 procedure TRSShop._SetupMapObjects();
 begin
-  Self.Shops     := TRSObjectArray.Create(Map.Walker, ObjectsJSON.GetByAction('Buy-food'));
-  Self.Merchants := TRSEntityArray.Create(Map.Walker, NPCsJSON.GetByAction('Trade'));
+  Self.Shops := TRSObjectArray.Create(
+    Map.Walker, ObjectsJSON.GetByAction('Buy-food')
+  );
+
+  Self.Merchants := TRSEntityArray.Create(
+    Map.Walker, NPCsJSON.GetByAction('Trade')
+  );
 end;
 
 (*

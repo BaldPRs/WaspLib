@@ -30,7 +30,9 @@ methods.
 
   TRSButtonArray = array of TRSButton;
 
-function TRSButton.Construct(bounds: TBox; enabledColors: array of TColorTolerance = []): TRSButton; static;
+function TRSButton.Construct(
+  bounds: TBox; enabledColors: array of TColorTolerance = []
+): TRSButton; static;
 begin
   Result.Bounds := bounds;
   Result.EnabledColors := enabledColors;
@@ -41,7 +43,8 @@ end;
 ```pascal
 procedure TRSButton.Click(button: EMouseButton = EMouseButton.LEFT);
 ```
-Clicks a {ref]`TRSButton` with the specified mouse `button` which by default is the left one.
+Clicks a {ref]`TRSButton` with the specified mouse `button` which by default is the
+left one.
 
 Example:
 ```pascal
@@ -73,11 +76,16 @@ var
   i: Integer;
 begin
   if Self.EnabledColors = [] then
-    raise GetDebugLn('TRSButton', 'This button has no state. Use `TRSButton.Click` instead or add `EnabledColors` to it.');
+    raise GetDebugLn(
+      'TRSButton',
+      'This button has no state. Use `TRSButton.Click` instead or add `EnabledColors` to it.'
+    );
 
+  {$R-}
   for i := 0 to High(Self.EnabledColors) do
     if Target.HasColor(Self.EnabledColors[i], 1, Self.Bounds) then
       Exit(True);
+  {$R+}
 end;
 
 property TRSButton.Enabled(value: Boolean): Boolean;
@@ -85,7 +93,7 @@ begin
   if value = Self.Enabled then
     Exit(True);
   Self.Click();
-  Result := SleepUntil(Self.Enabled = value, RandomMode(100, 50, 1500), 600);
+  Result := SleepUntil(Self.Enabled = value, RandomMode(100, 50, 1500), TICK);
 end;
 
 (*
@@ -107,12 +115,16 @@ begin
 end;
 
 
-function TRSButtonArray.Create(boxes: TBoxArray; enabledColors: array of TColorTolerance): TRSButtonArray; static;
+function TRSButtonArray.Create(
+  boxes: TBoxArray; enabledColors: array of TColorTolerance
+): TRSButtonArray; static;
 var
   b: TBox;
 begin
+  {$R-}
   for b in boxes do
     Result += new TRSButton(b, enabledColors);
+  {$R+}
 end;
 
 
@@ -168,7 +180,7 @@ WriteLn slider.SetLevel(60);
 function TRSSlider.SetLevel(level: Integer): Boolean;
 var
   current: Integer;
-  p: TPoint;
+  pt: TPoint;
 begin
   current := Self.GetLevel();
 
@@ -184,9 +196,13 @@ begin
       end;
   end;
 
-  p := Self.Bounds.TopLeft.Offset(level * Self.Width div 100 + 1, Random(Self.Bounds.Height));
-  Mouse.Click(p, EMouseButton.LEFT);
-  Result := SleepUntil(Abs(Self.GetLevel()-level) < 2, RandomMode(100, 50, 1500), 600);
+  pt := Self.Bounds.TopLeft.Offset(
+    level * Self.Width div 100 + 1, Random(Self.Bounds.Height)
+  );
+  Mouse.Click(pt, EMouseButton.LEFT);
+  Result := SleepUntil(
+    Abs(Self.GetLevel()-level) < 2, RandomMode(100, 50, 1500), TICK
+  );
 end;
 
 
@@ -224,7 +240,10 @@ scroll.Setup();
 procedure TRSScrollBar.Setup(rightSide: Boolean = True);
 begin
   if Self.Area = Default(TBox) then
-    raise GetDebugLn('ScrollBar', 'You need to set a Area to use the TRSScrollBar.Setup() method.');
+    raise GetDebugLn(
+      'ScrollBar',
+      'You need to set a Area to use the TRSScrollBar.Setup() method.'
+    );
 
   if rightSide then
     Self.Bounds.X1 := Self.Area.X2 + 1
@@ -263,9 +282,14 @@ WriteLn Bank.Scroll.IsVisible();
 *)
 function TRSScrollBar.IsVisible(): Boolean;
 begin
-  Result := Target.HasColor(ColorTolerance($16091C, 16.971, EColorSpace.HSV, [0.277, 0.671, 2.054]), 100, Self.Up)
-            and
-            Target.HasColor(ColorTolerance($16091C, 16.971, EColorSpace.HSV, [0.277, 0.671, 2.054]), 100, Self.Down);
+  Result :=
+    Target.HasColor(
+      [$16091C, 16.971, EColorSpace.HSV, [0.277, 0.671, 2.054]], 100, Self.Up
+    )
+    and
+    Target.HasColor(
+      [$16091C, 16.971, EColorSpace.HSV, [0.277, 0.671, 2.054]], 100, Self.Down
+    );
 end;
 
 (*
@@ -284,12 +308,16 @@ ShowOnTarget(Bank.Scroll.Slider);
 *)
 property TRSScrollBar.Slider: TBox;
 var
-  p: TPoint;
+  pt: TPoint;
   tpa: TPointArray;
 begin
-  p.X := Self.Bounds.X1 + Self.Width div 2;
-  tpa := Target.FindColor(TRSInterface.BORDER, 0, [p.X, Self.Bounds.Y1, p.X + 1, Self.Bounds.Y2]);
-  if tpa = [] then Exit;
+  pt.X := Self.Bounds.X1 + Self.Width div 2;
+  tpa := Target.FindColor(
+    TRSInterface.BORDER, 0, [pt.X, Self.Bounds.Y1, pt.X + 1, Self.Bounds.Y2]
+  );
+
+  if tpa = [] then
+    Exit;
   Result.X1 := Self.Bounds.X1+1;
   Result.Y1 := tpa.First.Y;
   Result.X2 := Self.Bounds.X2-1;
@@ -303,7 +331,8 @@ function TRSScrollBar.CanScroll(): Boolean;
 ```
 Returns True/False if the scrollbar is "scrollable".
 
-A scrollbar is not scrollable if it's not visible or if the slider occupies the whole space available.
+A scrollbar is not scrollable if it's not visible or if the slider occupies the whole
+space available.
 
 Example:
 ```pascal
@@ -315,7 +344,8 @@ begin
   if not Self.IsVisible() then
     Exit;
 
-  Result := (Abs(Self.Slider.Y1 - Self.Bounds.Y1) > 0) or (Abs(Self.Slider.Y2 - Self.Bounds.Y2) > 0);
+  Result := (Abs(Self.Slider.Y1 - Self.Bounds.Y1) > 0) or
+            (Abs(Self.Slider.Y2 - Self.Bounds.Y2) > 0);
 end;
 
 
@@ -502,7 +532,12 @@ This has to be used after the `TRSDropDown.Bounds` variable is already set.
 
 Example:
 ```pascal
-DropDown.Setup(['Fixed - Classic layout', 'Resizable - Classic layout', 'Resizable - Modern layout']);
+DropDown.Setup(
+  [
+    'Fixed - Classic layout', 'Resizable - Classic layout',
+    'Resizable - Modern layout'
+  ]
+);
 ```
 *)
 procedure TRSDropDown.Setup(
@@ -511,10 +546,12 @@ procedure TRSDropDown.Setup(
 );
 var
   i: Integer;
-  option: TRSDropDownOption;
 begin
   if Self.Bounds = Default(TBox) then
-    raise GetDebugLn('DropDown', 'You need to set up `Bounds` to use the TRSDropDown.Setup() method.');
+    raise GetDebugLn(
+      'DropDown',
+      'You need to set up `Bounds` to use the TRSDropDown.Setup() method.'
+    );
 
   Self.Index := -1;
 
@@ -528,13 +565,18 @@ begin
   Self.Font := font;
   Self.Colors := colors;
 
+  SetLength(Self.Options, Length(options));
+  {$R-}
   for i := 0 to High(options) do
   begin
-    option.Index := i;
-    option.Bounds := [Self.Bounds.X1+1, Self.Bounds.Y2 + 1 + 15*i, Self.Bounds.X2-18, Self.Bounds.Y2 + 1 + 14 + 15*i];
-    option.Text := options[i];
-    Self.Options += option;
+    Self.Options[i].Index := i;
+    Self.Options[i].Bounds := [
+      Self.Bounds.X1+1, Self.Bounds.Y2 + 1 + 15*i,
+      Self.Bounds.X2-18, Self.Bounds.Y2 + 1 + 14 + 15*i
+    ];
+    Self.Options[i].Text := options[i];
   end;
+  {$R+}
 end;
 
 
@@ -552,7 +594,9 @@ WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].IsVisible();
 *)
 function TRSDropDown.IsVisible(): Boolean;
 begin
-  Result := Target.HasColor(ColorTolerance($130C18, 15.825, EColorSpace.HSV, [0.271, 0.433, 2.298]), 1, Self.Arrow);
+  Result := Target.HasColor(
+    [$130C18, 15.825, EColorSpace.HSV, [0.271, 0.433, 2.298]], 1, Self.Arrow
+  );
 end;
 
 
@@ -572,7 +616,9 @@ function TRSDropDown.IsOpen(): Boolean;
 var
   tpa: TPointArray;
 begin
-  tpa := Target.FindColor(ColorTolerance($130C18, 15.825, EColorSpace.HSV, [0.271, 0.433, 2.298]), Self.Arrow);
+  tpa := Target.FindColor(
+    [$130C18, 15.825, EColorSpace.HSV, [0.271, 0.433, 2.298]], Self.Arrow
+  );
   Result := Self.Center.Y > tpa.Median().Y;
 end;
 
@@ -634,7 +680,7 @@ function TRSDropDown.Close(): Boolean;
 begin
   if not Self.IsVisible() or not Self.IsOpen() then Exit(True);
   Mouse.Click(Self.Bounds, EMouseButton.LEFT);
-  Result := SleepUntil(not Self.IsOpen(), RandomMode(100, 50, 1500), 600);
+  Result := SleepUntil(not Self.IsOpen(), RandomMode(100, 50, 1500), TICK);
 end;
 
 
@@ -706,8 +752,10 @@ function TRSDropDown.Select(option: String): Boolean; overload;
 var
   idx: Integer;
 begin
+  {$R-}
   for idx := 0 to High(Self.Options) do
     if Self.Options[idx].Text.Contains(option) then
       Exit(Self.Select(idx));
+  {$R+}
 end;
 

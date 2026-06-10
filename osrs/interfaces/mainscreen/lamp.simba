@@ -69,7 +69,14 @@ begin
   SetLength(Self.Slots, Length(tba));
 
   for i := 0 to High(tba) do
-    Self.Slots[SKILL_ORDER[i]] := new TRSButton(tba[i], [[$0F1043, 0], [$23269F, 0.227]]);
+    Self.Slots[SKILL_ORDER[i]] :=
+      new TRSButton(
+        tba[i],
+        [
+          [$0F1043, 0, EColorSpace.RGB, [1,1,1]],
+          [$23269F, 0.227, EColorSpace.RGB, [1,1,1]]
+        ]
+      );
 
   Self.ConfirmBounds.X1 := Self.Bounds.X1 + 81;
   Self.ConfirmBounds.Y1 := Self.Bounds.Y2 - 35;
@@ -91,7 +98,8 @@ WriteLn Lamp.IsOpen();
 *)
 function TRSLamp.IsOpen(): Boolean;
 begin
-  Result := Self.Title._IsOpen() and Target.HasColor($999999, 0, 819, Self.Title.Bounds);
+  Result := Self.Title._IsOpen() and
+            Target.HasColor($999999, 0, 819, Self.Title.Bounds);
 end;
 
 (*
@@ -143,8 +151,8 @@ end;
 function TRSLamp.Close(escape: Boolean): Boolean;
 function TRSLamp.Close(escapeProbability: Single = 0): Boolean; overload;
 ```
-Closes the Lamp interface.  Depending on `escape` or `escapeProbability the function will
-either click the button or press escape key.
+Closes the Lamp interface. Depending on `escape` or `escapeProbability the function
+will either click the button or press escape key.
 
 Example:
 ```pascal

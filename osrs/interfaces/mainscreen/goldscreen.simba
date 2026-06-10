@@ -47,8 +47,9 @@ Main record to interact with the {ref}`GoldScreen` interface.
     Bounds: TBox;
     SlotBoxes: TBoxArray;
     Buttons: array [ERSItemQuantity] of TRSButton;
-    const ITEMS: set of ERSGoldItem =
-      [ERSGoldItem.GOLD_RING .. ERSGoldItem.ZENYTE_BRACELET];
+    const ITEMS: set of ERSGoldItem = [
+      ERSGoldItem.GOLD_RING .. ERSGoldItem.ZENYTE_BRACELET
+    ];
   end;
 
 (*
@@ -76,8 +77,12 @@ begin
   Self.Title.Setup(Self.Bounds);
 
   {─ item‑slot boxes ─}
-  topRow     := TBoxArray.Create([Self.Bounds.X1 + 36, Self.Bounds.Y1 + 66], 9, 1, 31, 31, [14,30]);
-  gridBelow  := TBoxArray.Create([Self.Bounds.X1 + 36, Self.Bounds.Y1 + 127], 8, 3, 31, 31, [19,30]);
+  topRow := TBoxArray.Create(
+    [Self.Bounds.X1 + 36, Self.Bounds.Y1 + 66], 9, 1, 31, 31, [14,30]
+  );
+  gridBelow := TBoxArray.Create(
+    [Self.Bounds.X1 + 36, Self.Bounds.Y1 + 127], 8, 3, 31, 31, [19,30]
+  );
 
   Self.SlotBoxes += topRow;
   self.SlotBoxes += gridBelow;
@@ -85,9 +90,13 @@ begin
   Self.Title.Setup(Self.Bounds);
 
   {─ quantity buttons ─}
-  btnGrid := TBoxArray.Create([Self.Bounds.X1 + 445, Self.Bounds.Y1 + 38], 1, 5, 36, 36, [0,4]);
+  btnGrid := TBoxArray.Create(
+    [Self.Bounds.X1 + 445, Self.Bounds.Y1 + 38], 1, 5, 36, 36, [0,4]
+  );
+
   for i := 0 to 4 do
-    Self.Buttons[i] := new TRSButton(btnGrid[i], [[$25323B, 1.294]]);
+    Self.Buttons[i] :=
+      new TRSButton(btnGrid[i], [[$25323B, 1.294, EColorSpace.RGB, [1,1,1]]]);
 end;
 
 (*
@@ -105,11 +114,15 @@ end;
 (*
 ## GoldScreen.WaitOpen
 ```pascal
-function TRSGoldScreen.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSGoldScreen.WaitOpen(
+  time: Integer = TICK; interval: Integer = -1
+): Boolean;
 ```
-Waits up to `time` ms for the interface to appear.
+Waits up to `time` ms for the interface to appear.
 *)
-function TRSGoldScreen.WaitOpen(time, interval: Integer): Boolean;
+function TRSGoldScreen.WaitOpen(
+  time: Integer = TICK; interval: Integer = -1
+): Boolean;
 begin
   if interval < 0 then
     interval := RandomMode(100,50,1500);
@@ -164,8 +177,12 @@ begin
     txt := 'All';
 
   for btn in Self.Buttons do
-    if (OCR.Locate(btn.Bounds, txt, [RSFonts.WHITE], 1, RSFonts.PLAIN_11) > 0.85) and btn.Enabled then
+  begin
+    if not btn.Enabled then
+      Continue;
+    if OCR.Locate(btn.Bounds, txt, [RSFonts.WHITE], 1, RSFonts.PLAIN_11) > 0.85 then
       Exit(True);
+  end;
 
   for btn in Self.Buttons do
     if OCR.Locate(btn.Bounds, txt, [RSFonts.ORANGE], 1, RSFonts.PLAIN_11) > 0.85 then

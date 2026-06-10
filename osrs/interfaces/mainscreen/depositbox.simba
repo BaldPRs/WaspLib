@@ -38,7 +38,9 @@ Main record to interact with the {ref}`DepositBox` interface.
 ```pascal
 function TRSDepositBox.FindItemBoundaries(): TBoxArray;
 ```
-Finds and returns the bounding boxes of items currently visible in the deposit box slots.
+Finds and returns the bounding boxes of items currently visible in the deposit box
+slots.
+
 Used internally by the slot interface for item detection.
 
 Example:
@@ -47,7 +49,7 @@ WriteLn DepositBox.FindItemBoundaries();
 ```
 *)
 
-function TRSDepositBox.FindItemBoundaries(): TBoxArray;forward;
+function TRSDepositBox.FindItemBoundaries(): TBoxArray; forward;
 
 function TRSDepositBox.IsOpen(): Boolean; forward;
 
@@ -72,7 +74,9 @@ begin
   Self.SlotsArea.X2 := Self.Bounds.X2 - 70;
   Self.SlotsArea.Y2 := Self.Bounds.Y2 - 17;
 
-  Self.InvSlotBoxes := TBoxArray.Create([Self.SlotsArea.X1,Self.SlotsArea.Y1], 4, 7, 32, 32, [10, 4]);
+  Self.InvSlotBoxes := TBoxArray.Create(
+    [Self.SlotsArea.X1,Self.SlotsArea.Y1], 4, 7, 32, 32, [10, 4]
+  );
 
   Self.Slots.Setup('DepositBox.Slots', Self.InvSlotBoxes, @Self.FindItemBoundaries);
   Self.Items.Setup('DepositBox.Items', @Self.Slots, [0,1], @Self.IsOpen);
@@ -90,7 +94,14 @@ begin
   begin
     tba := TBoxArray.Create([X2-42,Y1+95], 1, 5, 27, 27, [0, 16]);
     for i := 0 to 4 do
-      Self.QuantityButtons[i] := new TRSButton(tba[i], [[$0F1043, 0], [$23269F, 0.227]]);
+      Self.QuantityButtons[i] :=
+        new TRSButton(
+          tba[i],
+          [
+            [$0F1043, 0, EColorSpace.RGB, [1,1,1]],
+            [$23269F, 0.227, EColorSpace.RGB, [1,1,1]]
+          ]
+        );
 
     tba := TBoxArray.Create([X1+24,Y2-41], 3, 1, 29, 27, [25, 0]);
     for i := 0 to 2 do
@@ -170,8 +181,8 @@ end;
 function TRSDepositBox.Close(escape: Boolean): Boolean;
 function TRSDepositBox.Close(escapeProbability: Single = 0): Boolean; overload;
 ```
-Closes the depositbox interface.  Depending on `escape` or `escapeProbability the function will
-either click the button or press escape key.
+Closes the depositbox interface. Depending on `escape` or `escapeProbability the
+function will either click the button or press escape key.
 
 Example:
 ```pascal
@@ -188,7 +199,9 @@ begin
   Result := Self.Title.Close(escapeProbability);
 end;
 
-function TRSDepositBox.DepositHelper(b: TBox; amount: Integer; useQuantityButtons: Boolean): Boolean;
+function TRSDepositBox.DepositHelper(
+  bounds: TBox; amount: Integer; useQuantityButtons: Boolean
+): Boolean;
 var
   Button: TRSButton;
 begin
@@ -200,7 +213,7 @@ begin
 
       if Button.Enabled[True] then
       begin
-        Mouse.Move(B);
+        Mouse.Move(bounds);
         Biometrics.Sleep(300);
 
         if MainScreen.IsUpText('Deposit-' + ToString(amount)) then
@@ -208,7 +221,10 @@ begin
           Mouse.Click(EMouseButton.LEFT);
           Result := True;
         end else
-          Result := ChooseOption.Select('Deposit-X') and Chat.AnswerQuery('Enter amount', ToString(amount), Random(2000, 4000));
+          Result := ChooseOption.Select('Deposit-X') and
+                    Chat.AnswerQuery(
+                      'Enter amount', ToString(amount), Random(2000, 4000)
+                    );
       end;
     end else
     begin
@@ -223,21 +239,23 @@ begin
       if Button.Enabled[True] then
       begin
         Result := True;
-        Mouse.Move(b, True);
+        Mouse.Move(bounds, True);
         Biometrics.Sleep(300);
         Mouse.Click(EMouseButton.LEFT);
       end;
     end;
   end else
   begin
-    Mouse.Move(B);
+    Mouse.Move(bounds);
 
     case amount of
       QUANTITY_ALL:
         Result := ChooseOption.Select('Deposit-All');
       else
-        Result := ChooseOption.Select('Deposit-' + ToString(amount) + ' ', True, False) or
-                  ChooseOption.Select('Deposit-X') and Chat.AnswerQuery('Enter amount', ToString(amount), Random(2000, 2500));
+        Result :=
+          ChooseOption.Select('Deposit-' + ToString(amount) + ' ', True, False) or
+          ChooseOption.Select('Deposit-X') and
+          Chat.AnswerQuery('Enter amount', ToString(amount), Random(2000, 2500));
     end;
   end;
 end;
@@ -245,26 +263,37 @@ end;
 (*
 ## DepositBox.Deposit
 ```pascal
-function TRSDepositBox.Deposit(item: TRSBankItem; useQuantityButtons: Boolean): Boolean;
-function TRSDepositBox.Deposit(item: TRSItem; useQuantityButtons: Boolean): Boolean; overload;
+function TRSDepositBox.Deposit(
+  item: TRSBankItem; useQuantityButtons: Boolean
+): Boolean;
+
+function TRSDepositBox.Deposit(
+  item: TRSItem; useQuantityButtons: Boolean
+): Boolean; overload;
 ```
 Deposits the specified item into the deposit box.
 If useQuantityButton is False it will use {ref}`ChooseOption`
 
 Example:
 ```pascal
-DepositBox.Deposit('Lobster', True);
+WriteLn DepositBox.Deposit('Lobster', True);
 ```
 *)
-function TRSDepositBox.Deposit(item: TRSBankItem; useQuantityButtons: Boolean): Boolean;
+function TRSDepositBox.Deposit(
+  item: TRSBankItem; useQuantityButtons: Boolean
+): Boolean;
 var
   ba: TBoxArray;
 begin
   if Self.Items.FindAll([item.Item], ba) then
-    Result := Self.DepositHelper(ba[Random(0,High(ba))], item.Quantity, useQuantityButtons);
+    Result := Self.DepositHelper(
+      ba[Random(0,High(ba))], item.Quantity, useQuantityButtons
+    );
 end;
 
-function TRSDepositBox.Deposit(Item: TRSItem; useQuantityButtons: Boolean): Boolean; overload;
+function TRSDepositBox.Deposit(
+  item: TRSItem; useQuantityButtons: Boolean
+): Boolean; overload;
 begin
   Result := Self.Deposit(new TRSBankItem(item), useQuantityButtons);
 end;
@@ -272,8 +301,13 @@ end;
 (*
 ## DepositBox.DepositArray
 ```pascal
-function TRSDepositBox.DepositArray(items: array of TRSBankItem; useQuantityButtons: Boolean): Boolean;
-function TRSDepositBox.DepositArray(items: TRSItemArray; useQuantityButtons: Boolean): Boolean; overload;
+function TRSDepositBox.DepositArray(
+  items: array of TRSBankItem; useQuantityButtons: Boolean
+): Boolean;
+
+function TRSDepositBox.DepositArray(
+  items: TRSItemArray; useQuantityButtons: Boolean
+): Boolean; overload;
 ```
 Deposits an array of items into the deposit box. Returns `True` if all items were successfully deposited.
 If useQuantityButton is False it will use {ref}`ChooseOption`
@@ -284,7 +318,9 @@ DepositBox.DepositArray(['Lobster', 'Swordfish'], True);
 ```
 *)
 
-function TRSDepositBox.DepositArray(items: array of TRSBankItem; useQuantityButtons: Boolean): Boolean;
+function TRSDepositBox.DepositArray(
+  items: array of TRSBankItem; useQuantityButtons: Boolean
+): Boolean;
 var
   item: TRSBankItem;
 begin
@@ -294,7 +330,9 @@ begin
       Result := False;
 end;
 
-function TRSDepositBox.DepositArray(items: TRSItemArray; useQuantityButtons: Boolean): Boolean; overload;
+function TRSDepositBox.DepositArray(
+  items: TRSItemArray; useQuantityButtons: Boolean
+): Boolean; overload;
 var
   item: TRSItem;
 begin
@@ -318,8 +356,8 @@ DepositBox.DepositInventory();
 *)
 procedure TRSDepositBox.DepositInventory();
 begin
-  if Self.IsOpen then
-    Self.DepositButtons[ERSDepositButtons.INVENTORY].Click;
+  if Self.IsOpen() then
+    Self.DepositButtons[ERSDepositButtons.INVENTORY].Click();
 end;
 
 (*
@@ -336,8 +374,8 @@ DepositBox.DepositLootBag();
 *)
 procedure TRSDepositBox.DepositLootBag();
 begin
-  if Self.IsOpen then
-    Self.DepositButtons[ERSDepositButtons.LOOT].Click;
+  if Self.IsOpen() then
+    Self.DepositButtons[ERSDepositButtons.LOOT].Click();
 end;
 
 (*
@@ -354,14 +392,16 @@ DepositBox.DepositEquipment();
 *)
 procedure TRSDepositBox.DepositEquipment();
 begin
-  if Self.IsOpen then
-    Self.DepositButtons[ERSDepositButtons.WORN].Click;
+  if Self.IsOpen() then
+    Self.DepositButtons[ERSDepositButtons.WORN].Click();
 end;
 
 (*
 ## DepositBox.DepositDifferent
 ```pascal
-function TRSDepositBox.DepositDifferent(items: TRSItemArray; useQuantityButton: Boolean = True): Boolean;
+function TRSDepositBox.DepositDifferent(
+  items: TRSItemArray; useQuantityButton: Boolean = True
+): Boolean;
 ```
 Attempts to deposit all items found that are not the `items` passed as a paremeter.
 
@@ -370,7 +410,9 @@ Example:
 WriteLn DepositBox.DepositDifferent(['Abyssal whip', 'Bandos chestplate', 'Bandos tassets']);
 ```
 *)
-function TRSDepositBox.DepositDifferent(items: TRSItemArray; useQuantityButton: Boolean = True): Boolean;
+function TRSDepositBox.DepositDifferent(
+  items: TRSItemArray; useQuantityButton: Boolean = True
+): Boolean;
 var
   slots: TIntegerArray;
   slot: Integer;
@@ -386,7 +428,9 @@ begin
     if deposited.Contains(hash) then
       Continue;
     deposited += hash;
-    if not Self.DepositHelper(Self.Slots.Box(slot), QUANTITY_ALL, useQuantityButton) then
+    if not Self.DepositHelper(
+      Self.Slots.Box(slot), QUANTITY_ALL, useQuantityButton
+    ) then
       Exit;
   end;
   Result := True;
@@ -395,7 +439,9 @@ end;
 
 procedure TRSDepositBox._SetupMapObjects();
 begin
-  Self.DepositBoxes := TRSObjectArray.Create(Map.Walker, ObjectsJSON.GetByAction('Bank Deposit Box'));
+  Self.DepositBoxes := TRSObjectArray.Create(
+    Map.Walker, ObjectsJSON.GetByAction('Bank Deposit Box')
+  );
 end;
 
 
@@ -403,7 +449,6 @@ end;
 ## DepositBox.Hover
 ```pascal
 function TRSDepositBox.Hover(constref obj: TRSObject; walk: Boolean = True): Boolean;
-function TRSDepositBox.Hover(constref npc: TRSEntity; walk: Boolean = True): Boolean; overload;
 function TRSDepositBox.Hover(walk: Boolean = True): Boolean; overload;
 ```
 Hovers the closest DepositBox that WaspLib is aware of.
@@ -412,8 +457,7 @@ This assumes that {ref}`Map` is being used and setup.
 It's possible to use this with other systems but you need to configure it all
 manually.
 
-It will always hover the closest DepositBox {ref}`TRSObject` or {ref}`TRSEntity` on your
-loaded map.
+It will always hover the closest DepositBox {ref}`TRSObject` on your loaded map.
 
 If you are too far, it will attempt to walk closer to it.
 *)
@@ -441,7 +485,6 @@ end;
 ## DepositBox.Open
 ```pascal
 function TRSDepositBox.Open(constref obj: TRSObject; walk: Boolean = True): Boolean;
-function TRSDepositBox.Open(constref npc: TRSEntity; walk: Boolean = True): Boolean; overload;
 function TRSDepositBox.Open(walk: Boolean = True): Boolean; overload;
 ```
 Opens the DepositBox for you.
@@ -450,8 +493,8 @@ This assumes that {ref}`Map` is being used and setup.
 It's possible to use this with other systems but you need to configure it all
 manually.
 
-It will always use the closest DepositBox {ref}`RSObject` or {ref}`RSNPC` WaspLib is
-aware of on your loaded map.
+It will always use the closest DepositBox {ref}`RSObject` WaspLib is aware of on your
+loaded map.
 
 If you are too far, it will attempt to walk closer to it by default unless you
 set the `walk` parameter to `False`.
@@ -475,7 +518,8 @@ begin
     Result := obj.Interact(['Deposit Box']);
 
   if not Result then
-    if not MainScreen.IsUpText('Deposit Box') or not ChooseOption.Select(['Deposit Deposit']) then
+    if not MainScreen.IsUpText('Deposit Box') or
+       not ChooseOption.Select(['Deposit Deposit']) then
       Exit;
 
   obj.Walker^.WaitMoving();

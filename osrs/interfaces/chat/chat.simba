@@ -30,11 +30,15 @@ Enum representing each of the available chat text colors.
 (ERSIronMan)=
 ## ERSIronMan enum
 ```pascal
-ERSIronMan = enum(NONE, IRONMAN, HARDCORE, ULTIMATE, GROUP, HARCORE_GROUP, UNRANKED_GROUP);
+ERSIronMan = enum(
+  NONE, IRONMAN, HARDCORE, ULTIMATE, GROUP, HARCORE_GROUP, UNRANKED_GROUP
+);
 ```
 Enum representing each of the available ironman types.
 *)
-  ERSIronMan = enum(NONE, IRONMAN, HARDCORE, ULTIMATE, GROUP, HARCORE_GROUP, UNRANKED_GROUP);
+  ERSIronMan = enum(
+    NONE, IRONMAN, HARDCORE, ULTIMATE, GROUP, HARCORE_GROUP, UNRANKED_GROUP
+  );
 
 (*
 ## TRSChat
@@ -64,15 +68,23 @@ begin
 
   with Self.Tabs.Bounds do
   begin
-    Self.ReportButton := new TRSButton([X1 + 436, Y1,  X1 + 515, Y2 - 1], [[1555,6], [5399922, 0], [795452, 0]]);
+    Self.ReportButton := new TRSButton(
+      [X1 + 436, Y1,  X1 + 515, Y2 - 1],
+      [
+        [$000613, 6, EColorSpace.RGB, [1,1,1]],
+        [$526572, 0, EColorSpace.RGB, [1,1,1]],
+        [$0C233C, 0, EColorSpace.RGB, [1,1,1]]
+      ]
+    );
     Self.Bounds.X1 := X1;
     Self.Bounds.X2 := X2;
     Self.Bounds.Y1 := Y1 - 142;
     Self.Bounds.Y2 := Y1 - 1;
   end;
 
-  with Self.Bounds do
-    Self.MessageLines := TBoxArray.Create(TopLeft + [10, 8], 1, 9, Width - 34, 13, [0, 1]);
+  Self.MessageLines := TBoxArray.Create(
+    Self.Bounds.TopLeft + [10, 8], 1, 9, Self.Bounds.Width - 34, 13, [0, 1]
+  );
 
   Self.InputLine := Self.MessageLines.Pop;
   Self.InputLine.X2 += 17;
@@ -85,7 +97,10 @@ begin
 
   Self.Scroll.Setup();
 
-  Self.Colors := [RSFonts.BLACK, $7F0000, RSFonts.BLUE, $7F007F, $2010EF, RSFonts.RED, RSFonts.WHITE, $FF9090, RSFonts.DARK_BLUE, $005F00];
+  Self.Colors := [
+    RSFonts.BLACK, $7F0000, RSFonts.BLUE, $7F007F, $2010EF, RSFonts.RED,
+    RSFonts.WHITE, $FF9090, RSFonts.DARK_BLUE, $005F00
+  ];
   MainScreen.Mask.DrawColor := $0000FF;
   MainScreen.Mask.DrawBoxFilled(Self.Bounds);
 end;
@@ -216,22 +231,34 @@ begin
   b.X2 := Self.InputLine.X1 + 10;
   b.Y2 := Self.InputLine.Y2;
 
-  if Target.HasColor([$484949, 1.216, EColorSpace.HSL, [0.018, 2.599, 0.385]], 1, b) then
+  if Target.HasColor(
+    [$484949, 1.216, EColorSpace.HSL, [0.018, 2.599, 0.385]], 1, b
+  ) then
   begin
-    if Target.HasColor([$7E3C1A, 0.761, EColorSpace.HSL, [1.396, 1.396, 0.210]], 1, b) then
+    if Target.HasColor(
+      [$7E3C1A, 0.761, EColorSpace.HSL, [1.396, 1.396, 0.210]], 1, b
+    ) then
       Exit(ERSIronMan.GROUP);
-    if Target.HasColor([$1A1A83, 0.817, EColorSpace.HSL, [1.977, 0.683, 0.342]], 1, b) then
+    if Target.HasColor(
+      [$1A1A83, 0.817, EColorSpace.HSL, [1.977, 0.683, 0.342]], 1, b
+    ) then
       Exit(ERSIronMan.HARCORE_GROUP);
-    if Target.HasColor([$5D801A, 1.2, EColorSpace.HSL, [1.345, 1.345, 0.312]], 1, b) then
+    if Target.HasColor(
+      [$5D801A, 1.2, EColorSpace.HSL, [1.345, 1.345, 0.312]], 1, b
+    ) then
       Exit(ERSIronMan.UNRANKED_GROUP);
 
     Exit(ERSIronMan.IRONMAN);
   end;
 
-  if Target.HasColor([$1B1B57, 0.787, EColorSpace.HSL, [2.371, 0.206, 0.425]], 1, b) then
+  if Target.HasColor(
+    [$1B1B57, 0.787, EColorSpace.HSL, [2.371, 0.206, 0.425]], 1, b
+  ) then
     Exit(ERSIronMan.HARDCORE);
 
-  if Target.HasColor([$BFC1C1, 2.268, EColorSpace.HSL, [0.034, 2.779, 0.189]], 1, b) then
+  if Target.HasColor(
+    [$BFC1C1, 2.268, EColorSpace.HSL, [0.034, 2.779, 0.189]], 1, b
+  ) then
     Exit(ERSIronMan.ULTIMATE);
 end;
 
@@ -307,7 +334,8 @@ end;
 A chat query is when you have some kind of question on the chatbox which you have
 to reply to.
 
-For example, when you try to "withdraw-x" from the bank, you are asked for the quantity:
+For example, when you try to "withdraw-x" from the bank, you are asked for the
+quantity:
 ```{figure} ../../images/chat_query.png
 A chat query.
 ```
@@ -376,7 +404,7 @@ end;
 function TRSChat.WaitQuery(
   query: String;
   caseSensitive: Boolean = False;
-  time: Integer = 600;
+  time: Integer = TICK;
   interval: Integer = -1
 ): Boolean;
 ```
@@ -391,7 +419,7 @@ WriteLn Chat.WaitQuery('Enter amount');
 function TRSChat.WaitQuery(
   query: String;
   caseSensitive: Boolean = False;
-  time: Integer = 600;
+  time: Integer = TICK;
   interval: Integer = -1
 ): Boolean;
 begin
@@ -403,7 +431,7 @@ end;
 #### Chat.AnswerQuery
 ```pascal
 function TRSChat.AnswerQuery(
-  query, answer: String; waitTime: Integer = 600; interval: Integer = -1
+  query, answer: String; waitTime: Integer = TICK; interval: Integer = -1
 ): Boolean;
 ```
 Attempts to reply to the specified `query` with `answer` if it's available in the
@@ -415,7 +443,7 @@ WriteLn Chat.AnswerQuery('Enter amount', '15');
 ```
 *)
 function TRSChat.AnswerQuery(
-  query, answer: String; waitTime: Integer = 600; interval: Integer = -1
+  query, answer: String; waitTime: Integer = TICK; interval: Integer = -1
 ): Boolean;
 begin
   Result := Self.WaitQuery(query, False, waitTime, interval);

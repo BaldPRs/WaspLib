@@ -93,7 +93,7 @@ end;
 (*
 ## Make.WaitOpen
 ```pascal
-function TRSMake.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSMake.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Returns True if the {ref}`Make` opens within `time` milliseconds.
 
@@ -102,7 +102,7 @@ Example:
 WriteLn Make.WaitOpen();
 ```
 *)
-function TRSMake.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSMake.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.IsOpen(), interval, time);
@@ -329,7 +329,7 @@ end;
 (*
 ## Make.WaitHint
 ```pascal
-function TRSMake.WaitHint(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSMake.WaitHint(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Returns true if a hint tooltip is visible within `time` milliseconds.
 
@@ -339,7 +339,7 @@ if Make.WaitHint() then
   ShowOnTarget(Make.GetHintBox());
 ```
 *)
-function TRSMake.WaitHint(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSMake.WaitHint(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.HasHint(), interval, time);

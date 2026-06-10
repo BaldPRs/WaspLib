@@ -170,7 +170,7 @@ function TRSChat.WaitOption(
   option: String;
   caseSensitive: Boolean = True;
   colors: TColorArray = CHAT_OPTION_COLORS;
-  time: Integer = 600;
+  time: Integer = TICK;
   interval: Integer = -1
 ): Boolean;
 ```
@@ -185,7 +185,7 @@ function TRSChat.WaitOption(
   option: String;
   caseSensitive: Boolean = True;
   colors: TColorArray = CHAT_OPTION_COLORS;
-  time: Integer = 600;
+  time: Integer = TICK;
   interval: Integer = -1
 ): Boolean;
 begin

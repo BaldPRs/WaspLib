@@ -84,6 +84,7 @@ Helper record to cache items positions on the {ref}`Bank` interface.
   end;
 
 (*
+(TRSBank)=
 ## TRSBank type
 Record responsible to handle the {ref}`Bank` interface.
 *)

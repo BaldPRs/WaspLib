@@ -10,7 +10,8 @@ Methods to interact with the bank pin interface.
 
 type
 (*
-## TRSBankPin
+(TRSBankPin)=
+## TRSBankPin type
 Main record to interact with the {ref}`BankPin` interface.
 *)
   TRSBankPin = record
@@ -29,7 +30,8 @@ This is automatically called for you on the {ref}`BankPin variable`.
 procedure TRSBankPin.SetupInterface();
 begin
   case RSClient.Mode of
-    ERSMode.FIXED: Self.Bounds := MSInterface.CreateBounds([0, 11, 0, 0], 488, 305);
+    ERSMode.FIXED:
+      Self.Bounds := MSInterface.CreateBounds([0, 11, 0, 0], 488, 305);
     ERSMode.RESIZABLE, ERSMode.MODERN_COMPACT, ERSMode.MODERN_WIDE:
       Self.Bounds := MSInterface.CreateBounds([0, 10, 0, 0], 488, 305);
   end;

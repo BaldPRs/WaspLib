@@ -237,7 +237,7 @@ var
 begin
   img := Target.GetImage(bounds);
   img.ReplaceColorBinary(False, colors, tolerance);
-  Result := Self.Engine.Recognize(img, Font);
+  Result := Self.Engine.Recognize(img, font);
 end;
 
 (*

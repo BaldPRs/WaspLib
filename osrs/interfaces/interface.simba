@@ -32,17 +32,17 @@ begin
   Result := Target.HasColor(TRSInterface.BORDER, 0, 80, Self.CloseButton);
 end;
 
-procedure TRSInterfaceTitle.Setup(bounds: TBox);
+procedure TRSInterfaceTitle.Setup(const bounds: TBox);
 begin
   Self.Bounds.X1 := bounds.X1 + 50;
   Self.Bounds.Y1 := bounds.Y1 + 10;
   Self.Bounds.X2 := bounds.X2 - 50;
   Self.Bounds.Y2 := Self.Bounds.Y1 + 17;
 
-  Self.CloseButton.X1 := bounds.X2-28;
+  Self.CloseButton.X1 := bounds.X2-27;
   Self.CloseButton.Y1 := bounds.Y1+7;
-  Self.CloseButton.X2 := bounds.X2-6;
-  Self.CloseButton.Y2 := bounds.Y1+29;
+  Self.CloseButton.X2 := bounds.X2-7;
+  Self.CloseButton.Y2 := bounds.Y1+27;
 
   Self.TitleColor := RSFonts.ORANGE;
 
@@ -81,7 +81,8 @@ end;
 
 function TRSInterfaceTitle.Close(escape: Boolean): Boolean;
 begin
-  if not Self.IsOpen() then Exit(True);
+  if not Self.IsOpen() then
+    Exit(True);
 
   case escape of
     False: Mouse.Click(Self.CloseButton, EMouseButton.LEFT);

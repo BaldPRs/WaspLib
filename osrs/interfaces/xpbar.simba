@@ -221,18 +221,18 @@ begin
   if not Target.HasColor(Self.INNER_BORDER, 0, 280, Self.Bounds) then
     Exit;
 
-  str := OCR.Recognize(Self.Bounds, Self.Font, [$FFFFFF], 0);
-
-  Result := str.ExtractInteger(0);
-  if Result = 0 then
-    Exit;
-
-  count := Target.CountColor($010000, 0, Self.Bounds);
+  count := Target.CountColor(ITEM_BORDER, 0, Self.Bounds);
   if ((count <> 45) and (not InRange(count, 141, 150))) then
   begin
     DebugLn('XPBar', 'Your XPBar doesn''t seem to be set to count "Total Experience"', ELogLevel.WARN);
     DebugLn('XPBar', 'XP Tracking won''t be used and this can cause issues.', ELogLevel.WARN);
   end;
+
+  str := OCR.Recognize(Self.Bounds, Self.Font, [$FFFFFF], 0);
+
+  Result := str.ExtractInteger(0);
+  if Result = 0 then
+    Exit;
 
   if Result < Self.Tracker.Previous then
   begin

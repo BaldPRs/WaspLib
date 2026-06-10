@@ -576,7 +576,7 @@ begin
 
     ERSLoginMessage.AUTHENTICATOR:     raise GetDebugLn('Login', 'profile needs authenticator to login.');
 
-    ERSLoginMessage.UNKNOWN:          if RSClient.IsLoggedIn() or Lobby.IsOpen() then Exit(True) else raise GetDebugLn('Login', 'Unknown login state.');
+    ERSLoginMessage.UNKNOWN:           if RSClient.IsLoggedIn() or Lobby.IsOpen() then Exit(True) else raise GetDebugLn('Login', 'Unknown login state.');
   end;
 end;
 

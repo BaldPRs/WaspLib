@@ -130,8 +130,8 @@ procedure TScriptForm.OnStart(sender: TLazObject); override;
 begin
   inherited();
 
-  Template.FormSetting := FormCheckbox.IsChecked();
-  if TemplateConfig.Data.Has('form_setting') then
+  Template.FormSetting := FormCheckbox.Checked;
+  if TemplateConfig.Data.Assert('form_setting', EJSONType.BOOL) then
     TemplateConfig.Data.Item['form_setting'].AsBool := Template.FormSetting
   else
     TemplateConfig.Data.AddBool('form_setting', Template.FormSetting);
@@ -156,10 +156,10 @@ begin
   panel.Align := ELazAlign.Bottom;
 
   FormCheckbox := TLazCheckBox.CreateEx(tab, 'My Setting', 'My setting does cool stuff', 20, 220);
-  if TemplateConfig.Data.Has('form_setting') then
-    FormCheckbox.SetChecked(TemplateConfig.Data.Item['form_setting'].AsBool)
+  if TemplateConfig.Data.Assert('form_setting', EJSONType.BOOL) then
+    FormCheckbox.Checked := TemplateConfig.Data.Item['form_setting'].AsBool
   else
-    FormCheckbox.SetChecked(True);
+    FormCheckbox.Checked := True;
 
   Self.CreateAntibanTab();
   Self.CreateMiscTab();

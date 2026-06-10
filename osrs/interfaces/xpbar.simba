@@ -176,7 +176,11 @@ begin
 
   Self.Bounds := border.Bounds();
 
-  if (Self.Bounds.Height <> 29) and (Self.Bounds.Height <> 38) then
+  //Trackbar is visible on XP (height 38) and hidden otherwise (height 29).
+  if Self.Bounds.Height = 29 then
+    Self.Bounds.Y2 += 9
+  else
+  if Self.Bounds.Height <> 38 then
     Exit;
 
   case Self.Bounds.Width of

@@ -7,13 +7,6 @@ These can be buttons, scrollbars, dropdowns, checkboxes, etc.
 {$INCLUDE_ONCE WaspLib/osrs.simba}
 
 type
-  TRSButtonEnabledColor = record
-    Color: TColor;
-    Tolerance: Single;
-  end;
-
-  TRSButtonEnabledColorArray = array of TRSButtonEnabledColor;
-
 (*
 ## TRSButton type
 RuneScape has several types of buttons, {ref}`TRSButton` can be used for
@@ -31,13 +24,13 @@ but in a lot of cases you won't be able to make use of the {ref}`TRSButton`
 methods.
 *)
   TRSButton = object
-    EnabledColors: TRSButtonEnabledColorArray;
+    EnabledColors: array of TColorTolerance;
     Bounds: TBox;
   end;
 
   TRSButtonArray = array of TRSButton;
 
-function TRSButton.Construct(bounds: TBox; enabledColors: TRSButtonEnabledColorArray = []): TRSButton; static;
+function TRSButton.Construct(bounds: TBox; enabledColors: array of TColorTolerance = []): TRSButton; static;
 begin
   Result.Bounds := bounds;
   Result.EnabledColors := enabledColors;
@@ -83,7 +76,7 @@ begin
     raise GetDebugLn('TRSButton', 'This button has no state. Use `TRSButton.Click` instead or add `EnabledColors` to it.');
 
   for i := 0 to High(Self.EnabledColors) do
-    if Target.HasColor(Self.EnabledColors[i].Color, Self.EnabledColors[i].Tolerance, 1, Self.Bounds) then
+    if Target.HasColor(Self.EnabledColors[i], 1, Self.Bounds) then
       Exit(True);
 end;
 
@@ -98,7 +91,7 @@ end;
 (*
 ### TRSButton.WaitEnabled
 ```pascal
-function TRSButton.WaitEnabled(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSButton.WaitEnabled(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Returns True if the button is enabled within `time` milliseconds.
 
@@ -107,14 +100,14 @@ Example:
 WriteLn Button.WaitEnabled();
 ```
 *)
-function TRSButton.WaitEnabled(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSButton.WaitEnabled(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.Enabled, interval, time);
 end;
 
 
-function TRSButtonArray.Create(boxes: TBoxArray; enabledColors: TRSButtonEnabledColorArray): TRSButtonArray; static;
+function TRSButtonArray.Create(boxes: TBoxArray; enabledColors: array of TColorTolerance): TRSButtonArray; static;
 var
   b: TBox;
 begin
@@ -199,6 +192,7 @@ end;
 
 type
 (*
+(TRSScrollBar)=
 ## TRSScrollBar type
 Record to handle the game interface's scrollbars:
 ```{figure} ../../images/scrollbar.png
@@ -466,6 +460,7 @@ end;
 
 type
 (*
+(TRSDropDownOption)=
 ## TRSDropDownOption type
 Helper record to handle {ref}`TRSDropDown` options.
 *)
@@ -476,6 +471,7 @@ Helper record to handle {ref}`TRSDropDown` options.
   end;
 
 (*
+(TRSDropDown)=
 ## TRSDropDown type
 Record to handle drop downs in the game interfaces:
 ```{figure} ../../images/dropdowns.png
@@ -485,6 +481,8 @@ Record to handle drop downs in the game interfaces:
     Index: Integer;
     Bounds, Arrow: TBox;
     Center: TPoint;
+    Font: TPixelFont;
+    Colors: TColorArray;
     Options: array of TRSDropDownOption;
   end;
 
@@ -493,7 +491,10 @@ Record to handle drop downs in the game interfaces:
 (*
 ### TRSDropDown.Setup
 ```pascal
-procedure TRSDropDown.Setup(options: TStringArray);
+procedure TRSDropDown.Setup(
+  options: TStringArray; constref font: TPixelFont;
+  colors: TColorArray = [$1F98FF, $3FB8FF]
+);
 ```
 Sets up a {ref}`TRSDropDown` internal variables.
 
@@ -504,7 +505,10 @@ Example:
 DropDown.Setup(['Fixed - Classic layout', 'Resizable - Classic layout', 'Resizable - Modern layout']);
 ```
 *)
-procedure TRSDropDown.Setup(options: TStringArray);
+procedure TRSDropDown.Setup(
+  options: TStringArray; constref font: TPixelFont;
+  colors: TColorArray = [$1F98FF, $3FB8FF]
+);
 var
   i: Integer;
   option: TRSDropDownOption;
@@ -520,6 +524,9 @@ begin
   Self.Arrow.Y2 := Self.Bounds.Y2 - 2;
 
   Self.Center := Self.Bounds.Center;
+
+  Self.Font := font;
+  Self.Colors := colors;
 
   for i := 0 to High(options) do
   begin
@@ -573,7 +580,7 @@ end;
 (*
 ### TRSDropDown.WaitOpen
 ```pascal
-function TRSDropDown.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSDropDown.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 ```
 Returns true if {ref}`TRSDropDown.IsOpen` returns true within `time` milliseconds.
 
@@ -582,7 +589,7 @@ Example:
 WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].WaitOpen();
 ```
 *)
-function TRSDropDown.WaitOpen(time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSDropDown.WaitOpen(time: Integer = TICK; interval: Integer = -1): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
   Result := SleepUntil(Self.IsOpen(), interval, time);
@@ -603,8 +610,10 @@ WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].Open();
 *)
 function TRSDropDown.Open(): Boolean;
 begin
-  if not Self.IsVisible() then Exit;
-  if Self.IsOpen() then Exit(True);
+  if not Self.IsVisible() then
+    Exit;
+  if Self.IsOpen() then
+    Exit(True);
   Mouse.Click(Self.Bounds, EMouseButton.LEFT);
   Result := Self.WaitOpen(2000);
 end;
@@ -642,17 +651,24 @@ WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].GetSelected();
 ```
 *)
 function TRSDropDown.GetSelected(): Integer;
+var
+  match: Single;
 begin
-  if Self.Index > -1 then Exit(Self.Index);
+  if Self.Index > -1 then
+    Exit(Self.Index);
 
-  try
-    for Result := 0 to High(Self.Options) do
-      if OCR.Locate(Self.Bounds, Self.Options[Result].Text, [$2FA8FE], 5.5, RSFonts.PLAIN_11) > 0.85 then
-        Exit;
-    Result := -1;
-  finally
-    Self.Index := Result;
+  for Result := 0 to High(Self.Options) do
+  begin
+    match := OCR.Locate(Self.Bounds, Self.Options[Result].Text, Self.Colors, 0, Self.Font);
+    if match >= 0.85 then
+    begin
+      Self.Index := Result;
+      Exit;
+    end;
   end;
+
+  Result := -1;
+  Self.Index := -1;
 end;
 
 
@@ -674,13 +690,16 @@ WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].Select('Fixed');
 *)
 function TRSDropDown.Select(index: Integer): Boolean;
 begin
-  if (Self.Index < 0) and (Self.GetSelected() < 0) then Exit;
-  if Self.Index = index then Exit(True);
-  if not Self.Open() then Exit;
+  if (Self.Index < 0) and (Self.GetSelected() < 0) then
+    Exit;
+  if Self.Index = index then
+    Exit(True);
+  if not Self.Open() then
+    Exit;
 
   Mouse.Click(Self.Options[index].Bounds, EMouseButton.LEFT);
   Self.Index := -1;
-  Result := SleepUntil(Self.GetSelected() = index, RandomMode(100, 50, 1500), 2000);
+  Result := SleepUntil(Self.GetSelected() = index, RandomMode(100, 50, 1500), 2*TICK);
 end;
 
 function TRSDropDown.Select(option: String): Boolean; overload;

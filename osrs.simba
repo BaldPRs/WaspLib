@@ -120,6 +120,7 @@ Summary: It includes this file until the current file is reached.
 
 
 {$IFNDEF WL_XPBAR_INCLUDED}                 {$INCLUDE_ONCE osrs/interfaces/xpbar.simba}
+{$IFNDEF WL_XPBAR_MENU_INCLUDED}            {$INCLUDE_ONCE osrs/interfaces/mainscreen/xpbarmenu.simba}
 
 {$IFNDEF WL_MOUSEZOOM_INCLUDED}             {$INCLUDE_ONCE osrs/mousezoom.simba}
 {$IFNDEF WL_DOTFILTERS_INCLUDED}            {$INCLUDE_ONCE osrs/dotfilters.simba}
@@ -192,7 +193,7 @@ Summary: It includes this file until the current file is reached.
 {$IFNDEF WL_INTERFACE_DEBUGGING_INCLUDED}   {$INCLUDE_ONCE osrs/interfaces/debugging.simba}
 {$IFNDEF WL_OVERRIDES_INCLUDED}             {$INCLUDE_ONCE osrs/overrides.simba}
 
-{$ENDIF}{$ENDIF}{$ENDIF}
+{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 {$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 {$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}
 {$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}

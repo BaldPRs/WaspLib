@@ -47,6 +47,7 @@ begin
 
   MSInterface.SetupInterface();
   XPBar.SetupInterface();
+  XPBarMenu.SetupInterface();
 
   HouseViewer.SetupInterface();
 

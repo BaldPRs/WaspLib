@@ -10,7 +10,8 @@ Methods to interact with the options gametab.
 
 type
 (*
-## ERSOptionsTab
+(ERSOptionsTab)=
+## ERSOptionsTab enum
 ```pascal
 ERSOptionsTab = enum(CONTROLS, AUDIO, DISPLAY);
 ```
@@ -19,7 +20,8 @@ Enum representing each of the options tabs.
   ERSOptionsTab = enum(CONTROLS, AUDIO, DISPLAY);
 
 (*
-## ERSOptionsSlider
+(ERSOptionsSlider)=
+## ERSOptionsSlider enum
 ```pascal
 ERSOptionsSlider = enum(BRIGHTNESS, ZOOM);
 ```
@@ -29,7 +31,8 @@ Could be expanded in the future to include the sound sliders but for now only ha
   ERSOptionsSlider = enum(BRIGHTNESS, ZOOM);
 
 (*
-## ERSOptionsDropDown
+(ERSOptionsDropDown)=
+## ERSOptionsDropDown enum
 ```pascal
 ERSOptionsDropDown = enum(PLAYER_ATTACK, NPC_ATTACK, CLIENT_MODE);
 ```
@@ -38,7 +41,8 @@ Enum representing each of the options gametab dropdowns.
   ERSOptionsDropDown = enum(PLAYER_ATTACK, NPC_ATTACK, CLIENT_MODE);
 
 (*
-## ERSOptionsButton
+(ERSOptionsButton)=
+## ERSOptionsButton enum
 ```pascal
 ERSOptionsButton = enum(AID, RUN, HOUSE, BOND, ALL_SETTINGS);
 ```
@@ -47,7 +51,8 @@ Enum representing each of the options gametab buttons.
   ERSOptionsButton = enum(AID, RUN, HOUSE, BOND, ALL_SETTINGS);
 
 (*
-## TRSOptions
+(TRSOptions)=
+## TRSOptions type
 Main record responsible with interacting with the {ref}`Options` gametab.
 *)
   TRSOptions = record
@@ -116,13 +121,28 @@ begin
     Self.Buttons[4] := new TRSButton([X1 + 22, Y2 - 32, X2 - 22, Y2 - 3]);
 
     Self.DropDowns[0].Bounds := [X1 + 11, Y1 + 111, X2 - 11, Y1 + 130];
-    Self.DropDowns[0].Setup(['Depends on combat levels', 'Always right-click', 'Left-click where available', 'Hidden', 'Right-click for clanmates']);
+    Self.DropDowns[0].Setup(
+      [
+        'Depends on combat levels', 'Always right-click',
+        'Left-click where available', 'Hidden', 'Right-click for clanmates'
+      ],
+      RSFonts.PLAIN_11
+    );
 
     Self.DropDowns[1].Bounds := [X1 + 11, Y1 + 150, X2 - 11, Y1 + 169];
-    Self.DropDowns[1].Setup(['Depends on combat levels', 'Always right-click', 'Left-click where available', 'Hidden']);
+    Self.DropDowns[1].Setup(
+      [
+        'Depends on combat levels', 'Always right-click', 'Left-click where available',
+        'Hidden'
+      ],
+      RSFonts.PLAIN_11
+    );
 
     Self.DropDowns[2].Bounds := [X1 + 11, Y2 - 109, X2 - 11, Y2 - 90];
-    Self.DropDowns[2].Setup(['Fixed - Classic layout', 'Resizable - Classic layout', 'Resizable - Modern layout']);
+    Self.DropDowns[2].Setup(
+      ['Fixed - Classic layout', 'Resizable - Classic layout', 'Resizable - Modern layout'],
+      RSFonts.PLAIN_11
+    );
   end;
 end;
 

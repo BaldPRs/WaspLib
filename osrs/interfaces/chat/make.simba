@@ -203,7 +203,7 @@ begin
     str := OCR.Recognize(boxes[i], RSFonts.PLAIN_11, [Self.TEXT_COLOR, RSFonts.WHITE], 0);
 
     Result[i].Quantity := ERSItemQuantity.String2Quantity(str);
-    Result[i].Button := new TRSButton(boxes[i], [[RSFonts.WHITE, 0]]);
+    Result[i].Button := new TRSButton(boxes[i], [[RSFonts.WHITE, 0, EColorSpace.RGB, [1,1,1]]]);
 
     if str.Equals('X', True) then
     begin

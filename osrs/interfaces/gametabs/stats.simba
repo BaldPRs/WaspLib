@@ -239,7 +239,7 @@ begin
       Self.Skills[skill].X2, Self.Skills[skill].Y2
     ];
 
-  Result := OCR.RecognizeNumber(bounds, RSFonts.PLAIN_11, [RSFonts.YELLOW], 0);
+  Result := OCR.RecognizeNumber(bounds, RSFonts.PLAIN_11, [TRSFonts.YELLOW], 0);
 
   if Result > 0 then
     Self.Levels[skill] := Result;

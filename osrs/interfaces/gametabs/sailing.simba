@@ -175,7 +175,7 @@ WriteLn Sailing.BoatName;
 *)
 property TRSSailing.BoatName: String;
 begin
-  Result := OCR.Recognize(Self.BoatNameBox, RSFonts.BOLD_SHADOW, [RSFonts.ORANGE], 0);
+  Result := OCR.Recognize(Self.BoatNameBox, RSFonts.BOLD_SHADOW, [TRSFonts.ORANGE], 0);
 end;
 
 (*
@@ -194,7 +194,7 @@ property TRSSailing.BoatHealth: Integer;
 var
   str: String;
 begin
-  str := OCR.Recognize(Self.BoatHealthBox, RSFonts.PLAIN_11, [RSFonts.WHITE], 0);
+  str := OCR.Recognize(Self.BoatHealthBox, RSFonts.PLAIN_11, [TRSFonts.WHITE], 0);
   Result := str.Before('/').ExtractInteger();
 end;
 
@@ -214,7 +214,7 @@ function TRSSailing.GetTab(): ERSSailingTab;
 var
   title: String;
 begin
-  title := OCR.Recognize(Self.TabTitle, RSFonts.PLAIN_12, [RSFonts.ORANGE], 0);
+  title := OCR.Recognize(Self.TabTitle, RSFonts.PLAIN_12, [TRSFonts.ORANGE], 0);
 
   case title of
     'Facilities': Result := ERSSailingTab.FACILITIES;

@@ -255,7 +255,7 @@ var
   slot: TRSDiarySlot;
 begin
   for slot in Self.GetSlots() do
-    if OCR.Locate(slot.Name, Self.Names[diary], [RSFonts.RED, RSFonts.YELLOW, RSFonts.LIGHT_GREEN, RSFonts.WHITE], 0, RSFonts.PLAIN_11) > 0.9 then
+    if OCR.Locate(slot.Name, Self.Names[diary], [TRSFonts.RED, TRSFonts.YELLOW, TRSFonts.LIGHT_GREEN, TRSFonts.WHITE], 0, RSFonts.PLAIN_11) > 0.9 then
       Exit(slot);
 end;
 
@@ -422,7 +422,7 @@ begin
     Self.SetupTabs();
   end;
 
-  title := OCR.Recognize(Self.TabTitle, RSFonts.BOLD_SHADOW, [RSFonts.ORANGE, $3399FF], 3);
+  title := OCR.Recognize(Self.TabTitle, RSFonts.BOLD_SHADOW, [TRSFonts.ORANGE, $3399FF], 3);
 
   case title of
     'Quest List': Result := ERSAchievementTab.QUESTS;

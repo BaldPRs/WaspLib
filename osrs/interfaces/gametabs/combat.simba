@@ -188,7 +188,7 @@ function TRSCombat.GetCategory(): EWeaponCategory;
 var
   str: String;
 begin
-  str := OCR.Recognize(Self.CategoryBox, RSFonts.PLAIN_11, [RSFonts.ORANGE], 0);
+  str := OCR.Recognize(Self.CategoryBox, RSFonts.PLAIN_11, [TRSFonts.ORANGE], 0);
   str := str.After('Category: ');
 
   Result := EWeaponCategory(WEAPON_CATEGORIES.IndexOf(str));
@@ -216,7 +216,7 @@ property TRSCombat.StyleBoxes: TBoxArray;
 var
   tpa: TPointArray;
 begin
-  tpa := Target.FindColor(RSFonts.ORANGE, 0, Self._StylesBox);
+  tpa := Target.FindColor(TRSFonts.ORANGE, 0, Self._StylesBox);
 
   case Length(tpa.Cluster(6,6)) of
     3: Exit(Self._StyleBoxes[1]);
@@ -230,7 +230,7 @@ function TRSCombat._GetWeaponStyle(b: TBox): EWeaponStyle;
 var
   str: String;
 begin
-  str := OCR.Recognize(b, RSFonts.PLAIN_11, [RSFonts.ORANGE], 0);
+  str := OCR.Recognize(b, RSFonts.PLAIN_11, [TRSFonts.ORANGE], 0);
   Result := EWeaponStyle(WEAPON_STYLES.IndexOf(str));
 end;
 
@@ -272,7 +272,7 @@ begin
 
   for b in Self.StyleBoxes do
   begin
-    str := OCR.Recognize(b, RSFonts.PLAIN_11, [RSFonts.ORANGE], 0);
+    str := OCR.Recognize(b, RSFonts.PLAIN_11, [TRSFonts.ORANGE], 0);
     if str <> WEAPON_STYLES[value] then Continue;
 
     if Target.HasColor([$1D1F82, 0.560, EColorSpace.HSL, [1.403, 1.403, 0.196]], 1, b) then

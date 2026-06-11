@@ -218,9 +218,13 @@ WriteLn HouseOptions.CallServant();
 *)
 function TRSHouseOptions.CallServant(): Boolean;
 begin
-  if not Self.Open() then Exit();
+  if not Self.Open() then
+    Exit;
   Mouse.Click(Self.Buttons[ERSHouseOptionsButton.SERVANT], EMouseButton.LEFT);
-  Result := SleepUntil(Chat.GetTitle().ContainsAny(['utler', 'Repeat']), RandomMode(100, 50, 1500), 600);
+
+  Result := SleepUntil(
+    Chat.Title.ContainsAny(['utler', 'Repeat']), RandomMode(100, 50, 1500), TICK
+  );
 end;
 
 (*
@@ -237,9 +241,10 @@ WriteLn HouseOptions.LeaveHouse();
 *)
 function TRSHouseOptions.LeaveHouse(): Boolean;
 begin
-  if not Self.Open() then Exit();
+  if not Self.Open() then
+    Exit;
   Mouse.Click(Self.Buttons[ERSHouseOptionsButton.LEAVE], EMouseButton.LEFT);
-  Result := SleepUntil(not Self.IsOpen(), RandomMode(100, 50, 1500), 600);
+  Result := SleepUntil(not Self.IsOpen(), RandomMode(100, 50, 1500), TICK);
 end;
 
 var

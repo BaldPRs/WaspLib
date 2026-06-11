@@ -165,7 +165,7 @@ WriteLn Shop.IsOpen();
 function TRSShop.IsOpen(): Boolean;
 begin
   Result := OCR.Recognize(
-      Self._IsOpenHelper, RSFonts.PLAIN_12, [RSFonts.ORANGE], 0
+      Self._IsOpenHelper, RSFonts.PLAIN_12, [TRSFonts.ORANGE], 0
     ).ContainsAny(['Value','check'], True
   );
 end;

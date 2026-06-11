@@ -57,6 +57,7 @@ function TRSFairyRing.IsOpen(): Boolean; forward;
 
 procedure TRSFairyRing.SetupInterface();
 var
+  i: Integer;
   b: TBox;
 begin
   case RSClient.Mode of
@@ -72,7 +73,7 @@ begin
     Self.TeleportButton := [X1+170, Y2-65, X2-170, Y2-28];
   end;
 
-  Self.Title.TitleColor := RSFonts.BROWN;
+  Self.Title.TitleColor := TRSFonts.BROWN;
 
   Self.Title.IsOpen := @Self.IsOpen;
   Self.Title.Font := @RSFonts.QUILL_8;
@@ -85,11 +86,15 @@ begin
   Self.DialBoxes[2].X1 -= 2;
   Self.DialBoxes[2].X2 -= 2;
 
-  for b in Self.DialBoxes do
+  SetLength(Self.DialHoles, Length(Self.DialBoxes));
+  SetLength(Self.RotateLeftBoxes, Length(Self.DialBoxes));
+  SetLength(Self.RotateRightBoxes, Length(Self.DialBoxes));
+  for i := 0 to High(Self.DialBoxes) do
   begin
-    Self.DialHoles += [b.X1+58, b.Y2-55, b.X2-58, b.Y2-10];
-    Self.RotateLeftBoxes += [b.X1, b.Y1, b.X2-80, b.Y2];
-    Self.RotateRightBoxes += [b.X1+80, b.Y1, b.X2, b.Y2];
+    b := Self.DialBoxes[i];
+    Self.DialHoles[i]        := [b.X1+58, b.Y2-55, b.X2-58, b.Y2-10];
+    Self.RotateLeftBoxes[i]  := [b.X1, b.Y1, b.X2-80, b.Y2];
+    Self.RotateRightBoxes[i] := [b.X1+80, b.Y1, b.X2, b.Y2];
   end;
 end;
 

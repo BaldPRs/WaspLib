@@ -162,7 +162,7 @@ var
   count: Integer;
 begin
   //no need for ocr, color count is lighter and should work fine.
-  count := Target.CountColor(RSFonts.ORANGE, 0, Self.Header);
+  count := Target.CountColor(TRSFonts.ORANGE, 0, Self.Header);
   case count of
     154:
         if Target.HasColor($6082AB, 0, 1, Self.BuyButton) then
@@ -236,7 +236,7 @@ WriteLn GrandExchange.Slots[7].Item;
 *)
 property TRSGrandExchangeSlot.Item: TRSItem;
 begin
-  Result := OCR.RecognizeLines(Self.ItemNameBox, RSFonts.PLAIN_11, [RSFonts.LIGHT_ORANGE], 0).Join(' ');
+  Result := OCR.RecognizeLines(Self.ItemNameBox, RSFonts.PLAIN_11, [TRSFonts.LIGHT_ORANGE], 0).Join(' ');
 end;
 
 (*
@@ -255,7 +255,7 @@ property TRSGrandExchangeSlot.Value: Integer;
 var
   str: String;
 begin
-  str := OCR.Recognize(Self.ValueBox, RSFonts.PLAIN_11, [RSFonts.ORANGE], 0);
+  str := OCR.Recognize(Self.ValueBox, RSFonts.PLAIN_11, [TRSFonts.ORANGE], 0);
   Result := str.ExtractInteger(-1);
 end;
 
@@ -277,7 +277,7 @@ var
   str: String;
 begin
   if (Self.GetType() = EGESlotType.EMPTY) or (Self.GetType() = EGESlotType.UNAVAILABLE) then Exit(-1);
-  str := OCR.Recognize(Self.ItemBox, RSFonts.PLAIN_11, [RSFonts.YELLOW], 0);
+  str := OCR.Recognize(Self.ItemBox, RSFonts.PLAIN_11, [TRSFonts.YELLOW], 0);
   Result := str.ExtractInteger(1);
 end;
 
@@ -647,9 +647,9 @@ WriteLn GrandExchange.Collect();
 *)
 function TRSGrandExchange.Collect(): Boolean;
 begin
-  if not Target.HasColor(RSFonts.WHITE, 0, 1, Self.CollectButton) then Exit(False);
+  if not Target.HasColor(TRSFonts.WHITE, 0, 1, Self.CollectButton) then Exit(False);
   Mouse.Click(Self.CollectButton, EMouseButton.LEFT);
-  Result := SleepUntil(not Target.HasColor(RSFonts.WHITE, 0, 1, Self.CollectButton),200, 2000);
+  Result := SleepUntil(not Target.HasColor(TRSFonts.WHITE, 0, 1, Self.CollectButton),200, 2000);
 end; 
 
 var

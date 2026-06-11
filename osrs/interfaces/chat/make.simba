@@ -200,10 +200,10 @@ begin
 
   for i := 0 to High(boxes) do
   begin
-    str := OCR.Recognize(boxes[i], RSFonts.PLAIN_11, [Self.TEXT_COLOR, RSFonts.WHITE], 0);
+    str := OCR.Recognize(boxes[i], RSFonts.PLAIN_11, [Self.TEXT_COLOR, TRSFonts.WHITE], 0);
 
     Result[i].Quantity := ERSItemQuantity.String2Quantity(str);
-    Result[i].Button := new TRSButton(boxes[i], [[RSFonts.WHITE, 0, EColorSpace.RGB, [1,1,1]]]);
+    Result[i].Button := new TRSButton(boxes[i], [[TRSFonts.WHITE, 0, EColorSpace.RGB, [1,1,1]]]);
 
     if str.Equals('X', True) then
     begin
@@ -502,7 +502,7 @@ WriteLn Make.IsQuantitySelected(Make.QUANTITY_ALL);
 *)
 function TRSMake.IsQuantitySelected(idx: Integer): Boolean;
 begin
-  Result := Target.HasColor(RSFonts.WHITE, 0, 1, Self.QuantityButtonBoxes[idx]);
+  Result := Target.HasColor(TRSFonts.WHITE, 0, 1, Self.QuantityButtonBoxes[idx]);
 end;
 
 (*

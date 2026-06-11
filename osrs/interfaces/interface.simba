@@ -44,7 +44,7 @@ begin
   Self.CloseButton.X2 := bounds.X2-7;
   Self.CloseButton.Y2 := bounds.Y1+27;
 
-  Self.TitleColor := RSFonts.ORANGE;
+  Self.TitleColor := TRSFonts.ORANGE;
 
   Self.IsOpen := @Self._IsOpen;
   Self.Font := @RSFonts.BOLD;

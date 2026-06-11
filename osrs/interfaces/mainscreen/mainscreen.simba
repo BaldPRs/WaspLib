@@ -130,20 +130,20 @@ end;
 function TRSMainScreen._IsUpText(
   out upText: String;
   strings: TStringArray;
-  caseSensitive: Boolean;
+  matchCase: Boolean;
   similarity: Single
 ): Boolean;
 ```
 Internal helper method used in {ref}`MainScreen.IsUpText`.
 
-`strings` casing must be lower case if `caseSensitive` is `False`.
+`strings` casing must be lower case if `matchCase` is `False`.
 
 You probably won't ever need to call this method directly.
 *)
 function TRSMainScreen._IsUpText(
   out upText: String;
   strings: TStringArray;
-  caseSensitive: Boolean;
+  matchCase: Boolean;
   similarity: Single
 ): Boolean;
 var
@@ -151,7 +151,7 @@ var
   i: Integer;
   match: Double;
 begin
-  if caseSensitive then
+  if matchCase then
     upText := Self.UpText
   else
     upText := LowerCase(Self.UpText);
@@ -190,14 +190,14 @@ end;
 ```pascal
 function TRSMainScreen.IsUpText(
   strings: TStringArray;
-  caseSensitive: Boolean = True;
+  matchCase: Boolean = True;
   similarity: Single = 0.85;
   time: Integer = -1
 ): Boolean;
 
 function TRSMainScreen.IsUpText(
   text: String;
-  caseSensitive: Boolean = True;
+  matchCase: Boolean = True;
   similarity: Single = 0.85;
   time: Integer = -1
 ): Boolean; overload;
@@ -219,7 +219,7 @@ if MainScreen.IsUpText('Walk here') then
 *)
 function TRSMainScreen.IsUpText(
   strings: TStringArray;
-  caseSensitive: Boolean = True;
+  matchCase: Boolean = True;
   similarity: Single = 0.85;
   time: Integer = -1
 ): Boolean;
@@ -233,7 +233,7 @@ begin
 
   timeout.Start(time);
 
-  if caseSensitive then
+  if matchCase then
     strs := Copy(strings)
   else
   begin
@@ -242,10 +242,10 @@ begin
   end;
 
   repeat
-    if Self._IsUpText(txt, strings, caseSensitive, similarity) then
+    if Self._IsUpText(txt, strings, matchCase, similarity) then
     begin
       Sleep(50);
-      if Self._IsUpText(txt, strings, caseSensitive, similarity) then
+      if Self._IsUpText(txt, strings, matchCase, similarity) then
         Exit(True);
     end;
 
@@ -255,12 +255,12 @@ end;
 
 function TRSMainScreen.IsUpText(
   text: String;
-  caseSensitive: Boolean = True;
+  matchCase: Boolean = True;
   similarity: Single = 0.85;
   time: Integer = -1
 ): Boolean; overload;
 begin
-  Result := Self.IsUpText([text], caseSensitive, similarity, time);
+  Result := Self.IsUpText([text], matchCase, similarity, time);
 end;
 
 
@@ -298,7 +298,7 @@ end;
 ### MainScreen.IsServerMessage
 ```pascal
 function TRSMainScreen.IsServerMessage(
-  text: String; caseSensitive: Boolean = True; similarity: Single = 0.85
+  text: String; matchCase: Boolean = True; similarity: Single = 0.85
 ): Boolean; overload;
 ```
 Compares `text` with the {ref}`server message` visible if any.
@@ -311,12 +311,12 @@ if MainScreen.IsServerMessage('Loading...') then
 ```
 *)
 function TRSMainScreen.IsServerMessage(
-  text: String; caseSensitive: Boolean = True; similarity: Single = 0.85
+  text: String; matchCase: Boolean = True; similarity: Single = 0.85
 ): Boolean; overload;
 var
   msg: String;
 begin
-  if caseSensitive then
+  if matchCase then
     msg := Self.ServerMessage
   else
   begin

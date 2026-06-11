@@ -1,13 +1,26 @@
 (*
 # InterfaceArea
-Interface area is the area where mainscreen interfaces can occupy.
+Interface area is the area where {ref}`MainScreen` interfaces can occupy.
 *)
 {$DEFINE WL_INTERFACE_AREA_INCLUDED}
 {$INCLUDE_ONCE WaspLib/osrs.simba}
 
 type
-  ERSInterfaceType = (CLASSIC, PAPER, ANY);
+(*
+(ERSInterfaceType)=
+## ERSInterfaceType enum
+```pascal
+ERSInterfaceType = enum(CLASSIC, PAPER, ANY);
+```
+Enum representing the types of {ref}`MainScreen` interfaces.
+*)
+  ERSInterfaceType = enum(CLASSIC, PAPER, ANY);
 
+(*
+(TRSInterfaceArea)=
+## TRSInterfaceArea type
+Type responsible to handle thefor handling general {ref}`MainScreen` interfaces.
+*)
   TRSInterfaceArea = type TRSInterface;
 
 procedure TRSInterfaceArea.SetupInterface();
@@ -48,53 +61,81 @@ begin
 end;
 
 (*
-## TRSInterfaceArea.IsOpen
+## MSInterface.IsOpen
 ```pascal
-function TRSInterfaceArea.IsOpen(interfaceType: ERSInterfaceType = ERSInterfaceType.ANY): Boolean;
+function TRSInterfaceArea.IsOpen(typ: ERSInterfaceType = ERSInterfaceType.ANY): Boolean;
 ```
 Returns True/False if any interface is found open.
 *)
-function TRSInterfaceArea.IsOpen(interfaceType: ERSInterfaceType = ERSInterfaceType.ANY): Boolean;
+function TRSInterfaceArea.IsOpen(typ: ERSInterfaceType = ERSInterfaceType.ANY): Boolean;
+const
+  CLASSIC: TColorTolerance = [$323E47, 0.75, EColorSpace.HSV, [0.778, 1.112, 1.112]];
+  PAPER:   TColorTolerance = [$88AABD, 0.4,  EColorSpace.HSV, [1.366, 1.437, 0.199]];
 begin
-  if interfaceType = ERSInterfaceType.CLASSIC then
-    Exit(Target.HasColor([$323E47, 0.75, EColorSpace.HSV, [0.778, 1.112, 1.112]], 10000, Self.Bounds));
-  if interfaceType = ERSInterfaceType.PAPER then
-    Exit(Target.HasColor([$88AABD, 0.4, EColorSpace.HSV, [1.366, 1.437, 0.199]], 10000, Self.Bounds));
-
-  Result := Self.IsOpen(ERSInterfaceType.CLASSIC) or
-            Self.IsOpen(ERSInterfaceType.PAPER);
+  case typ of
+    ERSInterfaceType.CLASSIC: Result := Target.HasColor(CLASSIC, 10000, Self.Bounds);
+    ERSInterfaceType.PAPER: Result := Target.HasColor(PAPER, 10000, Self.Bounds);
+    else Result := Self.IsOpen(ERSInterfaceType.CLASSIC) or
+                   Self.IsOpen(ERSInterfaceType.PAPER);
+  end;
 end;
 
 (*
-## TRSInterfaceArea.WaitOpen
+## MSInterface.WaitOpen
 ```pascal
-function TRSInterfaceArea.WaitOpen(interfaceType: ERSInterfaceType = ERSInterfaceType.ANY; time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSInterfaceArea.WaitOpen(
+  typ: ERSInterfaceType = ERSInterfaceType.ANY;
+  time: Integer = TICK;
+  interval: Integer = -1
+): Boolean;
 ```
 Returns True/False if any interface is found open within `time` milliseconds.
 *)
-function TRSInterfaceArea.WaitOpen(interfaceType: ERSInterfaceType = ERSInterfaceType.ANY; time: Integer = 600; interval: Integer = -1): Boolean;
+function TRSInterfaceArea.WaitOpen(
+  typ: ERSInterfaceType = ERSInterfaceType.ANY;
+  time: Integer = TICK;
+  interval: Integer = -1
+): Boolean;
 begin
   if interval < 0 then interval := RandomMode(100, 50, 1500);
-  Result := SleepUntil(Self.IsOpen(interfaceType), interval, time);
+  Result := SleepUntil(Self.IsOpen(typ), interval, time);
 end;
 
 
+(*
+## MSInterface.GetCloseButton
+function TRSInterfaceArea.GetCloseButton(): TBox;
+```
+Returns a TBox of the close button.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  ShowOnTarget(MSInterface.GetCloseButton());
+end.
+```
+*)
 function TRSInterfaceArea.GetCloseButton(): TBox;
 var
   tpa: TPointArray;
   atpa: T2DPointArray;
   b: TBox;
-  circularity: Double;
-  boxes: TBoxArray;
-  weights: TIntegerArray;
+  circ, dist, best: Double;
 begin
-  with Self.Bounds do
-    tpa := Target.FindColor(TRSInterface.BORDER, 0, [X2-Width div 3, Y1, X2, Y1 + Height div 3]);
+  b.X1 := Self.Bounds.X2-Self.Bounds.Width div 3;
+  b.Y1 := Self.Bounds.Y1;
+  b.X2 := Self.Bounds.X2;
+  b.Y2 := Self.Bounds.Y1 + Self.Bounds.Height div 3;
+
+  tpa := Target.FindColor(TRSInterface.BORDER, 0, b);
 
   if tpa.IsEmpty then
     Exit;
 
   atpa := tpa.Cluster(3);
+
+  best := $FFFFFFFF;
 
   for tpa in atpa do
   begin
@@ -102,33 +143,38 @@ begin
       Continue;
 
     b := tpa.Bounds();
-    case b.Height of
-      21,23:;
-      else Continue;
-    end;
 
-    case b.Width of
-      21,24:;
-      else Continue;
-    end;
+    case b.Height of 21,23:; else Continue; end;
+    case b.Width of 21,24:; else Continue; end;
 
-    circularity := tpa.Circularity();
+    circ := tpa.Circularity();
 
-    if InRange(circularity, 0.443, 0.445) or InRange(circularity, 0.471, 0.473) then
+    if InRange(circ, 0.443, 0.445) or InRange(circ, 0.471, 0.473) then
     begin
-      boxes += b;
-      with b.Center do
-        weights += X*100 - Y;
+      dist := b.Center.DistanceTo(Self.TopRight);
+      if dist < best then
+      begin
+        Result := b;
+        best := dist;
+      end;
     end;
   end;
-
-  if boxes.IsEmpty then
-    Exit;
-
-  Result := boxes.SortFrom(Self.TopRight).First;
 end;
 
 
+(*
+## MSInterface.Close
+function TRSInterfaceArea.Close(escape: Boolean): Boolean;
+function TRSInterfaceArea.Close(escapeProbability: Single = -1): Boolean; overload;
+```
+Attempts to close any interface currently open, depending on `escape` or
+`escapeProbability the function will either click the button or press escape key.
+
+Example:
+```pascal
+WriteLn MSInterface.Close();
+```
+*)
 function TRSInterfaceArea.Close(escape: Boolean): Boolean;
 var
   b: TBox;
@@ -198,6 +244,9 @@ begin
   end;
 end;
 
-
 var
+(*
+## MSInterface variable
+Global {ref}`TRSInterfaceArea` variable.
+*)
   MSInterface: TRSInterfaceArea;

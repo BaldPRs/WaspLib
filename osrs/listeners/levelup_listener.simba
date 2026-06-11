@@ -92,10 +92,10 @@ begin
 
   trgt := new TTarget();
   trgt.SetImage(img);
-  if not trgt.HasColor(RSFonts.DARK_BLUE, 0, 1) then
+  if not trgt.HasColor(TRSFonts.DARK_BLUE, 0, 1) then
     Exit;
 
-  img.ReplaceColorBinary(False, [RSFonts.DARK_BLUE], 0);
+  img.ReplaceColorBinary(False, [TRSFonts.DARK_BLUE], 0);
   Self.Engine.RecognizeLines(img, RSFonts.QUILL_8);
   if Self.Engine.Matches = [] then
     Exit;
@@ -130,7 +130,7 @@ begin
 
   tmp := img.Copy();
   tmp.Crop(Self.LevelBox);
-  tmp.ReplaceColorBinary(False, [RSFonts.BLACK], 0);
+  tmp.ReplaceColorBinary(False, [TRSFonts.BLACK], 0);
   str := Self.Engine.Recognize(tmp, RSFonts.QUILL_8);
 
   key := Trim(str.Between('Your ', ' level').ToLower());

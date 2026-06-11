@@ -134,16 +134,16 @@ end;
 (*
 ## TStringArray.AnyContains
 ```pascal
-function TStringArray.AnyContains(value: String; caseSensitive: Boolean = True): Boolean;
+function TStringArray.AnyContains(value: String; matchCase: Boolean = True): Boolean;
 ```
 Returns True/False if any String in the TStringArray contains `value`.
 *)
-function TStringArray.AnyContains(value: String; caseSensitive: Boolean = True): Boolean;
+function TStringArray.AnyContains(value: String; matchCase: Boolean = True): Boolean;
 var
   i: Integer;
 begin
   for i := 0 to High(Self) do
-    if Self[i].Contains(value, caseSensitive) then
+    if Self[i].Contains(value, matchCase) then
       Exit(True);
 end;
 

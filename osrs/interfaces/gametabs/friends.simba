@@ -133,17 +133,17 @@ begin
   if not Self.Open() then
     Exit;
 
-  tpa := Target.FindColor(RSFonts.WHITE, 0, Self.Scroll.Area);
+  tpa := Target.FindColor(TRSFonts.WHITE, 0, Self.Scroll.Area);
   atpa := tpa.Cluster(20, 1.5);
   for tpa in atpa do
     with tpa.Bounds() do
     begin
       friend.Name := OCR.Recognize(
-        [X1, Y1, X2, Y2], RSFonts.PLAIN_12, [RSFonts.WHITE], 0
+        [X1, Y1, X2, Y2], RSFonts.PLAIN_12, [TRSFonts.WHITE], 0
       );
       friend.World := OCR.RecognizeNumber(
         [X2, Y1, Self.Scroll.Area.X2, Y2], RSFonts.PLAIN_12,
-        [RSFonts.LIGHT_GREEN, RSFonts.YELLOW], 0
+        [TRSFonts.LIGHT_GREEN, TRSFonts.YELLOW], 0
       );
       friend.Bounds := tpa.Bounds();
 

@@ -121,7 +121,7 @@ begin
   if not Self.Open() then Exit;
   with GameTab.Bounds do
   begin
-      Result := OCR.Recognize([X1, Y1 + 35, X2, Y1 + 51], RSFonts.PLAIN_12, [RSFonts.LIGHT_GREEN], 0);
+      Result := OCR.Recognize([X1, Y1 + 35, X2, Y1 + 51], RSFonts.PLAIN_12, [TRSFonts.LIGHT_GREEN], 0);
   end;
 end;
 
@@ -146,19 +146,19 @@ var
 begin
   if not Self.Open() then Exit;
 
-  if Target.HasColor(RSFonts.WHITE, 0, 1, Self.Scroll.Area) then
+  if Target.HasColor(TRSFonts.WHITE, 0, 1, Self.Scroll.Area) then
     Mouse.Move(Self.Scroll.Area.NearestEdge(Mouse.Position));
 
-  tpa := Target.FindColor(RSFonts.LIGHT_GREEN, 0, Self.Scroll.Area) + Target.FindColor(RSFonts.RED, 0, Self.Scroll.Area);
+  tpa := Target.FindColor(TRSFonts.LIGHT_GREEN, 0, Self.Scroll.Area) + Target.FindColor(TRSFonts.RED, 0, Self.Scroll.Area);
   atpa := tpa.Cluster(10, 1.5);
   for tpa in atpa do
     with tpa.Bounds() do
     begin
-      track.Name := OCR.Recognize([X1, Y1, X2, Y2], RSFonts.PLAIN_12, [RSFonts.LIGHT_GREEN, RSFonts.RED], 0);
+      track.Name := OCR.Recognize([X1, Y1, X2, Y2], RSFonts.PLAIN_12, [TRSFonts.LIGHT_GREEN, TRSFonts.RED], 0);
 
       if track.Name = '' then Continue;
 
-      track.Available := Target.HasColor(RSFonts.LIGHT_GREEN, 0, 1, [X1, Y1, X2, Y2]);
+      track.Available := Target.HasColor(TRSFonts.LIGHT_GREEN, 0, 1, [X1, Y1, X2, Y2]);
       track.Bounds := [X1, Y1, X2, Y2];
 
         weights += Y1;

@@ -288,7 +288,7 @@ begin
   begin
     for b in Chat.MessageLines do
     begin
-      tpa := Target.FindColor(RSFonts.BLUE, 0, b);
+      tpa := Target.FindColor(TRSFonts.BLUE, 0, b);
       if tpa <> [] then
       begin
         Mouse.Move(tpa.Bounds());

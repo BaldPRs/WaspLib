@@ -180,19 +180,19 @@ begin
   begin
     if not btn.Enabled then
       Continue;
-    if OCR.Locate(btn.Bounds, txt, [RSFonts.WHITE], 1, RSFonts.PLAIN_11) > 0.85 then
+    if OCR.Locate(btn.Bounds, txt, [TRSFonts.WHITE], 1, RSFonts.PLAIN_11) > 0.85 then
       Exit(True);
   end;
 
   for btn in Self.Buttons do
-    if OCR.Locate(btn.Bounds, txt, [RSFonts.ORANGE], 1, RSFonts.PLAIN_11) > 0.85 then
+    if OCR.Locate(btn.Bounds, txt, [TRSFonts.ORANGE], 1, RSFonts.PLAIN_11) > 0.85 then
     begin
       btn.Click();
       Exit(True);
     end;
 
   for btn in Self.Buttons do
-    if OCR.Locate(btn.Bounds, 'X', [RSFonts.ORANGE], 1, RSFonts.PLAIN_11) > 0.85 then
+    if OCR.Locate(btn.Bounds, 'X', [TRSFonts.ORANGE], 1, RSFonts.PLAIN_11) > 0.85 then
     begin
       btn.Click();
       Exit(Chat.AnswerQuery('Enter amount', ToString(Amount), 3000));

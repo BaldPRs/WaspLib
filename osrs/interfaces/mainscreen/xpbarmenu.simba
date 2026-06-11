@@ -95,7 +95,7 @@ WriteLn XPBarMenu.IsOpen();
 function TRSXPBarMenu.IsOpen(): Boolean;
 begin
   Result := InRange(
-    Target.CountColor(RSFonts.ORANGE, 0, Self.Headers), 393, 582
+    Target.CountColor(TRSFonts.ORANGE, 0, Self.Headers), 393, 582
   );
 end;
 

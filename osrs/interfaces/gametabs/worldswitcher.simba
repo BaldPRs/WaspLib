@@ -25,6 +25,7 @@ Helper record for {ref}`TRSworldSwitcher`.
   TRSWorld = record
     Number: Integer;
     Bounds: TBox;
+    Available: Boolean;
   end;
 (*
 ## TRSWorldArray type
@@ -39,10 +40,14 @@ var
 begin
   img := Target.GetImage();
 
-  img.DrawColor := $FFFFFF;
+
   for i := 0 to High(worlds) do
   begin
     WriteLn worlds[i].Number;
+    if worlds[i].Available then
+      img.DrawColor := $FFFFFF
+    else
+      img.DrawColor := $0000FF;
     img.DrawBox(worlds[i].Bounds);
   end;
 
@@ -59,8 +64,9 @@ Main record that interacts with the {ref}`WorldSwitcher`.
     Cooldown: TCountDown;
     CurrentWorldBounds, SortArrow: TBox;
     Buttons: array [ERSWorldSwitcherButton] of TRSButton;
-    const SILVER: TColor = $E0E0E0;
-    const YELLOW: TColor = $00F0F0;
+    const UNAVAILABLE: TColor = $7F7F7F;
+    const F2P: TColor = $E0E0E0;
+    const P2P: TColor = $00F0F0;
   end;
 
 (*
@@ -255,33 +261,69 @@ Returns the currently visible {ref}`TRSWorldArray`.
 
 Example:
 ```pascal
-ShowOnTarget(WorldSwitcher.GetWorlds());
+ShowOnTarget(WorldSwitcher.Worlds);
 ```
 *)
 function TRSWorldSwitcher.GetWorlds(): TRSWorldArray;
 var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
+  img: TImage;
+  tpa0, tpa1: TPointArray;
+  tmp, atpa: T2DPointArray;
   weights: TIntegerArray;
   world: TRSWorld;
+  b, bounds: TBox;
+  i, len, idx: Integer;
 begin
-  tpa := Target.FindColor(Self.SILVER, 0, Self.Scroll.Area) +
-         Target.FindColor(Self.YELLOW, 0, Self.Scroll.Area);
+  img := Target.GetImage(Self.Scroll.Area.Expand(0, 2));
 
-  atpa := tpa.Cluster(5, 1.5);
-  for tpa in atpa do
-    with tpa.Bounds() do
-    begin
-      if Height <> 10 then Continue;
+  tpa0 := img.FindColor(TRSWorldSwitcher.F2P, 0) +
+               img.FindColor(TRSWorldSwitcher.P2P, 0);
 
-      world.Number := OCR.RecognizeNumber([X1-3, Y1-2, X2+3, Y2+2], RSFonts.PLAIN_12, [Self.SILVER, Self.YELLOW], 0);
-      if world.Number = -1 then Continue;
+  atpa := tpa0.Cluster(5, 1.5);
 
-      world.Bounds := [Self.Scroll.Area.X1, Y1-2, Self.Scroll.Area.X2, Y2+3];
+  tpa1 := img.FindColor(TRSWorldSwitcher.UNAVAILABLE, 0);
+  tmp := tpa1.Cluster(5, 1.5);
+  atpa += tmp;
 
-      weights += Y1;
-      Result += World;
-    end;
+  img.Fill($0);
+  img.DrawColor := $FFFFFF;
+  img.DrawTPA(tpa0+tpa1);
+
+  idx := High(atpa) - Length(tmp); //available index
+
+  SetLength(weights, Length(atpa));
+  SetLength(Result, Length(atpa));
+
+  for i := 0 to High(atpa) do
+  begin
+    b := atpa[i].Bounds();
+    if b.Height <> 10 then
+      Continue;
+
+    b.Y1 -= 2;
+    b.Y2 += 2;
+
+    bounds := [b.X1-3, b.Y1, b.X2+3, b.Y2];
+
+    world.Number :=
+      OCR.Engine.Recognize(img.Copy(bounds), RSFonts.PLAIN_12).ExtractInteger();
+
+    if world.Number = -1 then
+      Continue;
+
+    world.Available := i < idx;
+    world.Bounds.X1 := Self.Scroll.Area.X1;
+    world.Bounds.Y1 := Max(Self.Scroll.Area.Y1, Self.Scroll.Area.Y1 + b.Y1-2);
+    world.Bounds.X2 := Self.Scroll.Area.X2;
+    world.Bounds.Y2 := Min(Self.Scroll.Area.Y2, Self.Scroll.Area.Y1 + b.Y2 -1);
+
+    weights[len] := b.Y1;
+    Result[len] := world;
+    Inc(len);
+  end;
+
+  SetLength(Result, len);
+  SetLength(weights, len);
 
   Result.Sort(weights, True);
 end;
@@ -302,25 +344,56 @@ if WorldSwitcher.FindWorld(311, world) then
 *)
 function TRSWorldSwitcher.FindWorld(number: Integer; out world: TRSWorld): Boolean;
 var
-  tpa: TPointArray;
-  atpa: T2DPointArray;
+  img: TImage;
+  available, unavailable: TPointArray;
+  tmp, atpa: T2DPointArray;
+  b, bounds: TBox;
+  i, idx: Integer;
 begin
-  tpa := Target.FindColor(Self.SILVER, 0, Self.Scroll.Area) +
-         Target.FindColor(Self.YELLOW, 0, Self.Scroll.Area);
+  img := Target.GetImage(Self.Scroll.Area.Expand(0, 2));
 
-  atpa := tpa.Cluster(5, 1.5);
-  for tpa in atpa do
-    with tpa.Bounds() do
-    begin
-      if Height <> 10 then Continue;
+  available := img.FindColor(TRSWorldSwitcher.F2P, 0) +
+         img.FindColor(TRSWorldSwitcher.P2P, 0);
 
-      world.Number := OCR.RecognizeNumber([X1-3, Y1-2, X2+3, Y2+2], RSFonts.PLAIN_12, [Self.SILVER, Self.YELLOW], 0);
-      if world.Number <> number then Continue;
+  atpa := available.Cluster(5, 1.5);
 
-      world.Bounds := [Self.Scroll.Area.X1, Y1-2, Self.Scroll.Area.X2, Y2+3];
-      Exit(True);
-    end;
+  unavailable := img.FindColor(TRSWorldSwitcher.UNAVAILABLE, 0);
+  tmp := unavailable.Cluster(5, 1.5);
+  atpa += tmp;
+
+  img.Fill($0);
+  img.DrawColor := $FFFFFF;
+  img.DrawTPA(available+unavailable);
+
+  idx := High(atpa) - Length(tmp);
+
+  for i := 0 to High(atpa) do
+  begin
+    b := atpa[i].Bounds();
+    if b.Height <> 10 then
+      Continue;
+
+    b.Y1 -= 2;
+    b.Y2 += 2;
+
+    bounds := [b.X1-3, b.Y1, b.X2+3, b.Y2];
+
+    world.Number :=
+      OCR.Engine.Recognize(img.Copy(bounds), RSFonts.PLAIN_12).ExtractInteger();
+
+    if world.Number <> number then
+      Continue;
+
+    world.Available := i < idx;
+    world.Bounds.X1 := Self.Scroll.Area.X1;
+    world.Bounds.Y1 := Max(Self.Scroll.Area.Y1, Self.Scroll.Area.Y1 + b.Y1-2);
+    world.Bounds.X2 := Self.Scroll.Area.X2;
+    world.Bounds.Y2 := Min(Self.Scroll.Area.Y2, Self.Scroll.Area.Y1 + b.Y2 -1);
+
+    Exit(True);
+  end;
 end;
+
 
 (*
 ## WorldSwitcher.IsSorted
@@ -370,8 +443,9 @@ function TRSWorldSwitcher.WaitSwitch(world: Integer; failCooldown: Boolean = Tru
 function TRSWorldSwitcher._Hop(next: Integer): Boolean;
 var
   timeout: TCountDown;
-  available: TRSWorldArray;
+  worlds: TRSWorldArray;
   world: TRSWorld;
+  profile: TProfile;
 begin
   if not Self.IsSorted() and not Self.Sort() then
     Exit;
@@ -379,18 +453,34 @@ begin
   timeout.Start(20 * ONE_SECOND);
 
   repeat
-    available := Self.GetWorlds();
-    if available = [] then Exit;
+    worlds := Self.GetWorlds();
 
-    for world in available do
+    if worlds.IsEmpty then
+      Exit;
+
+    for world in worlds do
       if world.Number = next then
       begin
+        if not world.Available then
+        begin
+          DebugLn(
+            'WorldSwitcher',
+            'World ' + ToStr(next) + ' is unavailable.' + LINE_SEP +
+            'It will be removed temporarily, but you should remove it in your profile!',
+            ELogLevel.WARN
+          );
+
+          profile := Profiles.Get();
+          profile.Worlds.Remove(next);
+          profiles.Update(profile);
+          Exit;
+        end;
         Mouse.Click(world.Bounds, EMouseButton.LEFT);
         if Self.WaitSwitch(next) then
           Exit(True);
       end;
 
-    Self.Scroll.Scroll(Biometrics.RandomModeInteger(2,1,3), next > available[0].Number);
+    Self.Scroll.Scroll(Biometrics.RandomModeInteger(2,1,3), next > worlds[0].Number);
   until not InRange(Self.Scroll.GetLevel(), 1, 99) or timeout.IsFinished;
 end;
 

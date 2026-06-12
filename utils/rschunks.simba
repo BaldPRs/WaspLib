@@ -34,6 +34,15 @@ begin
   Result := Chunk(b, [plane]);
 end;
 
+property TRSMapChunk.TopLeft: TPoint;
+begin
+  Result := [Min(Self.Box.X1, Self.Box.X2), Max(Self.Box.Y1, Self.Box.Y2)];
+end;
+
+property TRSMapChunk.BottomRight: TPoint;
+begin
+  Result := [Max(Self.Box.X1, Self.Box.X2), Min(Self.Box.Y1, Self.Box.Y2)];
+end;
 
 (*
 ### TRSMapChunkArray.CreateFromString

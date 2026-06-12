@@ -226,15 +226,14 @@ TRSMap to add maps to an already setup TRSMap.
 procedure TRSMap.AddEx(boxes: TBoxArray; planes: TIntegerArray = [0]; downscale: UInt32 = 8);
 var
   i: Int32;
-  chunk: TRSMapChunk;
-  chunks: array of TRSMapChunk;
+  chunks: TRSMapChunkArray;
 begin
-  chunk.Planes := planes;
+  SetLength(chunks, Length(boxes));
 
   for i := 0 to High(boxes) do
   begin
-    chunk.Box := boxes[i];
-    chunks += chunk;
+    chunks[i].Box := boxes[i];
+    chunks[i].Planes := planes;
   end;
 
   Self.Loader.Add(chunks, downscale);

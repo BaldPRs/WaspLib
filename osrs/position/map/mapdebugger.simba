@@ -40,7 +40,6 @@ Main record used to hold core values of the {ref}`Map Debugger`.
     Selected: Int32;
     Path: TPointArray;
 
-    GetLocal: function (pt: TPoint; offset: TPoint = [0,0]): TPoint of object;
     GetGlobal: function (pt: TPoint; offset: TPoint = [0,0]): TPoint of object;
 
     Coordinate, SelectedInfo: TLazLabel;
@@ -364,7 +363,6 @@ var
   collision: TImage;
   pt: TPoint;
   x, y, i: Int32;
-  node: TPoint;
 begin
   collision := loader.Collision.Copy();
 
@@ -379,34 +377,18 @@ begin
   Self.Images := [loader.Map.Copy(), loader.Heightmap.Copy(), collision];
 
   Self.GetGlobal := @loader.GetGlobal;
-  Self.GetLocal  := @loader.GetLocal;
 
-  Self.Graph.Nodes := [];
-  for node in loader.Graph.Nodes do
-    Self.Graph.Nodes += Self.GetLocal(node);
+  Self.Graph.Nodes := loader.Graph.Nodes;
+  Self.Graph.Paths := loader.Graph.Paths;
 
-  Self.Graph.Paths := Copy(loader.Graph.Paths);
+  Self.Graph.WalkableSpace := loader.Graph.WalkableSpace;
+  Self.Graph.WalkableClusters := loader.Graph.WalkableClusters;
+  Self.Graph.ObjectClusters := loader.Graph.ObjectClusters;
 
-  Self.Graph.WalkableSpace := [];
-  for pt in loader.Graph.WalkableSpace do
-    Self.Graph.WalkableSpace += Self.GetLocal(pt);
-
-  Self.Graph.WalkableClusters := [];
-  SetLength(Self.Graph.WalkableClusters, loader.Graph.WalkableClusters.Length);
-  for i := 0 to High(loader.Graph.WalkableClusters) do
-    for pt in loader.Graph.WalkableClusters[i] do
-      Self.Graph.WalkableClusters[i] += Self.GetLocal(pt);
-
-  Self.Graph.ObjectClusters := [];
-  SetLength(Self.Graph.ObjectClusters, loader.Graph.ObjectClusters.Length);
-  for i := 0 to High(loader.Graph.ObjectClusters) do
-    for pt in loader.Graph.ObjectClusters[i] do
-      Self.Graph.ObjectClusters[i] += Self.GetLocal(pt);
-
-  for i := 0 to Max(Length(loader.Graph.WalkableClusters), Length(loader.Graph.ObjectClusters)) do
+  for i := 0 to Max(Length(Self.Graph.WalkableClusters), Length(Self.Graph.ObjectClusters)) do
     Self.ColorArray += TColor.Random();
 
-  Self.Graph.Setup();
+  Self.Graph.KDTree := loader.Graph.KDTree;
   Self.ShowGraph := True;
 
   Self.Show();

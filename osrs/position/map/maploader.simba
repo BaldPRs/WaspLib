@@ -18,6 +18,9 @@ Credits: Torwent
 {%anchor WL_GENERATE_GRAPH_ALWAYS}
 {.$DEFINE WL_GENERATE_GRAPH_ALWAYS}
 
+{%anchor WL_DEBUG_MAPLOADER}
+{.$DEFINE WL_DEBUG_MAPLOADER}
+
 {$R-}
 
 {$IFDEF RANGECHECKS}
@@ -40,6 +43,7 @@ This is an internal type. Don't use it if you don't know what you are doing.
     Region: TBox;
     Plane: Integer;
     Offset: TPoint;
+    Graph: TWebGraph;
   end;
 
 (*
@@ -289,7 +293,7 @@ begin
     end;
 end;
 
-procedure TRSMapLoader.Setup(downscale: Integer);
+procedure TRSMapLoader.Setup(downscale: UInt32);
 var
   timer: TCountDown;
   emap: ERSMap;
@@ -328,12 +332,15 @@ Internal method that returns a chunk image.
 If possible, it will be loaded from a cached .bmp file.
 If no .bmp file exists, the .png file is loaded instead, it's saved as .bmp for future uses and the .png file is deleted.
 *)
-function TRSMapLoader.GetFile(chunk: TPoint; plane: Integer; map: ERSMap): TImage;
+function TRSMapLoader.GetFile(chunk: T3DPoint; map: ERSMap): TImage;
 var
   filename: String;
   idx: Integer;
 begin
-  filename := Format('%d-%d-%d.png', [plane, chunk.X, chunk.Y]);
+  if WebGraphGenerator.BlockedChunks.Contains(chunk) then
+    Exit(new TImage(RSTranslator.MAP_CHUNK_SIZE, RSTranslator.MAP_CHUNK_SIZE));
+
+  filename := Format('%d-%d-%d.png', [chunk.Z, chunk.X, chunk.Y]);
 
   idx := Self.MapReader[map].Find(filename);
   if idx > -1 then
@@ -354,6 +361,7 @@ var
   i, x, y, n: Integer;
   lo, hi: TPoint;
   img: TImage;
+  pt3D: T3DPoint;
 begin
   lo := [$FFFFFF, $FFFFFF];
   hi := [-$FFFFFF, -$FFFFFF];
@@ -374,7 +382,12 @@ begin
   begin
     x := (chunks[i].X - lo.X) * n;
     y := ((199 - chunks[i].Y) - lo.Y) * n;
-    img := Self.GetFile(chunks[i], plane, map);
+
+    pt3D.X := chunks[i].X;
+    pt3d.Y := chunks[i].Y;
+    pt3D.Z := plane;
+
+    img := Self.GetFile(pt3D, map);
     Result.DrawImage(img, [x, y]);
   end;
 end;
@@ -448,9 +461,7 @@ end;
 (*
 ## MapLoader.GetGraph
 ```pascal
-function TRSMapLoader.GetGraph(
-  constref region: TRSMapRegion; padding: UInt32; map: TImage
-): TWebGraph;
+function TRSMapLoader.GetGraph(const region: TRSMapRegion; map: TImage): TWebGraph;
 ```
 Returns a TWebGraph for the given `map`.
 
@@ -461,13 +472,9 @@ with {ref}`WebGraph Generator` and save it into cache.
 This is an internal method. Don't use it if you don't know what you are doing.
 ```
 *)
-function TRSMapLoader.GetGraph(
-  constref region: TRSMapRegion; padding: UInt32; map: TImage
-): TWebGraph;
+function TRSMapLoader.GetGraph(const region: TRSMapRegion; map: TImage): TWebGraph;
 var
   name, path, plane: String;
-  i: Integer;
-  offset: TPoint;
 begin
   name := region.Name;
   {$IFDEF WL_GENERATE_GRAPH_ALWAYS}
@@ -475,7 +482,6 @@ begin
   {$ENDIF}
   plane := ToStr(region.Plane);
   path := Self.CacheDir + 'graphs' + PATH_SEP + plane + PATH_SEP + name + '-' +
-          ToStr(padding) + '-' +
           WebGraphGenerator.Hash() + PATH_SEP;
 
   if
@@ -491,17 +497,6 @@ begin
     Result := WebGraphGenerator.BuildGraph(name, map);
     if Result = Default(TWebGraph) then
       Exit;
-
-    offset := region.Offset - region.Region.TopLeft + [padding, padding];
-
-    Result.Nodes := Result.Nodes.Offset(offset);
-    Result.WalkableSpace := Result.WalkableSpace.Offset(offset);
-
-    for i := 0 to High(Result.WalkableClusters) do
-      Result.WalkableClusters[i] := Result.WalkableClusters[i].Offset(offset);
-
-    for i := 0 to High(Result.ObjectClusters) do
-      Result.ObjectClusters[i] := Result.ObjectClusters[i].Offset(offset);
 
     Self.CacheGraph(Result, path);
     Exit;
@@ -528,14 +523,18 @@ procedure TRSMapLoader.Add(chunks: array of TRSMapChunk; downscale: UInt32 = 8; 
 var
   chunk: TRSMapChunk;
   region: TRSMapRegion;
-  i, idx, n, plane, regionCount: Integer;
+  i, idx, plane, regionCount: Integer;
   maps, heightmaps, collisionmaps: TImageArray;
-  topLeft, btmRight, offset: TPoint;
-  graphs: array of TWebGraph;
+  topLeft, btmRight: TPoint;
   boxes, oldRegions: TBoxArray;
   newMap, newHeightmap, newCollision: TImage;
   oldMapBox: TBox;
   graphPath: String;
+  kdItems: TKDItems;
+  graph: TWebGraph;
+  {$IFDEF WL_DEBUG_MAPLOADER}
+  t: Double;
+  {$ENDIF}
 begin
   if Self.Downscale <> downscale then
     raise GetDebugLn('MapLoader', 'Cannot add chunks with different downscale value');
@@ -574,25 +573,27 @@ begin
   if Length(Self.Regions) = regionCount then
     Exit;
 
-  boxes := [];
+  SetLength(maps, Length(Self.Regions)-regionCount);
+  SetLength(heightmaps, Length(maps));
+  SetLength(collisionmaps, Length(maps));
+  SetLength(boxes, Length(maps));
+
   for i := regionCount to High(Self.Regions) do
   begin
+    idx := i-regionCount;
     region := Self.Regions[i];
 
-    maps += Self.GetMap(region.Chunks, region.Plane, ERSMap.NORMAL);
-    heightmaps += Self.GetMap(region.Chunks, region.Plane, ERSMap.HEIGHT);
-    collisionmaps += Self.GetMap(region.Chunks, region.Plane, ERSMap.COLLISION);
-
-    idx := High(maps);
+    maps[idx] := Self.GetMap(region.Chunks, region.Plane, ERSMap.NORMAL);
+    heightmaps[idx] := Self.GetMap(region.Chunks, region.Plane, ERSMap.HEIGHT);
+    collisionmaps[idx] := Self.GetMap(region.Chunks, region.Plane, ERSMap.COLLISION);
 
     if not WebGraphGenerator.Disabled then
-      graphs += Self.GetGraph(region, padding, collisionmaps[idx]);
+      Self.Regions[i].Graph := Self.GetGraph(region, collisionmaps[idx]);
 
     maps[idx].Pad(padding);
     heightmaps[idx].Pad(padding);
     collisionmaps[idx].Pad(padding);
-
-    boxes += Box(0, 0, maps[idx].Width, maps[idx].Height);
+    boxes[idx] := Box(0, 0, maps[idx].Width, maps[idx].Height);
   end;
 
   SetLength(oldRegions, regionCount);
@@ -615,6 +616,11 @@ begin
   newMap := new TImage(Self.MapBox.Width, Self.MapBox.Height);
   newHeightmap := new TImage(Self.MapBox.Width, Self.MapBox.Height);
   newCollision := new TImage(Self.MapBox.Width, Self.MapBox.Height);
+  Self.Graph := Default(TWebGraph);
+
+  {$IFDEF WL_DEBUG_MAPLOADER}
+  t := PerformanceTime();
+  {$ENDIF}
 
   for i := 0 to regionCount - 1 do
   begin
@@ -622,6 +628,9 @@ begin
     newMap.DrawImage(Self.Map.Copy(oldRegions[i]), topLeft);
     newHeightmap.DrawImage(Self.Heightmap.Copy(oldRegions[i]), topLeft);
     newCollision.DrawImage(Self.Collision.Copy(oldRegions[i]), topLeft);
+    graph := Self.Regions[i].Graph.Offset(topLeft+[padding,padding]);
+    kdItems += graph.GetKDItems(Length(Self.Graph.WalkableClusters));
+    Self.Graph.Merge(graph);
   end;
 
   for i := regionCount to High(Self.Regions) do
@@ -631,6 +640,9 @@ begin
     newMap.DrawImage(maps[idx], topLeft);
     newHeightmap.DrawImage(heightmaps[idx], topLeft);
     newCollision.DrawImage(collisionmaps[idx], topLeft);
+    graph := Self.Regions[i].Graph.Offset(topLeft+[padding,padding]);
+    kdItems += graph.GetKDItems(Length(Self.Graph.WalkableClusters));
+    Self.Graph.Merge(graph);
   end;
 
   Self.Map := newMap;
@@ -640,36 +652,8 @@ begin
   Self.HalfMap := Self.Map.Downsample(2);
   Self.DownscaledMap := Self.Map.Downsample(Self.Downscale);
 
-  if WebGraphGenerator.Disabled then Exit;
-
-  for i := 0 to regionCount - 1 do
-  begin
-    offset := Self.Regions[i].Region.TopLeft - oldRegions[i].TopLeft;
-
-    if offset <> Default(TPoint) then
-    begin
-      for idx := 0 to High(Self.Graph.Nodes) do
-        if Self.Graph.Nodes[idx] in oldRegions[i] then
-          Self.Graph.Nodes[idx] := Self.Graph.Nodes[idx] + offset;
-
-      for idx := 0 to High(Self.Graph.WalkableSpace) do
-        if Self.Graph.WalkableSpace[idx] in oldRegions[i] then
-          Self.Graph.WalkableSpace[idx] := Self.Graph.WalkableSpace[idx] + offset;
-
-      for idx := 0 to High(Self.Graph.WalkableClusters) do
-        for n := 0 to High(Self.Graph.WalkableClusters[idx]) do
-          if Self.Graph.WalkableClusters[idx][n] in oldRegions[i] then
-            Self.Graph.WalkableClusters[idx][n] := Self.Graph.WalkableClusters[idx][n] + offset;
-
-      for idx := 0 to High(Self.Graph.ObjectClusters) do
-        for n := 0 to High(Self.Graph.ObjectClusters[idx]) do
-          if Self.Graph.ObjectClusters[idx][n] in oldRegions[i] then
-            Self.Graph.ObjectClusters[idx][n] := Self.Graph.ObjectClusters[idx][n] + offset;
-    end;
-  end;
-
-  for i := 0 to High(graphs) do
-    Self.Graph.Merge(graphs[i]);
+  if WebGraphGenerator.Disabled then
+    Exit;
 
   graphPath := Self.CacheDir + 'graphs' + PATH_SEP + 'trees' + PATH_SEP;
   if not DirCreate(graphPath) then
@@ -677,11 +661,16 @@ begin
 
   graphPath += Self.Graph.TreeHash();
 
+  {$IFNDEF WL_DEBUG_MAPLOADER}
   if FileExists(graphPath) then
     Self.Graph.KDTree := TKDTree.Create(graphPath)
   else
+  {$ENDIF}
   begin
-    Self.Graph.Setup();
+    Self.Graph.Setup(kdItems);
+    {$IFDEF WL_DEBUG_MAPLOADER}
+    WriteLn('MapLoader took ', PerformanceTime()-t, 'ms to setup graph.');
+    {$ENDIF}
     Self.Graph.KDTree.SaveToFile(graphPath);
   end;
 end;
@@ -720,7 +709,7 @@ end.
 This is an internal method. Usually, {ref}`TRSMap` `Load` methods will call this for you.
 ```
 *)
-procedure TRSMapLoader.Load(chunks: TRSMapChunkArray; downscale: Integer = 8; padding: Integer = 40);
+procedure TRSMapLoader.Load(chunks: TRSMapChunkArray; downscale: UInt32 = 8; padding: UInt32 = 40);
 begin
   Self.Setup(downscale);
   if Self.Padding = 0 then

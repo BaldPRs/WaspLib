@@ -58,27 +58,45 @@ begin
 end;
 
 (*
-## TWebGraph.Setup
+## TWebGraph.GetKDItems
 ```pascal
-procedure TWebGraph.Setup();
+function TWebGraph.GetKDItems(offset: Itneger = 0): TKDItems;
 ```
-It sets up `TWebGraph.Tree`, a {ref}`TKDPointTree` used to compare distances between
-nodes very fast.
+Returns `TKDItems` to be used on a {ref}`TKDTree` which can be used to compare
+distances between nodes very fast.
 *)
-procedure TWebGraph.Setup();
+function TWebGraph.GetKDItems(offset: Integer = 0): TKDItems;
 var
   i, j: Integer;
   boxes: TBoxArray;
-  items: TKDItems;
 begin
   boxes := Self.WalkableClusters.BoundsArray();
 
+  SetLength(Result, Length(Self.Nodes));
   for i := 0 to High(Self.Nodes) do
     for j := 0 to High(Self.WalkableClusters) do
       if boxes[j].Contains(Self.Nodes[i]) then
         if Self.WalkableClusters[j].Contains(Self.Nodes[i]) then
-          items += [j, [Self.Nodes[i].X, Self.Nodes[i].Y]];
-  Self.KDTree := TKDTree.Create(items);
+        begin
+          Result[i] := [j+offset, [Self.Nodes[i].X, Self.Nodes[i].Y]];
+          Continue(2);
+        end;
+end;
+
+(*
+## TWebGraph.Setup
+```pascal
+procedure TWebGraph.Setup(const kditems: TKDItems = []);
+```
+It sets up `TWebGraph.Tree`, a {ref}`TKDTree` used to compare distances between
+nodes very fast.
+*)
+procedure TWebGraph.Setup(const kditems: TKDItems = []);
+begin
+  if kditems = [] then
+    Self.KDTree := TKDTree.Create(Self.GetKDItems())
+  else
+    Self.KDTree := TKDTree.Create(kditems);
 end;
 
 
@@ -563,11 +581,11 @@ end;
 (*
 ## TWebGraph.Merge
 ```pascal
-procedure TWebGraph.Merge(graph: TWebGraph);
+procedure TWebGraph.Merge(constref graph: TWebGraph);
 ```
 Merges `graph` into the current `TWebGraph`.
 *)
-procedure TWebGraph.Merge(graph: TWebGraph);
+procedure TWebGraph.Merge(constref graph: TWebGraph);
 var
   i, n, len: Integer;
 begin
@@ -583,6 +601,22 @@ begin
   Self.WalkableSpace    += graph.WalkableSpace;
   Self.WalkableClusters += graph.WalkableClusters;
   Self.ObjectClusters   += graph.ObjectClusters;
+end;
+
+(*
+## TWebGraph.Offset
+```pascal
+function TWebGraph.Offset(pt: TPoint): TWebGraph;
+```
+Returns an offset `TWebGraph` by the specified `pt`.
+*)
+function TWebGraph.Offset(pt: TPoint): TWebGraph;
+begin
+  Result.Nodes := Self.Nodes.Offset(pt);
+  Result.Paths := Self.Paths.Copy();
+  Result.WalkableSpace := Self.WalkableSpace.Offset(pt);
+  Result.WalkableClusters := Self.WalkableClusters.Offset(pt);
+  Result.ObjectClusters   := Self.ObjectClusters.Offset(pt);
 end;
 
 

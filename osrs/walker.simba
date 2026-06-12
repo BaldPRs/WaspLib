@@ -158,10 +158,15 @@ end;
 
 function TRSWalker.Points2MM(me: TPoint; tpa: TPointArray; radians: Double): TPointArray; static;
 var
+  i: Integer;
   pt: TPoint;
 begin
-  for pt in tpa do
-    Result += TRSWalker.Point2MM(me, pt, radians);
+  SetLength(Result, Length(tpa));
+  for i := 0 to High(tpa) do
+  begin
+    pt := tpa[i];
+    Result[i] := TRSWalker.Point2MM(me, pt, radians);
+  end;
 end;
 
 function TRSWalker.FilterToMM(me: TPoint; const dotFilter: TRSDotFilter; radians: Single): TRSDotFilter; static;
@@ -197,10 +202,15 @@ end;
 
 function TRSWalker.GetLocalEx(tpa: TPointArray; offset: TPoint = [0,0]): TPointArray;
 var
+  i: Integer;
   pt: TPoint;
 begin
-  for pt in tpa do
-    Result += Self.GetLocal(pt, offset);
+  SetLength(Result, Length(tpa));
+  for i := 0 to High(tpa) do
+  begin
+    pt := tpa[i];
+    Result[i] := Self.GetLocal(pt, offset);
+  end;
 end;
 
 function TRSWalker.GetQuadMS(me, mapPoint: TPoint; size: TVector2; radians: Single): TQuad;
@@ -964,7 +974,7 @@ end;
 
 function TRSWalker.GetPath(me, destination: TPoint; randomness: Double): TPointArray;
 begin
-  Result := Self.Graph^.PathBetween(me, destination, randomness, 4);
+  Result := Self.Graph^.PathBetween(Self.GetLocal(me), Self.GetLocal(destination), randomness, 4);
 end;
 
 (*
@@ -996,14 +1006,20 @@ end;
 
 function TRSWalker.WebWalk(destinations: TPointArray; minDist: Integer = 0; randomness: Double = 0; debug: Boolean = False): Boolean; overload;
 var
+  i: Integer;
+  dests: TPointArray;
   me, destination: TPoint;
   path: TPointArray;
 begin
   if not System.InRange(randomness, 0, 1) then
     raise GetDebugLn(Self.Name, 'WebWalk `randomness` must be between 0.0 an 1.0');
 
-  me := Self.Position();
-  destination := Self.Graph^.NearestPathable(me, destinations);
+  me := Self.GetLocal(Self.Position());
+  SetLength(dests, Length(destinations));
+  for i := 0 to High(destinations) do
+    dests[i] := Self.GetLocal(destinations[i]);
+
+  destination := Self.Graph^.NearestPathable(me, dests);
 
   if me.InRange(destination, 3) then
     Exit(True);
@@ -1052,7 +1068,7 @@ cluster.
 *)
 function TRSWalker.CheckConnection(a, b: TPoint): Boolean;
 begin
-  Result := Self.Graph^.WalkableClusters.InSameTPA(a, b);
+  Result := Self.Graph^.WalkableClusters.InSameTPA(Self.GetLocal(a), Self.GetLocal(b));
 end;
 
 {$R+}

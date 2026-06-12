@@ -14,6 +14,13 @@ begin
 end;
 {$ENDIF}
 
+type
+  T3DPoint = record
+    X,Y,Z: Integer;
+  end;
+
+  T3DPointArray = array of T3DPoint;
+
 const
   TAU: Double = 2 * PI;
 

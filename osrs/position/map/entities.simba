@@ -285,13 +285,13 @@ begin
        Self.Walker^.Height(meLocal + [3,1], False) + Self.Walker^.Height(meLocal - [1,1], False);
   h := h/4;
 
-  if Self.Filter <> [] then
+  if not Self.Filter.IsEmpty then
   begin
     dots := Minimap.GetFilteredDotArray(
       Self.MinimapDots, Self.Walker^.FiltersToMM(me, Self.Filter, radians), False
     );
 
-    if dots = [] then
+    if dots.IsEmpty then
       Exit;
 
     dots := dots.SortFrom(Minimap.Center);

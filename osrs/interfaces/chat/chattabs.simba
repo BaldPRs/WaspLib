@@ -70,7 +70,7 @@ begin
     for i := 0 to 6 do
       Self.Tabs[i+1] := new TRSButton(
         [X1+3+(i*62), Y1, X1+58+(i*62), Y2-1],
-        [[$0E202D, 0.888, EColorSpace.RGB, [1,1,1]]]
+        [[$112244, 7.768, EColorSpace.HSV, [0.623, 1.217, 1.161]]]
       );
 
   MainScreen.Mask.DrawColor := $FFFFFF;

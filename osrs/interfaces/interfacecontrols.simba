@@ -56,6 +56,7 @@ begin
   Mouse.Click(Self.Bounds, button);
 end;
 
+{$R-}
 (*
 ### TRSButton.Enabled
 ```pascal
@@ -75,17 +76,15 @@ property TRSButton.Enabled: Boolean;
 var
   i: Integer;
 begin
-  if Self.EnabledColors = [] then
+  if Self.EnabledColors.IsEmpty then
     raise GetDebugLn(
       'TRSButton',
       'This button has no state. Use `TRSButton.Click` instead or add `EnabledColors` to it.'
     );
 
-  {$R-}
   for i := 0 to High(Self.EnabledColors) do
     if Target.HasColor(Self.EnabledColors[i], 1, Self.Bounds) then
       Exit(True);
-  {$R+}
 end;
 
 property TRSButton.Enabled(value: Boolean): Boolean;
@@ -119,12 +118,11 @@ function TRSButtonArray.Create(
   boxes: TBoxArray; enabledColors: array of TColorTolerance
 ): TRSButtonArray; static;
 var
-  b: TBox;
+  i: Integer;
 begin
-  {$R-}
-  for b in boxes do
-    Result += new TRSButton(b, enabledColors);
-  {$R+}
+  SetLength(Result, Length(boxes));
+  for i := 0 to High(boxes) do
+    Result[i] := new TRSButton(boxes[i], enabledColors);
 end;
 
 
@@ -161,7 +159,8 @@ var
   tpa: TPointArray;
 begin
   tpa := Target.FindColor(Self.Color, 0, Self.Bounds.Expand(10));
-  if tpa = [] then Exit(-1);
+  if tpa.IsEmpty then
+    Exit(-1);
   Result := (tpa.Mean().X - Self.Bounds.X1) * 100 div Self.Width;
 end;
 
@@ -316,7 +315,7 @@ begin
     TRSInterface.BORDER, 0, [pt.X, Self.Bounds.Y1, pt.X + 1, Self.Bounds.Y2]
   );
 
-  if tpa = [] then
+  if tpa.IsEmpty then
     Exit;
   Result.X1 := Self.Bounds.X1+1;
   Result.Y1 := tpa.First.Y;
@@ -437,7 +436,7 @@ begin
 
   timeout.Start(3 * ONE_SECOND);
   while not timeout.IsFinished do
-    if Target.GetPixelDifference(30, 3, Self.Area) = [] then
+    if Target.GetPixelDifference(30, 3, Self.Area).IsEmpty then
       Break;
 end;
 
@@ -566,7 +565,6 @@ begin
   Self.Colors := colors;
 
   SetLength(Self.Options, Length(options));
-  {$R-}
   for i := 0 to High(options) do
   begin
     Self.Options[i].Index := i;
@@ -576,7 +574,6 @@ begin
     ];
     Self.Options[i].Text := options[i];
   end;
-  {$R+}
 end;
 
 
@@ -678,7 +675,8 @@ WriteLn Options.DropDowns[ERSOptionsDropDown.CLIENT_MODE].Close();
 *)
 function TRSDropDown.Close(): Boolean;
 begin
-  if not Self.IsVisible() or not Self.IsOpen() then Exit(True);
+  if not Self.IsVisible() or not Self.IsOpen() then
+    Exit(True);
   Mouse.Click(Self.Bounds, EMouseButton.LEFT);
   Result := SleepUntil(not Self.IsOpen(), RandomMode(100, 50, 1500), TICK);
 end;
@@ -752,10 +750,8 @@ function TRSDropDown.Select(option: String): Boolean; overload;
 var
   idx: Integer;
 begin
-  {$R-}
   for idx := 0 to High(Self.Options) do
     if Self.Options[idx].Text.Contains(option) then
       Exit(Self.Select(idx));
-  {$R+}
 end;
-
+{$R+}

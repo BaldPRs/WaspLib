@@ -27,6 +27,7 @@ Helper record for {ref}`TRSworldSwitcher`.
     Bounds: TBox;
     Available: Boolean;
   end;
+
 (*
 ## TRSWorldArray type
 Helper type for {ref}`TRSworldSwitcher`.

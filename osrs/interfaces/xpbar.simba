@@ -23,6 +23,11 @@ begin
   Result := Self.Current-Self.Previous;
 end;
 
+function TXPTracker.Total(): UInt64;
+begin
+  Result := Self.Current-Self.Start;
+end;
+
 type
 (*
 ## TRSXPBar
@@ -33,7 +38,7 @@ Record responsible with interacting with the {ref}`XPBar`.
     Bounds: TBox;
     Font: TPixelFont;
 
-    Tracker: TXPTracker;
+    Tracker, OnlineTracker: TXPTracker;
 
     SetupAttempts: Integer;
     IsSetup: Boolean;
@@ -237,14 +242,24 @@ begin
   if Result < Self.Tracker.Previous then
   begin
     Self.Tracker.Reset();
+    Self.OnlineTracker.Reset();
     Exit(0);
   end;
 
   if Self.Tracker.Start = 0 then
+  begin
     Self.Tracker.Start := Result;
+    Self.OnlineTracker.Start := Result;
+  end;
+
   if Self.Tracker.Previous = 0 then
+  begin
     Self.Tracker.Previous := Result;
+    Self.OnlineTracker.Previous := Result;
+  end;
+
   Self.Tracker.Current := Result;
+  Self.OnlineTracker.Current := Result;
 end;
 
 (*
@@ -272,7 +287,8 @@ begin
 
   if Result then
   begin
-    WaspClient.UpdatePayload(Self.Tracker.Earned(), 0);
+    if WaspClient.UpdatePayload(Self.OnlineTracker.Earned(), 0) then
+      Self.OnlineTracker.Previous := Self.Tracker.Current;
     Self.Tracker.Previous := Self.Tracker.Current;
     Activity.Restart();
   end;
@@ -303,8 +319,9 @@ due to several reasons, like open interfaces.
 *)
 function TRSXPBar.TotalEarnedXP(update: Boolean = True): UInt64;
 begin
-  if update then Self.Read();
-  Result := Self.Tracker.Current - Self.Tracker.Start;
+  if update then
+    Self.Read();
+  Result := Self.Tracker.Total();
 end;
 
 var

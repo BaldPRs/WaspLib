@@ -33,6 +33,7 @@ Helper type for {ref}`TRSworldSwitcher`.
 *)
   TRSWorldArray = array of TRSWorld;
 
+{$R-}
 procedure ShowOnTarget(worlds: TRSWorldArray); overload;
 var
   img: TImage;
@@ -432,8 +433,10 @@ WriteLn WorldSwitcher.Sort();
 *)
 function TRSWorldSwitcher.Sort(): Boolean;
 begin
-  if not Self.IsOpen() then Exit;
-  if Self.IsSorted() then Exit(True);
+  if not Self.IsOpen() then
+    Exit;
+  if Self.IsSorted() then
+    Exit(True);
   Mouse.Click(Self.SortArrow, EMouseButton.LEFT);
   Result := SleepUntil(Self.IsSorted(), 50, 600);
 end;
@@ -454,31 +457,48 @@ begin
 
   repeat
     worlds := Self.GetWorlds();
-
     if worlds.IsEmpty then
       Exit;
 
     for world in worlds do
-      if world.Number = next then
-      begin
-        if not world.Available then
-        begin
-          DebugLn(
-            'WorldSwitcher',
-            'World ' + ToStr(next) + ' is unavailable.' + LINE_SEP +
-            'It will be removed temporarily, but you should remove it in your profile!',
-            ELogLevel.WARN
-          );
+    begin
+      if world.Number <> next then
+        Continue;
 
-          profile := Profiles.Get();
-          profile.Worlds.Remove(next);
-          profiles.Update(profile);
-          Exit;
-        end;
-        Mouse.Click(world.Bounds, EMouseButton.LEFT);
-        if Self.WaitSwitch(next) then
-          Exit(True);
+      if not world.Available then
+      begin
+        DebugLn(
+          'WorldSwitcher',
+          'World ' + ToStr(next) + ' is unavailable.' + LINE_SEP +
+          'It will be removed temporarily, but you should remove it in your profile!',
+          ELogLevel.WARN
+        );
+
+        profile := Profiles.Get();
+        profile.Worlds.Remove(next);
+        profiles.Update(profile);
+        Exit;
       end;
+
+      Mouse.Click(world.Bounds, EMouseButton.LEFT);
+      if Self.WaitSwitch(next) then
+        Exit(True);
+    end;
+
+    if (worlds.First.Number < next) and (worlds.Last.Number > next) then
+    begin
+      DebugLn(
+        'WorldSwitcher',
+        'World ' + ToStr(next) + ' doesn''t exist.' + LINE_SEP +
+        'It will be removed temporarily, but you should remove it in your profile!',
+        ELogLevel.WARN
+      );
+
+      profile := Profiles.Get();
+      profile.Worlds.Remove(next);
+      profiles.Update(profile);
+      Exit;
+    end;
 
     Self.Scroll.Scroll(Biometrics.RandomModeInteger(2,1,3), next > worlds[0].Number);
   until not InRange(Self.Scroll.GetLevel(), 1, 99) or timeout.IsFinished;
@@ -525,7 +545,7 @@ end;
 function TRSWorldSwitcher.Next(): Boolean;
 ```
 Hops to the world that follows our current world according to the contents of
-`Profiles[ProfileIndex].Worlds`.
+`Profiles.Get().Worlds`.
 
 Example:
 ```pascal
@@ -536,23 +556,25 @@ WriteLn WorldSwitcher.World;
 *)
 function TRSWorldSwitcher.Next(): Boolean;
 var
+  profile: TProfile;
   current, next: Integer;
 begin
   if not Self.Cooldown.IsFinished or not Self.Open() then
     Exit;
 
-  if Profiles[ProfileIndex].Worlds = [] then
+  profile := Profiles.Get();
+  if profile.Worlds.IsEmpty then
     raise GetDebugLn('WorldSwitcher', 'Current profile has no worlds saved.');
 
   current := Self.World;
-  if Profiles[ProfileIndex].Worlds = [current] then
+  if profile.Worlds = [current] then
     Exit(True);
 
-  next := Profiles[ProfileIndex].Worlds.IndexOf(current);
-  if Inc(next) > High(Profiles[ProfileIndex].Worlds) then
+  next := profile.Worlds.IndexOf(current);
+  if Inc(next) > High(profile.Worlds) then
     next := 0;
 
-  Result := Self._Hop(Profiles[ProfileIndex].Worlds[next]);
+  Result := Self._Hop(profile.Worlds[next]);
 end;
 
 (*
@@ -561,7 +583,7 @@ end;
 function TRSWorldSwitcher.Previous(): Boolean;
 ```
 Hops to the world that comes before our current world according to the contents
-of `Profiles[ProfileIndex].Worlds`.
+of `Profiles.Get().Worlds`.
 
 Example:
 ```pascal
@@ -572,23 +594,25 @@ WriteLn WorldSwitcher.World;
 *)
 function TRSWorldSwitcher.Previous(): Boolean;
 var
+  profile: TProfile;
   current, prev: Integer;
 begin
   if not Self.Cooldown.IsFinished or not Self.Open() then
     Exit;
 
-  if Profiles[ProfileIndex].Worlds = [] then
+  profile := Profiles.Get();
+  if profile.Worlds.IsEmpty then
     raise GetDebugLn('WorldSwitcher', 'Current profile has no worlds saved.');
 
   current := Self.World;
-  if Profiles[ProfileIndex].Worlds = [current] then
+  if profile.Worlds = [current] then
     Exit(True);
 
-  prev := Profiles[ProfileIndex].Worlds.IndexOf(current);
+  prev := profile.Worlds.IndexOf(current);
   if Dec(prev) < 0 then
-    prev := High(Profiles[ProfileIndex].Worlds);
+    prev := High(profile.Worlds);
 
-  Result := Self._Hop(Profiles[ProfileIndex].Worlds[prev]);
+  Result := Self._Hop(profile.Worlds[prev]);
 end;
 
 (*
@@ -596,7 +620,7 @@ end;
 ```pascal
 function TRSWorldSwitcher.Random(): Boolean;
 ```
-Hops to a random world that's in `Profiles[ProfileIndex].Worlds` and is not our
+Hops to a random world that's in `Profiles.Get().Worlds` and is not our
 current world.
 
 Example:
@@ -608,20 +632,22 @@ WriteLn WorldSwitcher.World;
 *)
 function TRSWorldSwitcher.Random(): Boolean;
 var
+  profile: TProfile;
   current, rnd: Integer;
 begin
   if not Self.Cooldown.IsFinished or not Self.Open() then
     Exit;
 
-  if Profiles[ProfileIndex].Worlds = [] then
+  profile := Profiles.Get();
+  if profile.Worlds.IsEmpty then
     raise GetDebugLn('WorldSwitcher', 'Current profile has no worlds saved.');
 
   current := Self.World;
-  if Profiles[ProfileIndex].Worlds = [current] then
+  if profile.Worlds = [current] then
     Exit(True);
 
   repeat
-    rnd := Profiles[ProfileIndex].Worlds.Random();
+    rnd := profile.Worlds.Random();
   until rnd <> current;
 
   Result := Self._Hop(rnd);
@@ -648,7 +674,7 @@ begin
 
   Result := SleepUntil(Self.World = world, 200, 10000);
 end;
-
+{$R+}
 
 var
 (*

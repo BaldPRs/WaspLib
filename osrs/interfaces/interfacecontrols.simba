@@ -418,7 +418,7 @@ begin
   direction := old > value;
   area := Self.ScrollArea;
 
-  timeout.Start(15 * ONE_SECOND);
+  timeout.Start(15*SECOND);
   while (old <> value) and (direction = (old > value)) and not timeout.IsFinished do
   begin
     Mouse.Move(area);
@@ -434,7 +434,7 @@ begin
     old := Result;
   end;
 
-  timeout.Start(3 * ONE_SECOND);
+  timeout.Start(3*SECOND);
   while not timeout.IsFinished do
     if Target.GetPixelDifference(30, 3, Self.Area).IsEmpty then
       Break;
@@ -480,7 +480,7 @@ begin
     Mouse.Scroll(Random(1,3), down);
   end;
 
-  timeout.Start(3 * ONE_SECOND);
+  timeout.Start(3*SECOND);
   while not timeout.IsFinished do
     if Target.GetPixelDifference(30, 3, Self.Area) = [] then
       Break;

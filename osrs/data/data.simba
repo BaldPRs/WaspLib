@@ -54,7 +54,7 @@ begin
       FileDelete(Self.Filename);
     end;
 
-    Self.Timeout := t + ONE_HOUR;
+    Self.Timeout := t + HOUR;
     Self.Filename := Self.CacheDir  + 'prices' + PATH_SEP + ToStr(Self.Timeout) + '.json';
     HTTPClient.GetFile(Self.PRICES_URL, Self.Filename);
   end;

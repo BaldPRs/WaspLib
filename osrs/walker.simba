@@ -491,22 +491,25 @@ begin
     if @Self.OnWaitMovingEvent <> nil then
       Self.OnWaitMovingEvent(@Self, position.Current, destination);
 
-    if (Self.AdaptiveWalk) and (Time() > awct) then
+    if Self.AdaptiveWalk and not Self._Path.IsEmpty and (Time() > awct) then
     begin
       Self.AdaptiveWalkCheck(Position.Current);
       awct := Time() + 1000;
     end;
 
     if Antiban.WalkCameraAdjustments then
-      if not angleUpdated and Biometrics.RandomBoolean(0.5) then
-      begin
-        pt := TRSWalker.Point2MM(position.Current, destination, Minimap.CompassRadians);
-        with Minimap.ZoomQuad do
-          angleUpdated := Minimap.FacePointEx(pt, Top, Right, 20);
-      end;
+      if not angleUpdated then
+        if Biometrics.RandomBoolean(0.5) then
+        begin
+          pt := TRSWalker.Point2MM(position.Current, destination, Minimap.CompassRadians);
+          with Minimap.ZoomQuad do
+            angleUpdated := Minimap.FacePointEx(pt, Top, Right, 20);
+        end;
 
-    if Self.FancyMouse then Self.DoMouseAhead(position.Current);
-    if not Self.Walking then Break;
+    if Self.FancyMouse then
+      Self.DoMouseAhead(position.Current);
+    if not Self.Walking then
+      Break;
 
     Sleep(50, 150);
   until timeout.IsFinished or countdown.IsFinished or position.Current.InRange(destination, minDist);

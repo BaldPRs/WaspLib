@@ -36,9 +36,9 @@ begin
     Antiban.TimeRunning.ElapsedFmt(TIME_SHORT),
     sleepInfo,
     actionsStr,
-    FormatNumber(Self.Actions / Logger.TimeRunning.Elapsed * ONE_HOUR),
+    FormatNumber(Self.Actions / Logger.TimeRunning.Elapsed * HOUR),
     FormatNumber(xp),
-    FormatNumber(xp / Logger.TimeRunning.Elapsed * ONE_HOUR),
+    FormatNumber(xp / Logger.TimeRunning.Elapsed * HOUR),
     ToStr(Stats.GetLevel(ERSSkill.TOTAL))
   ];
 end;

@@ -200,12 +200,10 @@ begin
   page := HTTPClient.Get('https://oldschool.runescape.wiki/w/Music');
   matchArray := page.RegExprFindAll('data-music-track-name="(.*?)"');
   for trackIndex := 0 to High(matchArray) do
-  begin
     if matchArray[trackIndex].Groups[0].Match.Equals(trackName, False) then
-     break;
-  end;
+     Break;
 
-  timeout.Start(10 * ONE_SECOND);
+  timeout.Start(10*SECOND);
 
   Self.Scroll.SetLevel(((trackIndex * 100) div high(matchArray))-1);
 

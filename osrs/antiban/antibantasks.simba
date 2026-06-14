@@ -33,7 +33,7 @@ SRL built in Antiban Tasks that can be added with **TAntiban.AddTask**.
 
 Example:
 ```pascal
-Antiban.AddTask(15 * ONE_MINUTE, @Antiban.HoverSkills);
+Antiban.AddTask(15*MINUTE, @Antiban.HoverSkills);
 ```
 *)
 

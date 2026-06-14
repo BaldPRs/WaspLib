@@ -251,11 +251,11 @@ var
   sleep: Double;
 begin
   sleep := 23;
-  sleep += 4     * Self.GetProbability(EBiometric.SLEEP_H) * ONE_HOUR;
-  sleep += 59.99 * Self.GetProbability(EBiometric.SLEEP_M) * ONE_MINUTE;
-  sleep += 59.99 * Self.GetProbability(EBiometric.SLEEP_S) * ONE_SECOND;
+  sleep += 4     * Self.GetProbability(EBiometric.SLEEP_H) * HOUR;
+  sleep += 59.99 * Self.GetProbability(EBiometric.SLEEP_M) * MINUTE;
+  sleep += 59.99 * Self.GetProbability(EBiometric.SLEEP_S) * SECOND;
 
-  if sleep > ONE_DAY then sleep -= ONE_DAY;
+  if sleep > DAY then sleep -= DAY;
   Result := FormatMilliseconds(Round(sleep), 'hh:mm:ss');
 end;
 

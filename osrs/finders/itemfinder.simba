@@ -190,7 +190,7 @@ begin
   end;
 
   Self.Unzipping := True;
-  Self.Timeout.Start(60 * ONE_SECOND);
+  Self.Timeout.Start(60 * SECOND);
   Async.FileUnZip(
     WLEnv.AssetsDir + 'finders' + PATH_SEP + 'items' + PATH_SEP + 'items.zip',
     Self.CacheDir, @Self._UnzipFinished

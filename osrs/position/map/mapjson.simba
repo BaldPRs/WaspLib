@@ -69,7 +69,7 @@ begin
     Exit;
 
   Self.Unzipping := True;
-  Self.Timeout.Start(ONE_MINUTE);
+  Self.Timeout.Start(MINUTE);
   Async.FileUnZip(filename, Self.CacheDir, @Self.Unzipped);
 end;
 

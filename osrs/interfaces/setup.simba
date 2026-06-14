@@ -239,7 +239,7 @@ begin
     RSClient.Mode := ERSMode.FIXED;
   SetupInterfaces();
 
-  Activity.Start(5 * ONE_MINUTE);
+  Activity.Start(5*MINUTE);
 end;
 
 {$IFNDEF WL_TEST}

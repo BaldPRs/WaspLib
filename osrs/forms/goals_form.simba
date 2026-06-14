@@ -229,7 +229,7 @@ var
   y, size: Integer;
   timer: TCountDown;
 begin
-  timer.Start(8 * ONE_SECOND);
+  timer.Start(8*SECOND);
   while Self.Unzipping do
   begin
     Sleep(100);
@@ -411,10 +411,10 @@ begin
   if not DirCreate(Self.CacheDir) then
     raise GetDebugLn('SpellFinder', 'Failed to create cache directory: ' + Self.CacheDir);
 
-  if DirList(Self.CacheDir) = [] then
+  if DirList(Self.CacheDir).IsEmpty then
   begin
     Self.Unzipping := True;
-    Self.Timeout.Start(2 * ONE_MINUTE);
+    Self.Timeout.Start(2*MINUTE);
     Async.FileUnZip(Self.ZIP, Self.CacheDir, @Self.Unzipped);
   end;
 end;

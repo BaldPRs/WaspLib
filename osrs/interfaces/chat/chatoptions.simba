@@ -319,9 +319,7 @@ end;
 (*
 ### Chat.ContinueUntilOption
 ```pascal
-function TRSChat.ContinueUntilOption(
-  const txt: String; timeout: Int64 = 10 * ONE_SECOND
-): Boolean;
+function TRSChat.ContinueUntilOption(const txt: String; timeout: Int64 = 10*SECOND): Boolean;
 ```
 Selects the "Click here to continue" continuously until `option` is available
 as a chat option or until we reach the `timeout` which is measured in milliseconds.
@@ -331,9 +329,7 @@ Example:
 WriteLn Chat.ContinueUntilOption('access my bank');
 ```
 *)
-function TRSChat.ContinueUntilOption(
-  const txt: String; timeout: Int64 = 10 * ONE_SECOND
-): Boolean;
+function TRSChat.ContinueUntilOption(const txt: String; timeout: Int64 = 10*SECOND): Boolean;
 begin
   timeout := Time() + timeout;
   while (Time() < timeout) do

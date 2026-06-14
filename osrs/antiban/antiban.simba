@@ -78,8 +78,8 @@ begin
   res -= current;
   if res < 0 then res += 1;
 
-  Result := GetTimeRunning() + UInt64(Trunc(res * ONE_DAY));
-  Result += Trunc(Abs(GaussRand(0, randomness * ONE_DAY / 2)));
+  Result := GetTimeRunning() + UInt64(Trunc(res*DAY));
+  Result += Trunc(Abs(GaussRand(0, randomness*DAY/2)));
 end;
 
 
@@ -181,7 +181,7 @@ This task will only occur when **TAntiban.DoAntiban** is called.
 
 Example:
 ```pascal
-Antiban.AddTask(@Antiban.HoverSkills, 15 * ONE_MINUTE); //Every 15 minutes the script will run Antiban.HoverSkills().
+Antiban.AddTask(@Antiban.HoverSkills, 15 * MINUTE); //Every 15 minutes the script will run Antiban.HoverSkills().
 ```
 *)
 procedure TAntiban.AddTask(method: TAntibanMethod; interval: Double; randomness: Double = 0.2);
@@ -212,7 +212,7 @@ This break will only occur when {ref}`Antiban.DoAntiban` is called.
 
 Example:
 ```pascal
-Antiban.AddBreak(30 * ONE_MINUTE, 5 * ONE_MINUTE); //Every 30 minutes the script will take a 5 minute break, subject to variance from the randomness variable.
+Antiban.AddBreak(30 * MINUTE, 5 * MINUTE); //Every 30 minutes the script will take a 5 minute break, subject to variance from the randomness variable.
 ```
 *)
 procedure TAntiban.AddBreak(interval, length: Double; randomness: Double = 0.2; logoutChance: Double = 0.33);
@@ -250,7 +250,7 @@ sleep break is due.
 
 Example:
 ```pascal
-Antiban.AddSleep('01:30:45', 8 * ONE_HOUR, 0.1, 0.8); //At 01:30:45 on our computer time the script will take a break for 8 hours, subject to variance from the randomness variable.
+Antiban.AddSleep('01:30:45', 8*HOUR, 0.1, 0.8); //At 01:30:45 on our computer time the script will take a break for 8 hours, subject to variance from the randomness variable.
 ```
 *)
 procedure TAntiban.AddSleep(time: String; length: Double; randomness: Double = 0.1; logoutChance: Double = 0.5);
@@ -282,7 +282,7 @@ This task will only occur when **TAntiban.DoAntiban** is called.
 
 Example:
 ```pascal
-Antiban.AddWalkTask(@Antiban.HoverSkills, 15 * ONE_MINUTE); //Every 15 minutes the script will run Antiban.HoverSkills().
+Antiban.AddWalkTask(@Antiban.HoverSkills, 15 * MINUTE); //Every 15 minutes the script will run Antiban.HoverSkills().
 ```
 *)
 procedure TAntiban.AddWalkTask(method: TAntibanMethod; interval: Double; randomness: Double = 0.2);
@@ -402,7 +402,7 @@ begin
     if (@Self.OnBreaking <> nil) then //callback runs every 5 seconds
       Self.OnBreaking(@task, countdown);
 
-    Sleep(Round(Min(countdown.Remaining, 5 * ONE_SECOND)));
+    Sleep(Round(Min(countdown.Remaining, 5*SECOND)));
   until countdown.IsFinished;
 
   WriteLn GetDebugLn('Antiban', 'Break finished');
@@ -461,10 +461,10 @@ begin
       //OnSleeping callback only runs every 5 mins.
       if (@Self.OnSleeping <> nil) then
         Self.OnSleeping(@task, countdown);
-      marker := Time() + 5 * ONE_MINUTE;
+      marker := Time() + 5*MINUTE;
     end;
 
-    Sleep(Round(Min(countdown.Remaining, 5 * ONE_SECOND)));
+    Sleep(Round(Min(countdown.Remaining, 5*SECOND)));
   until countdown.IsFinished;
 
   WriteLn GetDebugLn('Antiban', 'Sleep finished.');
@@ -675,7 +675,7 @@ nothing will happen.
 
 Example:
 ```pascal
-Antiban.AddTask(15 * ONE_MINUTE, @Antiban.HoverSkills);
+Antiban.AddTask(15 * MINUTE, @Antiban.HoverSkills);
 
 while True do        //Infinite loop
   Antiban.DoAntiban(); //Antiban.HoverSkills will be called every time 15 minutes passed when this is called.
@@ -778,7 +778,7 @@ breaks and prints the results.
 
 Example
 ```pascal
-Antiban.AddBreak(30 * ONE_MINUTE, 5 * ONE_MINUTE);
+Antiban.AddBreak(30*MINUTE, 5*MINUTE);
 Antiban.SimulateBreaks();
 ```
 *)
@@ -788,7 +788,7 @@ var
   i: Int32;
   task: PBreakTask;
 begin
-  while (active + inactive < bottingDays * ONE_DAY) do
+  while (active + inactive < bottingDays * DAY) do
   begin
     task := @Self.Breaks[0];
     for I := 0 to High(Self.Breaks) do

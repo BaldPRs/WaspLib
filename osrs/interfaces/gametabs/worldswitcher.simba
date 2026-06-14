@@ -453,7 +453,7 @@ begin
   if not Self.IsSorted() and not Self.Sort() then
     Exit;
 
-  timeout.Start(20 * ONE_SECOND);
+  timeout.Start(10*SECOND);
 
   repeat
     worlds := Self.GetWorlds();

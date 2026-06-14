@@ -162,7 +162,7 @@ end;
 
 procedure TWaspClient.AsyncRefreshSession();
 begin
-  Async.ScheduleEvery('WaspClient-RefreshToken', @Self.RefreshSession, 5 * ONE_MINUTE);
+  Async.ScheduleEvery('WaspClient-RefreshToken', @Self.RefreshSession, 5 * MINUTE);
 end;
 
 procedure TWaspClient.Login(email, password: String);
@@ -225,7 +225,7 @@ begin
   AddOnTerminate(@Self.Free);
 
   Self.Client.RequestHeader['RefreshToken'] := refreshToken;
-  Self.Timer.Start(5 * ONE_MINUTE);
+  Self.Timer.Start(5 * MINUTE);
   Self.TimeRunning.Start();
   if refreshToken <> '' then
     Self.AsyncRefreshSession();

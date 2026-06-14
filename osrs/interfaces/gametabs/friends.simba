@@ -181,7 +181,7 @@ begin
   Result := Default(TRSFriend);
   if not Self.Open() then Exit;
 
-  timeout.Start(10 * ONE_SECOND);
+  timeout.Start(10*SECOND);
 
   Self.Scroll.SetLevel(0);
 

@@ -22,13 +22,13 @@ type
 (*
 ## TProgressReport.Setup
 ```pascal
-procedure TProgressReport.Setup(title: String = 'ProgressReport'; headers: TStringArray = []; valueProvider: function: TStringArray of Object = nil; printInterval: Integer = ONE_MINUTE * 5);
+procedure TProgressReport.Setup(title: String = 'ProgressReport'; headers: TStringArray = []; valueProvider: function: TStringArray of Object = nil; printInterval: Integer = MINUTE * 5);
 ```
 Sets up the progress report with title and column headers.
 
 Check the example in {ref}`TProgressReport.Print` for more information.
 *)
-procedure TProgressReport.Setup(title: String = 'ProgressReport'; headers: TStringArray = []; valueProvider: function: TStringArray of Object = nil; printInterval: Integer = ONE_MINUTE * 5);
+procedure TProgressReport.Setup(title: String = 'ProgressReport'; headers: TStringArray = []; valueProvider: function: TStringArray of Object = nil; printInterval: Integer = MINUTE * 5);
 begin
   Self.Headers := headers;
   Self.Title := title;
@@ -102,7 +102,7 @@ begin
     'Script Name',
     ['Full script runtime:', 'Botting runtime:', 'Time spent in antiban:', 'Boss kills:'],
     @GetReportValues,
-    ONE_SECOND
+    SECOND
   );
 
   while True do

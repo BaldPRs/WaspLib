@@ -82,7 +82,7 @@ begin
   if idx = -1 then
     raise GetDebugLn('WLAssets', 'Can''t find ' + result.Data + ' in the download queue.');
   Delete(Self.Queue, idx, 1);
-  Self.Timeout.Extend(-18 * ONE_SECOND);
+  Self.Timeout.Extend(-18 * SECOND);
   Self.Lock.Leave();
 end;
 
@@ -128,12 +128,12 @@ begin
         FileDelete(path);
         DirCreate(PathExtractDir(path));
         Self.Queue += path;
-        Self.Timeout.Extend(20 * ONE_SECOND);
+        Self.Timeout.Extend(20 * SECOND);
         Async.HTTPGetFile(Self.URL + key, path, @Self.DownloadFinished);
       end;
     end;
 
-    timer.Start(8 * ONE_SECOND);
+    timer.Start(8 * SECOND);
     while Self.Queue <> [] do
     begin
       Sleep(100);

@@ -283,7 +283,7 @@ begin
     if not FileExists(Self.CacheDir + tmp) then
     begin
       Self.Unzipping := True;
-      Self.Timeout.Start(4 * ONE_MINUTE);
+      Self.Timeout.Start(4*MINUTE);
       Async.FileUnZip(Self.ZIP, Self.CacheDir, @Self.Unzipped);
       Break;
     end;
@@ -297,7 +297,7 @@ begin
   Self.Downscale := downscale;
   AddOnTerminate(@Self.Free);
 
-  timer.Start(8 * ONE_SECOND);
+  timer.Start(8*SECOND);
   while Self.Unzipping do
   begin
     Sleep(100);

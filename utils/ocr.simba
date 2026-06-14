@@ -401,7 +401,7 @@ begin
     raise GetDebugLn('OCR', 'Failed to create path: ' + Self.PATH);
 
   Self.Unzipping := True;
-  Self.Timeout.Start(60 * ONE_SECOND);
+  Self.Timeout.Start(MINUTE);
   Async.FileUnZip(WLEnv.AssetsDir + 'fonts' + PATH_SEP + 'fonts.zip', Self.PATH, @Self._UnzipFinished);
 end;
 

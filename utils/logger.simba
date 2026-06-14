@@ -23,7 +23,7 @@ Record for managing script logging to files and console output.
   TLogger = record
     Name, Path, PreviousMessage: String;
     TimeRunning: TStopwatch;
-    IsSetup, RepeatedMessages: Boolean;
+    IsSetup, Verbose: Boolean;
   end;
 
 (*
@@ -199,8 +199,9 @@ end;
 ```pascal
 procedure TLogger.Info(text: String; vars: TVariantArray = []);
 ```
-Logs an info message. Duplicate consecutive messages are suppressed unless
-`Logger.RepeatedMessages` is True.
+Logs an info message.
+
+Duplicate consecutive messages are suppressed unless `Logger.Verbose` is True.
 *)
 procedure TLogger.Info(text: String; vars: TVariantArray = []);
 var
@@ -208,7 +209,7 @@ var
 begin
   formatted := Format(text, vars);
   Self.AddLine(Format('%s:[Info]: %s', [GetTimeStamp(), formatted]));
-  if not Self.RepeatedMessages and (Self.PreviousMessage = formatted) then
+  if not Self.Verbose and (Self.PreviousMessage = formatted) then
     Exit;
   WriteLn(GetDebugLn(Self.Name, formatted, False));
   Self.PreviousMessage := formatted;

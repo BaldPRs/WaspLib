@@ -92,9 +92,9 @@ Date format strings ready to use with some popular date formatting schemes.
 *)
 
 (*
-(DATE_FORMAL)=
-### DATE_FORMAL const
-Formal date format `YYYY years, M months and D days`.
+(DT_FORMAL_DATE)=
+### DT_FORMAL_DATE const
+Formal date format `YYYY years, M months and D days` for {ref}`TDateTime`
 
 Example:
 ```pascal
@@ -108,18 +108,38 @@ Which should print something like this:
 2026 years, 6 months and 14 days
 ```
 *)
-  DATE_FORMAL:  String = 'YYYY "years", M "months and" D "days"';
+  DT_FORMAL_DATE: String = 'YYYY "years", M "months and" D "days"';
 
 (*
-(DATE_SHORT)=
-### DATE_SHORT const
+(MS_DATE_FORMAL)=
+### MS_DATE_FORMAL const
+Formal date format `YYYY years, M months and D days` for {ref}`FormatMilliseconds`
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn FormatMilliseconds(900*DAY, MS_DATE_FORMAL);
+end.
+```
+Which should print something like this:
+```
+2 years, 5 months and 17 days
+```
+*)
+  MS_DATE_FORMAL: String = 'Y \year\s, M \mont\h\s and D \day\s';
+
+
+(*
+(DT_SHORT_DATE)=
+### DT_SHORT_DATE const
 Short date format `DD/MM/YYYY`.
 
 Example:
 ```pascal
 {$I WaspLib/osrs.simba}
 begin
-  WriteLn TDateTime.CreateFromSystem().ToString(DATE_SHORT);
+  WriteLn TDateTime.CreateFromSystem().ToString(DT_SHORT_DATE);
 end.
 ```
 Which should print something like this:
@@ -127,18 +147,38 @@ Which should print something like this:
 14/06/2026
 ```
 *)
-  DATE_SHORT:   String = 'DD"/"MM"/"YYYY';
+  DT_SHORT_DATE: String = 'DD"/"MM"/"YYYY';
 
 (*
-(DATE_SHORT_R)=
-### DATE_SHORT_R const
-Reversed short date format `YYYY/MM/DD`.
+(MS_DATE_SHORT)=
+### MS_DATE_SHORT const
+Short date format `DD/MM/YYYY` for {ref}`FormatMilliseconds`.
 
 Example:
 ```pascal
 {$I WaspLib/osrs.simba}
 begin
-  WriteLn TDateTime.CreateFromSystem().ToString(DATE_SHORT_R);
+  WriteLn FormatMilliseconds(900*DAY, MS_DATE_SHORT);
+end.
+```
+Which should print something like this:
+```
+17/05/02
+```
+*)
+  MS_DATE_SHORT: String = 'DD/MM/YY';
+
+
+(*
+(DT_SHORT_DATE_R)=
+### DT_SHORT_DATE_R const
+Reversed short date format `YYYY/MM/DD` for {ref}`TDateTime`.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn TDateTime.CreateFromSystem().ToString(DT_SHORT_DATE_R);
 end.
 ```
 Which should print something like this:
@@ -146,7 +186,27 @@ Which should print something like this:
 2026/06/14
 ```
 *)
-  DATE_SHORT_R: String = 'YYYY"/"MM"/"DD';
+  DT_SHORT_DATE_R: String = 'YYYY"/"MM"/"DD';
+
+(*
+(MS_DATE_SHORT_R)=
+### MS_DATE_SHORT_R const
+Short date format `YYYY/MM/DD` for {ref}`FormatMilliseconds`.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn FormatMilliseconds(900*DAY, MS_DATE_SHORT_R);
+end.
+```
+Which should print something like this:
+```
+02/05/17
+```
+*)
+  MS_DATE_SHORT_R: String = 'YY/MM/DD';
+
 
 (*
 ## Time format constants
@@ -154,15 +214,15 @@ Time format strings ready to use with some popular time formatting schemes.
 *)
 
 (*
-(TIME_FORMAL)=
-### TIME_FORMAL const
-Formal time format `HH hours, MM minutes and SS seconds`.
+(DT_TIME_FORMAL)=
+### DT_TIME_FORMAL const
+Formal time format `HH hours, MM minutes and SS seconds` for {ref}`TDateTime`.
 
 Example:
 ```pascal
 {$I WaspLib/osrs.simba}
 begin
-  WriteLn TDateTime.CreateFromSystem().ToString(TIME_FORMAL);
+  WriteLn TDateTime.CreateFromSystem().ToString(DT_TIME_FORMAL);
 end.
 ```
 Which should print something like this:
@@ -170,12 +230,33 @@ Which should print something like this:
 13 hours, 40 minutes and 50 seconds
 ```
 *)
-  TIME_FORMAL: String = 'h "hours", n "minutes and" s "seconds"';
+  DT_TIME_FORMAL: String = 'h "hours", n "minutes and" s "seconds"';
+
+(*
+(MS_TIME_FORMAL)=
+### MS_TIME_FORMAL const
+Formal time format `HH hours, MM minutes and SS seconds` for {ref}`FormatMilliseconds`.
+
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn FormatMilliseconds(32*DAY+15*MINUTE+12*SECOND, MS_TIME_FORMAL);
+end.
+```
+Which should print something like this:
+```
+768 hours, 15 minutes and 12 seconds
+```
+*)
+  MS_TIME_FORMAL: String = 'h \ho\ur\s, m \min\ute\s and s \second\s';
+
 
 (*
 (TIME_SHORT)=
 ### TIME_SHORT const
-Short, 24H time format `HH:MM:SS`.
+Short, 24H time format `HH:MM:SS` for both {ref}`TDateTime` and {ref}`FormatMilliseconds`.
 
 Example:
 ```pascal
@@ -186,21 +267,23 @@ end.
 ```
 Which should print something like this:
 ```
-13:40:50 seconds
+13:40:50
 ```
 *)
   TIME_SHORT: String = 'hh:mm:ss';
 
-  (*
-(MINUTES_FORMAL)=
-### MINUTES_FORMAL const
-Formal time format for minutes and seconds `MM minutes and SS seconds`.
+
+(*
+(DT_MINUTES_FORMAL)=
+### DT_MINUTES_FORMAL const
+Formal time format for minutes and seconds `MM minutes and SS seconds` for
+{ref}`TDateTime`.
 
 Example:
 ```pascal
 {$I WaspLib/osrs.simba}
 begin
-  WriteLn TDateTime.CreateFromSystem().ToString(MINUTES_FORMAL);
+  WriteLn TDateTime.CreateFromSystem().ToString(DT_MINUTES_FORMAL);
 end.
 ```
 Which should print something like this:
@@ -208,12 +291,34 @@ Which should print something like this:
 48 minutes and 59 seconds
 ```
 *)
-  MINUTES_FORMAL: String = 'n "minutes and" s "seconds"';
+  DT_MINUTES_FORMAL: String = 'n "minutes and" s "seconds"';
+
+(*
+(MS_MINUTES_FORMAL)=
+### MS_MINUTES_FORMAL const
+Formal time format for minutes and seconds `MM minutes and SS seconds` for
+{ref}`FormatMilliseconds`.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn FormatMilliseconds(3*HOUR+15*SECOND, MS_MINUTES_FORMAL);
+end.
+```
+Which should print this:
+```
+180 minutes and 15 seconds
+```
+*)
+  MS_MINUTES_FORMAL: String = 'm \min\ute\s and s \second\s';
+
 
 (*
 (FILE_TIME_FORMAT)=
 ### FILE_TIME_FORMAT const
-Date and time format for file names `YYYY-MM-DD_hh-mm-ss-ms`.
+Date and time format for file names `YYYY-MM-DD_hh-mm-ss-ms` for both {ref}`TDateTime` and
+{ref}`FormatMilliseconds`.
 
 Example:
 ```pascal
@@ -241,7 +346,6 @@ begin
 end.
 ```
 *)
-
   FILE_TIME_FORMAT: String = 'YYYY-MM-DD_hh-mm-ss-ms';
 
 (*

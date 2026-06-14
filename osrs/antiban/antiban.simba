@@ -379,7 +379,7 @@ begin
 
   countdown.Start(Abs(Round(GaussRand(task.Length, task.Length * task.StdVar))));
 
-  WriteLn GetDebugLn('Antiban', 'Taking a break for ' + FormatMilliseconds(countdown.Remaining, MINUTES_FORMAL));
+  WriteLn GetDebugLn('Antiban', 'Taking a break for ' + FormatMilliseconds(countdown.Remaining, MS_MINUTES_FORMAL));
 
   if (@Self.OnStartBreak <> nil) then
     Self.OnStartBreak(@task);
@@ -397,7 +397,7 @@ begin
 
   repeat
     if (Inc(i) mod 12 = 0) then
-      WriteLn GetDebugLn('Antiban', 'Break time remaining: ' + FormatMilliseconds(countdown.Remaining, MINUTES_FORMAL));
+      WriteLn GetDebugLn('Antiban', 'Break time remaining: ' + FormatMilliseconds(countdown.Remaining, MS_MINUTES_FORMAL));
 
     if (@Self.OnBreaking <> nil) then //callback runs every 5 seconds
       Self.OnBreaking(@task, countdown);
@@ -442,7 +442,7 @@ begin
     activeTasks[i]^.countdown.Pause();
 
   countdown.Start(Abs(Round(GaussRand(task.Length, task.Length * task.StdVar))));
-  WriteLn GetDebugLn('Antiban', 'Sleeping for ' + FormatMilliseconds(countdown.Remaining, TIME_FORMAL));
+  WriteLn GetDebugLn('Antiban', 'Sleeping for ' + FormatMilliseconds(countdown.Remaining, MS_TIME_FORMAL));
 
   if @Self.OnStartSleep <> nil then Self.OnStartSleep(@task);
 
@@ -457,7 +457,7 @@ begin
   repeat
     if Time() > marker  then
     begin
-      WriteLn GetDebugLn('Antiban', 'Sleep time remaining: ' + FormatMilliseconds(countdown.Remaining, TIME_FORMAL));
+      WriteLn GetDebugLn('Antiban', 'Sleep time remaining: ' + FormatMilliseconds(countdown.Remaining, MS_TIME_FORMAL));
       //OnSleeping callback only runs every 5 mins.
       if (@Self.OnSleeping <> nil) then
         Self.OnSleeping(@task, countdown);
@@ -748,7 +748,7 @@ should be taken.
 
 Useful to show information to users.
 *)
-function TAntiban.TimeUntilBreak(constref task: TBreakTask; fmt: String = TIME_FORMAL): String;
+function TAntiban.TimeUntilBreak(constref task: TBreakTask; fmt: String = MS_TIME_FORMAL): String;
 begin
   Result := FormatMilliseconds(Max(0, Round(task.Next - GetTimeRunning())), fmt);
 end;
@@ -763,7 +763,7 @@ should be taken.
 
 Useful to show information to users.
 *)
-function TAntiban.TimeUntilSleep(constref task: TSleepTask; fmt: String = TIME_FORMAL): String;
+function TAntiban.TimeUntilSleep(constref task: TSleepTask; fmt: String = MS_TIME_FORMAL): String;
 begin
   Result := FormatMilliseconds(Max(0, Round(task.Next - GetTimeRunning())), fmt);
 end;
@@ -808,7 +808,7 @@ begin
 
   inactive /= bottingDays;
   active /= bottingDays;
-  WriteLn('Running for ', FormatMilliseconds(Round(active), TIME_FORMAL), ' per day, on average.');
+  WriteLn('Running for ', FormatMilliseconds(Round(active), MS_TIME_FORMAL), ' per day, on average.');
 end;
 
 var

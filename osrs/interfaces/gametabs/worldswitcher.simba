@@ -275,6 +275,9 @@ var
   b, bounds: TBox;
   i, len, idx: Integer;
 begin
+  if not Self.IsOpen() then
+    Exit;
+
   img := Target.GetImage(Self.Scroll.Area.Expand(0, 2));
 
   tpa0 := img.FindColor(TRSWorldSwitcher.F2P, 0) +

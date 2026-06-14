@@ -199,7 +199,7 @@ begin
 
   Result.Ironman := iron;
   Result.Username := txt.CopyRange(0, i-2).TrimRight();
-  Result.Text := txt.CopyRange(i+1, Length(txt)).TrimLeft();
+  Result.Text := txt.CopyRange(i+1, Length(txt)).TrimLeft().ExtractText();
 end;
 
 (*
@@ -247,7 +247,7 @@ begin
 
   Result.Ironman := iron;
   Result.Username := txt.CopyRange(0, i-2);
-  Result.Text := txt.CopyRange(i+1, Length(txt));
+  Result.Text := txt.CopyRange(i+1, Length(txt)).ExtractText();
 end;
 
 

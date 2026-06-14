@@ -457,20 +457,19 @@ end;
 function TRSChat._GetMessage(line: Integer): String;
 const
   STATIC_OFFSET: Integer = 2;
+  CHAT_BACKGROUND: TColorTolerance = [$6593AC, 3.329, EColorSpace.HSL, [2.063, 0.536, 0.402]];
 var
-  b: TBox;
+  bounds: TBox;
   tpa: TPointArray;
   colors: TColorArray;
 begin
   with Self.MessageLines[line] do
-    b := [X1, Y1-STATIC_OFFSET, X2, Y2];
+    bounds := [X1, Y1-STATIC_OFFSET, X2, Y2];
 
   //Find chatbox_bg_colors.txt has the colors used
-  tpa := Target.FindColor(
-    [$6593AC, 3.329, EColorSpace.HSL, [2.063, 0.536, 0.402]], b
-  ).Invert();
+  tpa := Target.FindColor(CHAT_BACKGROUND, bounds).Invert();
   colors := Target.GetColors(tpa).Unique();
-  Exit(OCR.Recognize(b, RSFonts.PLAIN_12, colors, 0));
+  Result := OCR.Recognize(bounds, RSFonts.PLAIN_12, colors, 0);
 end;
 
 function TRSChat._GetTransparentMessage(line: Integer): String;
@@ -507,19 +506,20 @@ function TRSChat.GetMessage(line: Integer): String;
 ```
 Get the message in the specified `line`.
 
+For consistency reasons all the symbols are stripped from the result.
+
 Example:
 ```pascal
 WriteLn Chat.GetMessage(5);
 ```
 
-Credits: Heavily based on Olly's solution for this on his 2.0 library.
+Credits: Original design inspired on Olly's solution for this on his 2.0 library.
 *)
 function TRSChat.GetMessage(line: Integer): String;
 begin
   if not Self.IsTransparent() then
-    Exit(Self._GetMessage(line));
-
-  Result := Self._GetTransparentMessage(line);
+    Exit(Self._GetMessage(line).ExtractText());
+  Result := Self._GetTransparentMessage(line).ExtractText();
 end;
 
 (*

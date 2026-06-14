@@ -119,7 +119,7 @@ begin
   img := Target.GetImage(Self.UptextBounds);
   Result := Self.UptextOCR.Recognize(img, RSFonts.BOLD_SHADOW, [0,0]);
   {$IFDEF WL_DEBUG_UPTEXT}
-  WriteLn GetDebugLn('MainScreen', 'UpText: ' + Result);
+  DebugLn('MainScreen', 'UpText: ' + Result);
   {$ENDIF}
 end;
 

@@ -272,8 +272,8 @@ begin
 
   if Result then
   begin
-    if WaspClient.UpdatePayload(Self.Tracker.Earned(), 0) then
-      Self.Tracker.Previous := Self.Tracker.Current;
+    WaspClient.UpdatePayload(Self.Tracker.Earned(), 0);
+    Self.Tracker.Previous := Self.Tracker.Current;
     Activity.Restart();
   end;
 end;

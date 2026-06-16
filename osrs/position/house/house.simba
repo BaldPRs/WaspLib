@@ -160,7 +160,7 @@ begin
 
   Self.Cache := TMatchTemplateCache.Create(Self.Loader.DownscaledMap.ToMatrix(), MinimapSample.ToMatrix(), ETMFormula.TM_CCOEFF_NORMED);
 
-  Self.Walker.Setup(@Self.Position, nil, nil, @Self.Graph, Self.Loader.Map);
+  Self.Walker.Setup(@Self.Position, nil, nil, nil, @Self.Graph, Self.Loader.Map);
   Self.Walker.Name := 'House.Walker';
 
   //TODO:

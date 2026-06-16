@@ -1313,6 +1313,8 @@ begin
   end;
 
   Result += img.FindColor($0000FF, 0); //flag
+  Result += img.FindColor($1C4BC4, 0); //flag on gpu
+  Result += img.FindColor($152F5C, 0); //flag on gpu
   Result += img.FindColor($0456C6, 0); //idk ask slacky/olly
   Result += img.FindColor($11335D, 0); //idk ask slacky/olly
   Result += img.FindColor($010000, 0); //replaced black

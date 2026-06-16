@@ -85,7 +85,7 @@ begin
 
   if not Self.IsSetup then
   begin
-    Self.Walker.Setup(@Self.Position, nil, nil, @Self.Graph, Self.Map);
+    Self.Walker.Setup(@Self.Position, nil, nil, nil, @Self.Graph, Self.Map);
     Self.Walker.Name := 'ImageMap.Walker';
     Self.IsSetup := True;
   end;

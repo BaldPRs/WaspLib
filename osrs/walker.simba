@@ -24,7 +24,8 @@ TRSWalker pointer.
   PRSWalker = ^TRSWalker;
 
 (*
-## type TRSWalkerEvent
+(TRSWalkerEvent)=
+## TRSWalkerEvent type
 Callback object method to use while walking. This can be used to perform custom tasks while walking.
 
 Example:
@@ -40,10 +41,11 @@ begin
 end;
 ```
 *)
-  TRSWalkerEvent          = procedure(walker: PRSWalker; position, destination: TPoint) of object;
-  TWalkerPositionFunction = function (): TPoint of object;
-  TWalkerHeightFunction   = function (pt: TPoint = [0,0]; global: Boolean = True): Single of object;
-  TWalkerGetLocalFunction = function (pt: TPoint; offset: TPoint = [0,0]): TPoint of object;
+  TRSWalkerEvent           = procedure(walker: PRSWalker; position, destination: TPoint) of object;
+  TWalkerPositionFunction  = function (): TPoint of object;
+  TWalkerHeightFunction    = function (pt: TPoint = [0,0]; global: Boolean = True): Single of object;
+  TWalkerGetLocalFunction  = function (pt: TPoint; offset: TPoint = [0,0]): TPoint of object;
+  TWalkerGetGlobalFunction = function (tpa: TPointArray; offset: TPoint = [0,0]): TPointArray of object;
 
 (*
 ## TRSWalker
@@ -61,6 +63,7 @@ via the {ref}`Walker.Setup` method.
     Position: TWalkerPositionFunction;
     Height:   TWalkerHeightFunction;
     GetLocal: TWalkerGetLocalFunction;
+    GetGlobal: TWalkerGetGlobalFunction;
 
     MinEnergy, ClickRandomness, MouseAheadTimer: Integer;
 
@@ -82,12 +85,11 @@ via the {ref}`Walker.Setup` method.
     _Flag: TPoint;
   end;
 
-{$H-}
 {%codetools off}
-function TRSWalker.DummyHeight(pt: TPoint = [0,0]; global: Boolean = True): Single; begin Result := pt.X; end;
+function TRSWalker.DummyHeight(pt: TPoint = [0,0]; global: Boolean = True): Single; begin Result := pt.X + Int32(global); end;
 function TRSWalker.DummyGetLocal(pt: TPoint; offset: TPoint = [0,0]): TPoint; begin Result := pt+offset; end;
+function TRSWalker.DummyGetGlobal(tpa: TPointArray; offset: TPoint = [0,0]): TPointArray; begin Result := tpa.Offset(offset); end;
 {%codetools on}
-{$H+}
 
 
 (*
@@ -106,15 +108,27 @@ Map.Setup(ERSChunk.CATACOMBS_OF_KOUREND);
 Walker.Setup(@Map.Position, @Map.Height, @Map.Loader.GetLocal, @Map.Loader.Graph, @Map.Loader.Map);
 ```
 *)
-procedure TRSWalker.Setup(position: TWalkerPositionFunction; height: TWalkerHeightFunction; getLocal: TWalkerGetLocalFunction; graph: PWebGraph; mapImage: TImage);
+procedure TRSWalker.Setup(
+  position: TWalkerPositionFunction;
+  height: TWalkerHeightFunction;
+  getLocal: TWalkerGetLocalFunction;
+  getGlobal: TWalkerGetGlobalFunction;
+  graph: PWebGraph;
+  mapImage: TImage
+);
 begin
   Self.Name := 'Walker';
   Self.Position := @position;
 
-  if @height <> nil then
-    Self.Height := @height else Self.Height := @Self.DummyHeight;
-  if @getLocal <> nil then
-    Self.GetLocal := @getLocal else Self.GetLocal := @Self.DummyGetLocal;
+  if @height <> nil then Self.Height := @height
+  else Self.Height := @Self.DummyHeight;
+
+  if @getLocal <> nil then Self.GetLocal := @getLocal
+  else Self.GetLocal := @Self.DummyGetLocal;
+
+  if @getGlobal <> nil then Self.GetGlobal := @getGlobal
+  else Self.GetGlobal := @Self.DummyGetGlobal;
+
   if Self.AdaptiveDistance = Default(TPoint) then
     Self.AdaptiveDistance := [25,110];
 
@@ -503,7 +517,7 @@ begin
 
     if Self.AdaptiveWalk and not Self._Path.IsEmpty and (Time() > awct) then
     begin
-      Self.AdaptiveWalkCheck(Position.Current);
+      Self.AdaptiveWalkCheck(position.Current);
       awct := Time() + 1000;
     end;
 
@@ -973,8 +987,14 @@ end;
 
 
 function TRSWalker.GetPath(me, destination: TPoint; randomness: Double): TPointArray;
+var
+  meEx, destEx: TPoint;
+  path: TPointArray;
 begin
-  Result := Self.Graph^.PathBetween(Self.GetLocal(me), Self.GetLocal(destination), randomness, 4);
+  meEx := Self.GetLocal(me);
+  destEx := Self.GetLocal(destination);
+  path := Self.Graph^.PathBetween(meEx, destEx, randomness, 4);
+  Result := Self.GetGlobal(path);
 end;
 
 (*

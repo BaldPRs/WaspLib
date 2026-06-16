@@ -158,7 +158,8 @@ begin
   end;
 
   Self.Walker.Setup(
-    @Self.Position, @Self.Height, @Self.Loader.GetLocal,
+    @Self.Position,
+    @Self.Height, @Self.Loader.GetLocal, @Self.Loader.GetGlobal,
     @Self.Loader.Graph, Self.Loader.Map
   );
   Self.Walker.Name := 'Map.Walker';

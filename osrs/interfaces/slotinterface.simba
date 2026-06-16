@@ -146,8 +146,9 @@ var
   i: Integer;
 begin
   tmp := Self.Boxes();
+  SetLength(Result, Length(slots));
   for i := 0 to High(slots) do
-    Result += tmp[slots[i]];
+    Result[i] := tmp[slots[i]];
 end;
 
 (*

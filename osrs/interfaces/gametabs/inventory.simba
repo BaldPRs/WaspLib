@@ -178,7 +178,8 @@ var
   boxes: TBoxArray;
   b, tmp: TBox;
 begin
-  if not Self.Open() then Exit;
+  if not Self.Open() then
+    Exit;
   boxes := Self.Slots.Boxes();
   if slot > -1 then
   begin
@@ -192,10 +193,11 @@ begin
     if Self.IsSelected(tmp) then
     begin
       Mouse.Click(tmp, EMouseButton.LEFT);
-      if slot = -1 then
-        Exit(True);
       Break;
     end;
+
+  if slot = -1 then
+    Exit(True);
 
   Result := Self.Items.Interact(slot, 'Use');
   if Result and wait then

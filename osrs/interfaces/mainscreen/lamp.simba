@@ -35,13 +35,12 @@ This is automatically called on the **Lamp** variable.
 *)
 procedure TRSLamp.SetupInterface();
 const
-  SKILL_ORDER: array [0..22] of ERSSkill = [
-    ERSSkill.ATTACK, ERSSkill.STRENGTH, ERSSkill.RANGED, ERSSkill.MAGIC,
-    ERSSkill.DEFENCE, ERSSkill.HITPOINTS, ERSSkill.PRAYER, ERSSkill.AGILITY,
-    ERSSkill.HERBLORE, ERSSkill.THIEVING, ERSSkill.CRAFTING,
-    ERSSkill.RUNECRAFTING, ERSSkill.SLAYER, ERSSkill.FARMING, ERSSkill.MINING,
-    ERSSkill.SMITHING, ERSSkill.FISHING, ERSSkill.COOKING, ERSSkill.FIREMAKING,
-    ERSSkill.WOODCUTTING, ERSSkill.FLETCHING, ERSSkill.CONSTRUCTION, ERSSkill.HUNTER
+  SKILL_ORDER: array [0..23] of ERSSkill = [
+    ERSSkill.ATTACK,ERSSkill.STRENGTH,ERSSkill.RANGED,ERSSkill.MAGIC,ERSSkill.DEFENCE, ERSSkill.SAILING,
+    ERSSkill.HITPOINTS,ERSSkill.PRAYER,ERSSkill.AGILITY,ERSSkill.HERBLORE,ERSSkill.THIEVING,
+    ERSSkill.CRAFTING,ERSSkill.RUNECRAFTING,ERSSkill.SLAYER,ERSSkill.FARMING,ERSSkill.MINING,
+    ERSSkill.SMITHING,ERSSkill.FISHING,ERSSkill.COOKING,ERSSkill.FIREMAKING,ERSSkill.WOODCUTTING,
+    ERSSkill.FLETCHING,ERSSkill.CONSTRUCTION,ERSSkill.HUNTER
   ];
 var
   i: Integer;
@@ -63,20 +62,18 @@ begin
   Self.Title.IsOpen := @Self.IsOpen;
 
   with Self.Bounds.TopLeft do
-    tba := TBoxArray.Create([X+64,Y+78], 5, 1, 26, 26, [10,10]) +
-           TBoxArray.Create([X+46,Y+114], 6, 3, 26, 26, [10,10]);
+    tba := TBoxArray.Create([X+41,Y+71], 6, 1, 30, 30, [8,7]) +
+           TBoxArray.Create([X+42,Y+108], 6, 3, 30, 30, [7,7]);
+
+  for i := 3 to 5 do
+    tba[i] := tba[i].Offset([-2-(i-3),0]);
 
   SetLength(Self.Slots, Length(tba));
 
   for i := 0 to High(tba) do
-    Self.Slots[SKILL_ORDER[i]] :=
-      new TRSButton(
-        tba[i],
-        [
-          [$0F1043, 0, EColorSpace.RGB, [1,1,1]],
-          [$23269F, 0.227, EColorSpace.RGB, [1,1,1]]
-        ]
-      );
+    Self.Slots[SKILL_ORDER[i]] := new TRSButton(
+      tba[i], [[$0F1043, 0, EColorSpace.RGB, [1,1,1]],[$23269F, 0.227, EColorSpace.RGB, [1,1,1]]]
+    );
 
   Self.ConfirmBounds.X1 := Self.Bounds.X1 + 81;
   Self.ConfirmBounds.Y1 := Self.Bounds.Y2 - 35;

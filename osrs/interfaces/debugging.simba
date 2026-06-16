@@ -171,6 +171,7 @@ procedure TRSDepositBox.Draw(img: TImage);
 procedure TRSShop.Draw(img: TImage);
 procedure TRSGoldScreen.Draw(img: TImage);
 procedure TRSSilverScreen.Draw(img: TImage);
+procedure TRSLamp.Draw(img: TImage);
 ```
 Draws several parts of the interface on a {ref}`TImage`
 
@@ -373,7 +374,7 @@ var
   i: Integer;
 begin
   img.DrawBox(Self.Bounds);
-  img.DrawBoxArray(Self.ItemBoxes, False);
+  img.DrawBoxArray(Self.SlotBoxes, False);
   for i := 0 to High(Self.Buttons) do
     Self.Buttons[i].Draw(img);
 end;
@@ -386,8 +387,8 @@ begin
   img.DrawBoxArray(Self.SlotBoxes, False);
   for i := 0 to High(Self.SlotBoxes) do
     img.DrawText(ToStr(i), Self.SlotBoxes[i], [EImageTextAlign.CENTER, EImageTextAlign.VERTICAL_CENTER]);
-  for i := 0 to High(Self.Buttons) do
-    Self.Buttons[i].Draw(img);
+  for i := 0 to High(Self.QuantityButtons) do
+    Self.QuantityButtons[i].Draw(img);
 end;
 
 procedure TRSAnvil.Draw(img: TImage);
@@ -403,6 +404,18 @@ begin
   img.DrawColor := $00FFFF;
 
   Self.QuantityButtons.Draw(img);
+end;
+
+procedure TRSLamp.Draw(img: TImage);
+begin
+  img.DrawColor := $FFFFFF;
+  img.DrawBox(Self.Bounds);
+
+  img.DrawColor := $00FFFF;
+  img.DrawBox(Self.ConfirmBounds);
+
+  img.DrawColor := $00FFFF;
+  Self.Slots.Draw(img);
 end;
 
 
@@ -529,6 +542,15 @@ var
 begin
   img := Target.GetImage();
   anvil.Draw(img);
+  img.Show();
+end;
+
+procedure ShowOnTarget(constref lamp: TRSLamp); overload;
+var
+  img: TImage;
+begin
+  img := Target.GetImage();
+  lamp.Draw(img);
   img.Show();
 end;
 

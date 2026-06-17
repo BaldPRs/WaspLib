@@ -262,7 +262,10 @@ begin
     Self.MiscButtons[i].Draw(img);
 
   for i := 0 to High(Self.DepositButtons) do
-    Self.DepositButtons[i].Draw(img);
+    if Self.DepositButtons[i] <> nil then
+      Self.DepositButtons[i].Draw(img);
+
+  Self.Worn.Draw(img);
 
   img.DrawColor := $FFFFFF;
   for i := 0 to Self.CountTabs() do

@@ -92,6 +92,8 @@ real time, e.g.:
 
 begin
   Map.Setup([Chunk(Box(44,58,46,56), 0)]);
+  Projection.System := EProjector.MM2MS;
+
   while True do
   begin
     Options.GetZoomLevel(False);
@@ -111,7 +113,7 @@ begin
     WriteLn('EYE_Y_RESIZABLE: array [0..100] of Single = ' + ToStr(EYE_Y_RESIZABLE) + ';');
     WriteLn('EYE_Z_RESIZABLE: array [0..100] of Single = ' + ToStr(EYE_Z_RESIZABLE) + ';');
 
-    MM2MS.Projector.UpdateZoom(Options.ZoomLevel);
+    MM2MS.Update(Options.ZoomLevel, Minimap.CompassRadians);
     Map.DebugHeight();
   end;
 end.

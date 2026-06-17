@@ -244,7 +244,7 @@ end;
 (*
 ## Bank.UpdateButtons
 ```pascal
-procedure TRSBank.UpdateButtons(tpa: TPointArray);
+procedure TRSBank.UpdateButtons(const tpa: TPointArray);
 ```
 Internal helper method used to update the buttons coordinates.
 
@@ -254,7 +254,7 @@ All the bank's bottom buttons shift slightly on the X axis depending on how many
 This is automatically called for you with {ref}`Bank.IsOpen`.
 ```
 *)
-procedure TRSBank.UpdateButtons(tpa: TPointArray);
+procedure TRSBank.UpdateButtons(const tpa: TPointArray);
 var
   i: Integer;
   boxes: TBoxArray;
@@ -280,7 +280,7 @@ begin
 
   boxes := TBoxArray.Create([tpa[2].X+5, Self.Bounds.Y2-41], 3, 1, 33, 33, [4,0]);
   for i := High(boxes) downto 0 do
-    if not Target.HasColor($010202, 0, 1, boxes[i]) then
+    if not Target.HasColor($516472, 0, 1, boxes[i]) then
       Delete(boxes, i, 1);
 
   case Length(boxes) of
@@ -1267,18 +1267,18 @@ begin
 end;
 
 (*
-## Bank.DepositEquipment
+## Bank.DepositWorn
 ```pascal
-function TRSBank.DepositEquipment(): Boolean;
+function TRSBank.DepositWorn(): Boolean;
 ```
 Deposits all items in the worn equipment into the bank.
 
 Example:
 ```pascal
-WriteLn Bank.DepositEquipment();
+WriteLn Bank.DepositWorn();
 ```
 *)
-function TRSBank.DepositEquipment(): Boolean;
+function TRSBank.DepositWorn(): Boolean;
 begin
   if not Self.IsOpen() then
     Exit;

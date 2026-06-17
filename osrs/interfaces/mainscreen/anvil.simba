@@ -64,7 +64,9 @@ begin
 
   with Self.Bounds do
     boxes := TBoxArray.Create([X2-43, Y1+36], 1, 6, 36, 36, [0,9]);
-  Self.QuantityButtons := TRSButtonArray.Create(boxes, [[TRSFonts.WHITE]]);
+  Self.QuantityButtons := TRSButtonArray.Create(
+    boxes, [[$FFFFFF, 0.000, EColorSpace.RGB, [1.000, 1.000, 1.000]]]
+  );
 end;
 
 (*
@@ -170,7 +172,7 @@ function TRSAnvil.SetQuantity(value: Integer): Boolean;
 var
   i: Integer;
   btns: TRSButtonArray;
-  str: String;
+  str, recognized: String;
 begin
   if value = 1 then
     Exit(Self.QuantityButtons[0].Enabled[True]);
@@ -182,32 +184,37 @@ begin
   if btns = [] then
     Exit;
 
-  case value of
-    -1, 0: str := 'All';
-    5, 10: str := ToStr(value);
-    else
-    begin
-      if Length(btns) < 2 then
-        Exit;
+  if value <= 0 then
+    str := 'All'
+  else
+    case value of
+      5, 10: str := ToStr(value);
+      else
+      begin
+        if Length(btns) < 2 then
+          Exit;
 
-      str := ToStr(value);
-      i := High(btns);
-      if OCR.RecognizeShadow(btns[i].Bounds, RSFonts.PLAIN_11, 0) = str then
-        Exit(btns[i].Enabled);
+        str := ToStr(value);
+        i := High(btns);
+        if OCR.RecognizeShadow(btns[i].Bounds, RSFonts.PLAIN_11, 0) = str then
+          Exit(btns[i].Enabled);
 
-      case OCR.RecognizeShadow(btns[Dec(i)].Bounds, RSFonts.PLAIN_11, 0) of
-        'X': Mouse.Click(btns[i].Bounds, EMouseButton.LEFT);
-        '?': ;
-        else Exit;
+        case OCR.RecognizeShadow(btns[Dec(i)].Bounds, RSFonts.PLAIN_11, 0) of
+          'X': Mouse.Click(btns[i].Bounds, EMouseButton.LEFT);
+          '?': ;
+          else Exit;
+        end;
+
+        Exit(Chat.AnswerQuery('Enter amount:', str, 1200));
       end;
-
-      Exit(Chat.AnswerQuery('Enter amount:', str, 1200));
     end;
-  end;
 
   for i := 0 to High(btns) do
-    if OCR.RecognizeShadow(btns[i].Bounds.Expand(-2), RSFonts.PLAIN_11, 0) = str then
+  begin
+    recognized := OCR.RecognizeShadow(btns[i].Bounds.Expand(-2), RSFonts.PLAIN_11, 0);
+    if recognized = str then
       Exit(btns[i].Enabled[True]);
+  end;
 end;
 
 

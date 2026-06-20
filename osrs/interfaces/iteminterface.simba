@@ -437,7 +437,7 @@ end;
 
 (*
 (Recognize methods)=
-## Item finding methods
+## Item recognize methods
 The following methods are what we call "Recognize" methods.
 
 They work by screenshotting each slot of the interface, cleaning it's background and

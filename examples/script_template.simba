@@ -80,7 +80,7 @@ begin
   if (Self.MaxTime > 0) and (Logger.TimeRunning.Elapsed >= Self.MaxTime) then
     Exit(ETemplateState.MAX_TIME);
 
-  if Stats.AnyGoalsCompleted() then
+  if Self.LevelGoals and Stats.AnyGoalsCompleted() then
     Exit(ETemplateState.MAX_LEVEL);
 
   if not RSClient.IsLoggedIn() then

@@ -336,7 +336,7 @@ begin
 
   for slot := Low(ERSEquipment) to High(ERSEquipment) do
   begin
-    items := Equipment.Items.Discover(Ord(slot));
+    items := Equipment.Items.Recognize(Ord(slot));
 
     if items <> [] then
       Self.Gear.Items[slot] := items[0]

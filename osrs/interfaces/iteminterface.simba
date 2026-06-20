@@ -2,11 +2,10 @@
 # ItemInterface
 Methods to interact item interfaces.
 
-"Item interfaces" in WaspLib refers to any interface that is an item
-container.
+"Item interfaces" in WaspLib refers to any interface that is an item container.
 
-In other words, if an interface has holds items, it's both a
-{ref}`SlotInterface` and {ref}`ItemInterface`.
+In other words, if an interface has holds items, it's both a {ref}`SlotInterface` and
+{ref}`ItemInterface`.
 
 Examples of "item containers" are:
 - {ref}`Inventory`
@@ -16,8 +15,8 @@ Examples of "item containers" are:
 - {ref}`CollectBox`
 
 Just because an interface is an "item container", does not mean it uses
-{ref}`ItemInterface`, but all the examples above do and you can access it
-through their `Items` variable, for example:
+{ref}`ItemInterface`, but all the examples above do and you can access it through their
+`Items` variable, for example:
 ```pascal
 Inventory.Items;
 Equipment.Items;
@@ -29,8 +28,12 @@ Throughout this page examples, {ref}`Inventory` will be used in most of them
 but any interface that has a {ref}`TRSItemInterface` variable can used
 instead.
 ```
-*)
 
+Lastly, {ref}`TRSItemInterface` uses `ItemFinder` underneath and there's 2 main types of
+methods:
+- {ref}`Finding methods`
+- {ref}`Recognize methods`
+*)
 
 {$DEFINE WL_ITEM_INTERFACE_INCLUDED}
 {$INCLUDE_ONCE WaspLib/osrs.simba}
@@ -48,7 +51,7 @@ unless specified otherwise.
   TRSItemInterface = record
     Name: String;
     Slots: ^TRSSlotInterface;
-    DiscoverOffset: TPoint;
+    RecognizeOffset: TPoint;
     PreConditionFunction: TInterfacePreConditionFunction;
   end;
 
@@ -85,19 +88,33 @@ Bank.Items.Setup('Bank.Items', @Bank.Slots, [0, 1], @Bank.IsOpen);
 procedure TRSItemInterface.Setup(
   name: String;
   slots: ^TRSSlotInterface;
-  discoverOffset: TPoint;
+  recognizeOffset: TPoint;
   checkFunc: TInterfacePreConditionFunction = nil
 );
 begin
   Self.Name := name;
   Self.Slots := slots;
-  Self.DiscoverOffset := discoverOffset;
+  Self.RecognizeOffset := recognizeOffset;
   Self.PreConditionFunction := @checkFunc;
 end;
 
 
 (*
-## Items.IndexOf
+(Finding methods)=
+## Item finding methods
+The following methods are what we call "Finding" methods.
+
+They work by loading up an image(s) of the item(s) you want to find and go over each slot
+the interface has, screenshotting each slot and comparing the images to deduce whether
+what's on the slot matches what you are looking for.
+
+This is very reliable, the only caveat is that you need to know the item you want in
+advance which is not possible in some situations, in that case you will need one of the
+{ref}`Recognize methods`.
+*)
+
+(*
+### Items.IndexOf
 ```pascal
 function TRSItemInterface.IndexOf(items: TRSItemArray): Integer;
 ```
@@ -124,7 +141,7 @@ end;
 
 
 (*
-## Items.IndicesOf
+### Items.IndicesOf
 ```pascal
 function TRSItemInterface.IndicesOf(items: TRSItemArray): TIntegerArray;
 ```
@@ -154,7 +171,7 @@ end;
 
 
 (*
-## Items.FindAny
+### Items.FindAny
 ```pascal
 function TRSItemInterface.FindAny(items: TRSItemArray; out slot: TBox): Boolean;
 ```
@@ -187,7 +204,7 @@ begin
 end;
 
 (*
-## Items.Find
+### Items.Find
 ```pascal
 function TRSItemInterface.Find(item: TRSItem; out slot: TBox): Boolean;
 function TRSItemInterface.Find(items: TRSItemArray; out slot: Integer): Boolean; overload;
@@ -233,7 +250,7 @@ end;
 
 
 (*
-## Items.FindAll
+### Items.FindAll
 ```pascal
 function TRSItemInterface.FindAll(items: TRSItemArray): TBoxArray;
 function TRSItemInterface.FindAll(items: TRSItemArray; out slots: TIntegerArray): Boolean; overload;
@@ -300,9 +317,8 @@ begin
 end;
 
 
-
 (*
-## Items.Contains
+### Items.Contains
 ```pascal
 function TRSItemInterface.Contains(item: TRSItem): Boolean;
 ```
@@ -325,7 +341,7 @@ begin
 end;
 
 (*
-## Items.ContainsAny
+### Items.ContainsAny
 ```pascal
 function TRSItemInterface.ContainsAny(items: TRSItemArray): Boolean;
 ```
@@ -348,7 +364,7 @@ begin
 end;
 
 (*
-## Items.ContainsAll
+### Items.ContainsAll
 ```pascal
 function TRSItemInterface.ContainsAll(items: TRSItemArray): Boolean;
 ```
@@ -372,82 +388,6 @@ begin
   if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
     Exit;
   Result := ItemFinder.FindAll(items, Self.Slots^.Boxes(), matches);
-end;
-
-
-function TRSItemInterface._GetShadowHash(slot: Integer): String;
-var
-  b: TBox;
-begin
-  with Self.Slots^.Box(slot) do
-  begin
-    b.X1 := X1 + Self.DiscoverOffset.X;
-    b.Y1 := Y1 + Self.DiscoverOffset.Y;
-  end;
-
-  b.X2 := b.X1 + 35;
-  b.Y2 := b.Y1 + 31;
-
-  Result := ItemFinder.GetBorderHash(Target.GetImage(b));
-end;
-
-function TRSItemInterface._GetHash(slot: Integer): String;
-var
-  b: TBox;
-begin
-  with Self.Slots^.Box(slot) do
-  begin
-    b.X1 := X1 + Self.DiscoverOffset.X;
-    b.Y1 := Y1 + Self.DiscoverOffset.Y;
-  end;
-
-  b.X2 := b.X1 + 35;
-  b.Y2 := b.Y1 + 31;
-  Result := ItemFinder.GetHash(Target.GetImage(b));
-end;
-
-function TRSItemInterface._Discover(slot: Integer): TRSItemArray;
-var
-  hash: String;
-begin
-  hash := Self._GetHash(slot);
-  if hash <> '' then
-    Result := ItemFinder.GetHashItems(hash);
-end;
-
-function TRSItemInterface.Discover(slot: Integer): TRSItemArray;
-begin
-  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
-    Exit;
-
-  Result := Self._Discover(slot);
-end;
-
-function TRSItemInterface.DiscoverAllEx(): array of TRSItemArray;
-var
-  slot: Integer;
-begin
-  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
-    Exit;
-
-  for slot := Low(Self.Slots^.Boxes()) to High(Self.Slots^.Boxes()) do
-    Result += Self._Discover(slot);
-end;
-
-function TRSItemInterface.DiscoverAll(): TRSItemArray;
-var
-  slot: Integer;
-  items: TRSItemArray;
-begin
-  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
-    Exit;
-
-  for slot := Low(Self.Slots^.Boxes()) to High(Self.Slots^.Boxes()) do
-  begin
-    items := Self._Discover(slot);
-    if items.Length > 0 then
-      Result += items[0];
-  end;
 end;
 
 
@@ -492,6 +432,289 @@ function TRSItemInterface.ContainsDifferent(items: TRSItemArray): Boolean;
 begin
   Result := Self.FindDifferent(items) <> [];
 end;
+
+
+
+(*
+(Recognize methods)=
+## Item finding methods
+The following methods are what we call "Recognize" methods.
+
+They work by screenshotting each slot of the interface, cleaning it's background and
+hashing the result. With the resulting hash the `ItemFinder.Database` is queried for a
+known match.
+
+This is very fast, the downside in comparison to a {ref}`Finding method` is that you can
+get multiple items recognized per slot.
+There's several items in game that share the same exact sprite and there's no way to know
+just from the image exactly what an item is.
+For example, if you have `bones` in your inventory, you will get back:
+```
+sheep bones (3), sheep bones (2), sheep bones (1), human bones, sheep bones (4), bones, alan's bones, bat bones, small ninja monkey bones, small zombie monkey bones, medium ninja monkey bones, monkey bones
+```
+Because all those items share the same image as `bones`.
+
+For this reason, these methods return `TRSItemArrays` and it's up to you to deduce what
+which item of the returned ones is the correct one.
+
+Another thing important to note, is that for consistency reasons, the top 9 pixels of the images are ignored.
+This is because when an item is stackable you need to wipe those pixels and because
+stackable items whose you have just 1 don't have a stack number, the only consistent way
+to do this is to always ignore those top pixels for every item.
+
+The result of this is that certain items where the result should be obvious, it's not for
+WaspLib, e.g. if you have any spear, because their tip is on the top 9 pixels and it gets
+ignored, whatever spear you have will always return all spears as a match:
+```
+rune spear(p), adamant spear(p), mithril spear(p), bronze spear, iron spear, bronze spear(p), steel spear, adamant spear, steel spear(p), iron spear(p), mithril spear, rune spear, adamant spear(kp), rune spear(kp), mithril spear(kp), iron spear(kp), steel spear(kp), bronze spear(kp), black spear, black spear(kp), black spear(p), rune spear(p++), adamant spear(p++), black spear(p++), black spear(p+), mithril spear(p++), bronze spear(p++), rune spear(p+), steel spear(p++), iron spear(p++), adamant spear(p+), iron spear(p+), bronze spear(p+), mithril spear(p+), steel spear(p+)
+```
+Same applies to most arrows, most bolts, most elemental staves and any item that only has a
+difference on the top 9 pixels.
+*)
+
+(*
+### Items._GetShadowHash
+```pascal
+function TRSItemInterface._GetShadowHash(slot: Integer): String;
+```
+Mostly used for debugging, has no real other use currently. In a nutshell, extracts the
+shadow of an item in the specified slot and returns the hash of that shadow.
+*)
+function TRSItemInterface._GetShadowHash(slot: Integer): String;
+var
+  b: TBox;
+begin
+  with Self.Slots^.Box(slot) do
+  begin
+    b.X1 := X1 + Self.RecognizeOffset.X;
+    b.Y1 := Y1 + Self.RecognizeOffset.Y;
+  end;
+
+  b.X2 := b.X1 + 35;
+  b.Y2 := b.Y1 + 31;
+
+  Result := ItemFinder.GetBorderHash(Target.GetImage(b));
+end;
+
+(*
+### Items._GetHash
+```pascal
+function TRSItemInterface._GetHash(slot: Integer): String;
+function TRSItemInterface._GetHash(img: TImage): String; overload;
+```
+Internal method to get an hash of an item in a slot.
+*)
+function TRSItemInterface._GetHash(slot: Integer): String;
+var
+  b: TBox;
+begin
+  with Self.Slots^.Box(slot) do
+  begin
+    b.X1 := X1 + Self.RecognizeOffset.X;
+    b.Y1 := Y1 + Self.RecognizeOffset.Y;
+  end;
+
+  b.X2 := b.X1 + 35;
+  b.Y2 := b.Y1 + 31;
+  Result := ItemFinder.GetHash(Target.GetImage(b));
+end;
+
+function TRSItemInterface._GetHash(img: TImage): String; overload;
+begin
+  Result := ItemFinder.GetHash(img);
+end;
+
+(*
+### Items._Recognize
+```pascal
+function TRSItemInterface._Recognize(slot: Integer): TRSItemArray;
+function TRSItemInterface._Recognize(img: TImage): TRSItemArray; overload;
+```
+Internal method to get an a `TRSItemArray` of the possible items in the given `slot`.
+*)
+function TRSItemInterface._Recognize(slot: Integer): TRSItemArray;
+var
+  hash: String;
+begin
+  hash := Self._GetHash(slot);
+  if hash <> '' then
+    Result := ItemFinder.GetHashItems(hash);
+end;
+
+function TRSItemInterface._Recognize(img: TImage): TRSItemArray; overload;
+var
+  hash: String;
+begin
+  hash := Self._GetHash(img);
+  if hash <> '' then
+    Result := ItemFinder.GetHashItems(hash);
+end;
+
+
+(*
+### Items.Recognize
+```pascal
+function TRSItemInterface.Recognize(slot: Integer): TRSItemArray;
+```
+Attempts to recognize an item in the given `slot` and returns a `TRSItemArray` of possible
+results.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn Inventory.Items.Recognize(0);
+end.
+```
+Assuming you have `coins` in the first slot of your inventory like this:
+```{figure} ../../images/items-recognize.png
+```
+You should see something
+like this printed:
+```
+[coins]
+```
+Otherwise you should see a list of possible items for the item you have in that slot if
+any.
+*)
+function TRSItemInterface.Recognize(slot: Integer): TRSItemArray;
+begin
+  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
+    Exit;
+  Result := Self._Recognize(slot);
+end;
+
+(*
+### Items.RecognizeAllEx
+```pascal
+function TRSItemInterface.RecognizeAllEx(): array of TRSItemArray;
+```
+Attempts to recognize all items the inventory and returns and `array of TRSItemArray`.
+Each index of the outter array is the represents the slot number.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+var
+  items: TRSItemArray;
+begin
+  for items in Inventory.Items.RecognizeAllEx() do
+    WriteLn items;
+end.
+```
+Assuming your inventory looks like this:
+```{figure} ../../images/items-recognize.png
+```
+You should get this printed:
+```
+[coins]
+[steel axe]
+[rune spear(p), adamant spear(p), mithril spear(p), bronze spear, iron spear, bronze spear(p), steel spear, adamant spear, steel spear(p), iron spear(p), mithril spear, rune spear, adamant spear(kp), rune spear(kp), mithril spear(kp), iron spear(kp), steel spear(kp), bronze spear(kp), black spear, black spear(kp), black spear(p), rune spear(p++), adamant spear(p++), black spear(p++), black spear(p+), mithril spear(p++), bronze spear(p++), rune spear(p+), steel spear(p++), iron spear(p++), adamant spear(p+), iron spear(p+), bronze spear(p+), mithril spear(p+), steel spear(p+)]
+[sheep bones (3), sheep bones (2), sheep bones (1), human bones, sheep bones (4), bones, alan's bones, bat bones, small ninja monkey bones, small zombie monkey bones, medium ninja monkey bones, monkey bones]
+[angler hat]
+[angler top]
+[angler boots]
+[angler waders]
+[sheep bones (3), sheep bones (2), sheep bones (1), human bones, sheep bones (4), bones, alan's bones, bat bones, small ninja monkey bones, small zombie monkey bones, medium ninja monkey bones, monkey bones]
+[]
+[spice, gnome spice]
+[]
+[]
+[]
+[water rune (nz), board game piece, water rune]
+[]
+[yommi tree seeds, mithril seeds]
+[]
+[]
+[pet kitten]
+[]
+[limestone]
+[fire rune (nz), fire rune, board game piece]
+[]
+[]
+[charcoal]
+[damaged armour]
+[hammer]
+```
+Otherwise you should see a list of possible items for the item you have in that slot if
+any.
+*)
+function TRSItemInterface.RecognizeAllEx(): array of TRSItemArray;
+var
+  img: TImage;
+  boxes: TBoxArray;
+  b: TBox;
+begin
+  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
+    Exit;
+
+  img := Target.GetImage();
+
+  boxes := Self.Slots^.Boxes();
+
+  for b in boxes do
+  begin
+    b.X1 += Self.RecognizeOffset.X;
+    b.Y1 += Self.RecognizeOffset.Y;
+    b.X2 := b.X1 + 35;
+    b.Y2 := b.Y1 + 31;
+    Result += Self._Recognize(img.Copy(b));
+  end;
+end;
+
+(*
+### Items.RecognizeAll
+```pascal
+function TRSItemInterface.RecognizeAll(): TRSItemArray;
+```
+Attempts to recognize all items the inventory and returns them as a `TRSItemArray`.
+
+This is essentially the same as {ref}`Items.RecognizeAllEx` but with a "flatted" out
+result.
+
+Example:
+```pascal
+{$I WaspLib/osrs.simba}
+begin
+  WriteLn Inventory.Items.RecognizeAll();
+end.
+```
+Assuming your inventory looks like this:
+```{figure} ../../images/items-recognize.png
+```
+You should get this printed:
+```
+[coins, steel axe, rune spear(p), sheep bones (3), angler hat, angler top, angler boots, angler waders, sheep bones (3), spice, water rune (nz), yommi tree seeds, pet kitten, limestone, fire rune (nz), charcoal, damaged armour, hammer]
+```
+Otherwise you should see a list of possible items for the item you have in that slot if
+any.
+*)
+function TRSItemInterface.RecognizeAll(): TRSItemArray;
+var
+  img: TImage;
+  items: TRSItemArray;
+  boxes: TBoxArray;
+  b: TBox;
+begin
+  if (@Self.PreConditionFunction <> nil) and not Self.PreConditionFunction() then
+    Exit;
+
+  img := Target.GetImage();
+
+  boxes := Self.Slots^.Boxes();
+  for b in boxes do
+  begin
+    b.X1 += Self.RecognizeOffset.X;
+    b.Y1 += Self.RecognizeOffset.Y;
+    b.X2 := b.X1 + 35;
+    b.Y2 := b.Y1 + 31;
+
+    items := Self._Recognize(img.Copy(b));
+    if items.Length > 0 then
+      Result += items[0];
+  end;
+end;
+
 
 
 (*

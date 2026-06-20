@@ -170,7 +170,7 @@ begin
 
   for i := 0 to 27 do
   begin
-    items := Inventory.Items.Discover(i);
+    items := Inventory.Items.Recognize(i);
     if items = [] then Continue;
 
     for j := 0 to High(items) do
@@ -285,7 +285,7 @@ begin
   for i := 0 to 27 do
   begin
     if items[i] = [] then
-      items[i] := Inventory.Items.Discover(i);
+      items[i] := Inventory.Items.Recognize(i);
 
     if items[i].Contains(Self.Layout.Items[i].Item) then
       Continue;
@@ -293,7 +293,7 @@ begin
     for j := i+1 to 27 do
     begin
       if items[j] = [] then
-        items[j] := Inventory.Items.Discover(j);
+        items[j] := Inventory.Items.Recognize(j);
 
       if items[j].Contains(Self.Layout.Items[i].Item) then
       begin

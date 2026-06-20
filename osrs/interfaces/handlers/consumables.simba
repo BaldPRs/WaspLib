@@ -372,7 +372,7 @@ begin
 
   Self.Setup(consumable);
 
-  items := Inventory.Items.DiscoverAll();
+  items := Inventory.Items.RecognizeAll();
 
   for i := 0 to High(items) do
     if items[i].EndsWith(')') then
@@ -393,7 +393,7 @@ begin
 
   Self.Setup(boost);
 
-  items := Inventory.Items.DiscoverAll();
+  items := Inventory.Items.RecognizeAll();
 
   for i := 0 to High(items) do
     if items[i].EndsWith(')') then

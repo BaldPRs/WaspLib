@@ -43,14 +43,21 @@ end;
 
 var
   AcaForm: TACAForm;
+  IsLive: Boolean;
 
 function GetImageForACA(): TImage;
 begin
   Result := Target.GetImage();
 end;
 
+procedure OnLiveChange(sender: TLazObject);
+begin
+  IsLive := TLazCheckBox(sender).Checked;
+end;
+
 var
   window: TWindowHandle;
+  liveToggle: TLazCheckbox;
 begin
   window := GetSimbaTargetWindow();
 
@@ -64,7 +71,20 @@ begin
   AcaForm := TACAForm.Create(@GetImageForACA);
   AcaForm.Width := 1600;
   AcaForm.Height := 800;
-  AcaForm.ShowModal();
+  liveToggle := TLazCheckbox.Create(AcaForm);
+  liveToggle.Parent := AcaForm;
+  liveToggle.Caption := 'Live image';
+  liveToggle.Left := 200;
+  liveToggle.OnChange := @OnLiveChange;
+
+  AcaForm.Show();
+
+  repeat
+    Sleep(100);
+    if IsLive then
+      AcaForm.UpdateImage();
+  until not AcaForm.Showing;
+
   WriteLn('The best color was: ', AcaForm.BestColor);
   AcaForm.Free();
 end;

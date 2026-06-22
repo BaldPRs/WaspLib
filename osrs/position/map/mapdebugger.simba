@@ -37,14 +37,16 @@ Main record used to hold core values of the {ref}`Map Debugger`.
 
     Graph: TWebGraph;
 
-    Selected: Int32;
+    Selected: Integer;
     Path: TPointArray;
+    Local, Global: TPoint;
 
     GetGlobal: function (pt: TPoint; offset: TPoint = [0,0]): TPoint of object;
 
     Coordinate, SelectedInfo: TLazLabel;
     ShowGraph, ShowWalkableSpace, ShowWalkableClusters, ShowObjectClusters, Normalize: Boolean;
     ColorArray: TColorArray;
+    Target: TTarget;
   end;
 
 procedure TMapDebugger.OnChange(sender: TLazObject);
@@ -96,48 +98,39 @@ begin
   tpa := tpa.Connect().Difference(tpa);
   canvas.DrawPoints(tpa, $F7AA4E);
 end;
-{$H+}
 
-procedure TMapDebugger.ImgBoxMouseMove(sender: TImageBox; shift: ELazShiftStates; x, y: Int32);
-var
-  pt, g: TPoint;
-  i: Int32;
+procedure TMapDebugger.OnKeyDown(sender: TImageBox; var key: UInt16; shift: ELazShiftStates);
 begin
-  pt := TPoint.Create(x,y);
   if Self.Normalize then
-    g := Self.GetGlobal([pt.X div 4 * 4, pt.Y div 4 * 4])
-  else
-    g := Self.GetGlobal([pt.X, pt.Y]);
-
-  Self.Coordinate.Caption := Format('[%d, %d]', [g.X, g.Y]);
-
-  Self.Path := [];
-  if (ELazShiftStates.Shift in shift) and (Self.Selected > -1) then
   begin
-    i := Self.Graph.Nodes.NearestIndex(pt);
-
-    if (Self.Selected <> i) and pt.InRange(Self.Graph.Nodes[i], 12) then
-    try
-      Self.Path := Self.Graph.PathBetween(Self.Graph.Nodes[Self.Selected], Self.Graph.Nodes[i], 0.33);
-    except
-      WriteLn GetExceptionMessage();
+    case EKeyCode(key) of
+      EKeyCode.LEFT: Self.Target.MouseX -= 4;
+      EKeyCode.UP: Self.Target.MouseY -= 4;
+      EKeyCode.RIGHT: Self.Target.MouseX += 4;
+      EKeyCode.DOWN: Self.Target.MouseY += 4;
+    end;
+  end
+  else
+  begin
+    case EKeyCode(key) of
+      EKeyCode.LEFT: Self.Target.MouseX -= 1;
+      EKeyCode.UP: Self.Target.MouseY -= 1;
+      EKeyCode.RIGHT: Self.Target.MouseX += 1;
+      EKeyCode.DOWN: Self.Target.MouseY += 1;
     end;
   end;
-
-  sender.Repaint();
 end;
 
 procedure TMapDebugger.ImgBoxMouseDown(sender: TImageBox; button: ELazMouseButton; shift: ELazShiftStates; x, y: Int32);
 var
-  pt, g: TPoint;
+  g: TPoint;
 begin
-  if button <> ELazMouseButton.Left then Exit;
+  if button <> ELazMouseButton.Left then
+    Exit;
 
-  pt := TPoint.Create(x, y);
+  Self.Selected := Self.Graph.Nodes.NearestIndex(Self.Local);
 
-  Self.Selected := Self.Graph.Nodes.NearestIndex(pt);
-
-  if not Self.Graph.Nodes.IsEmpty and pt.InRange(Self.Graph.Nodes[Self.Selected], 4) then
+  if not Self.Graph.Nodes.IsEmpty and Self.Local.InRange(Self.Graph.Nodes[Self.Selected], 4) then
   begin
     g := Self.GetGlobal(Self.Graph.Nodes[Self.Selected]);
 
@@ -155,9 +148,38 @@ begin
     Self.SelectedInfo.Caption := 'Selected Node: None';
   end;
 
-  Self.ImgBoxMouseMove(sender, shift, x, y);
   WriteLn('Clicked: ' + Self.Coordinate.Caption);
 end;
+{$H+}
+
+procedure TMapDebugger.ImgBoxMouseMove(sender: TImageBox; shift: ELazShiftStates; x, y: Integer);
+var
+  i: Integer;
+begin
+  Self.Local := TPoint.Create(x,y);
+  if Self.Normalize then
+    Self.Global := Self.GetGlobal([Self.Local.X div 4 * 4, Self.Local.Y div 4 * 4])
+  else
+    Self.Global := Self.GetGlobal([Self.Local.X, Self.Local.Y]);
+
+  Self.Coordinate.Caption := Format('[%d, %d]', [Self.Global.X, Self.Global.Y]);
+
+  Self.Path := [];
+  if (ELazShiftStates.Shift in shift) and (Self.Selected > -1) then
+  begin
+    i := Self.Graph.Nodes.NearestIndex(Self.Local);
+
+    if (Self.Selected <> i) and Self.Local.InRange(Self.Graph.Nodes[i], 12) then
+    try
+      Self.Path := Self.Graph.PathBetween(Self.Graph.Nodes[Self.Selected], Self.Graph.Nodes[i], 0.33);
+    except
+      WriteLn GetExceptionMessage();
+    end;
+  end;
+
+  sender.Repaint();
+end;
+
 
 procedure TMapDebugger.GraphOnChange(sender: TLazObject);
 begin
@@ -187,6 +209,7 @@ procedure TMapDebugger.NormalizeCoordinatesOnChange(sender: TLazObject);
 begin
   Self.Normalize := TLazCheckBox(sender).Checked;
 end;
+
 
 (*
 ## MapDebugger.Show
@@ -339,10 +362,11 @@ begin
   Self.ImageBox.OnImgPaint := @Self.ImgBoxPaint;
   Self.ImageBox.OnImgMouseMove := @Self.ImgBoxMouseMove; 
   Self.ImageBox.OnImgMouseDown := @Self.ImgBoxMouseDown;
+  Self.ImageBox.OnImgKeyDown := @Self.OnKeyDown;
 
   form.ShowOnTop();
   while form.Showing do
-    Sleep(500);
+    Sleep(100);
 end;
 
 (*
@@ -364,6 +388,9 @@ var
   pt: TPoint;
   x, y, i: Int32;
 begin
+  Self.Target := new TTarget();
+  Self.Target.SetDesktop();
+
   collision := loader.Collision.Copy();
 
   for pt in collision.FindColor($FFFFFF, 0) do

@@ -250,14 +250,12 @@ var
 begin
   str := Self.Search.Text;
 
-  if key = #08 then
-  begin
+  if EKeyCode(key) <> EKeyCode.BACK then
+    str := str+key
+  else
     str.Pop;
-    Self.Search.Text := str;
-    Exit;
-  end;
 
-  Self.Search.Text := str + key;
+  Self.Search.Text := str;
 end;
 {$H+}
 

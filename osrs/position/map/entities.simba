@@ -34,7 +34,7 @@ Main type to handle {ref}`RSEntity`.
 *)
   TRSEntity = record
     UpText: TStringArray;
-    Size: TVector3;
+    Size, Offset: TVector3;
     Model: TModel;
     Coordinates: TPointArray;
     Filter: TRSDotFilterArray;
@@ -231,6 +231,8 @@ function TRSEntity._GetBounds(me: TPoint; vector: TVector2; size: TVector3; heig
 var
   corners: TVector3Array;
   pt: TPoint;
+  c0, c1, c2, c3: TPoint;
+  h0, h1, h2, h3: Single;
 begin
   pt := me + vector.ToPoint() - Minimap.Center;
   if Self.Model <> nil then
@@ -244,15 +246,25 @@ begin
   size.X := size.X*2;
   size.Y := size.Y*2;
 
+  c0 := [Round(pt.X-size.X), Round(pt.Y-size.Y)];
+  c1 := [Round(pt.X+size.X), Round(pt.Y-size.Y)];
+  c2 := [Round(pt.X+size.X), Round(pt.Y+size.Y)];
+  c3 := [Round(pt.X-size.X), Round(pt.Y+size.Y)];
+
+  h0 := Self.Walker^.Height(c0, False) - height + Self.Offset.Z;
+  h1 := Self.Walker^.Height(c1, False) - height + Self.Offset.Z;
+  h2 := Self.Walker^.Height(c2, False) - height + Self.Offset.Z;
+  h3 := Self.Walker^.Height(c3, False) - height + Self.Offset.Z;
+
   corners := [
-    [vector.X-size.X, vector.Y-size.Y, Self.Walker^.Height(pt - [1,3],  False) - height],
-    [vector.X+size.X, vector.Y-size.Y, Self.Walker^.Height(pt + [3,-3], False) - height],
-    [vector.X+size.X, vector.Y+size.Y, Self.Walker^.Height(pt + [3,1],  False) - height],
-    [vector.X-size.X, vector.Y+size.Y, Self.Walker^.Height(pt - [1,1],  False) - height],
-    [vector.X-size.X, vector.Y-size.Y, Self.Walker^.Height(pt - [1,3],  False) - height+size.Z],
-    [vector.X+size.X, vector.Y-size.Y, Self.Walker^.Height(pt + [3,-3], False) - height+size.Z],
-    [vector.X+size.X, vector.Y+size.Y, Self.Walker^.Height(pt + [3,1],  False) - height+size.Z],
-    [vector.X-size.X, vector.Y+size.Y, Self.Walker^.Height(pt - [1,1],  False) - height+size.Z]
+    [vector.X-size.X+Self.Offset.X, vector.Y-size.Y+Self.Offset.Y, h0],
+    [vector.X+size.X+Self.Offset.X, vector.Y-size.Y+Self.Offset.Y, h1],
+    [vector.X+size.X+Self.Offset.X, vector.Y+size.Y+Self.Offset.Y, h2],
+    [vector.X-size.X+Self.Offset.X, vector.Y+size.Y+Self.Offset.Y, h3],
+    [vector.X-size.X+Self.Offset.X, vector.Y-size.Y+Self.Offset.Y, h0+size.Z],
+    [vector.X+size.X+Self.Offset.X, vector.Y-size.Y+Self.Offset.Y, h1+size.Z],
+    [vector.X+size.X+Self.Offset.X, vector.Y+size.Y+Self.Offset.Y, h2+size.Z],
+    [vector.X-size.X+Self.Offset.X, vector.Y+size.Y+Self.Offset.Y, h3+size.Z]
   ];
 
   Result := Projection.Run(corners, radians).ConvexHull();
@@ -838,12 +850,12 @@ end;
 (*
 ## DrawEntity
 ```pascal
-procedure TImage.DrawEntity(const entity: TRSEntity; alpha: Byte = $50);
-procedure TExternalCanvas.DrawEntity(const entity: TRSEntity; alpha: Byte = $50);
+procedure TImage.DrawEntity(const entity: TRSEntity; alpha: Byte = $C8);
+procedure TExternalCanvas.DrawEntity(const entity: TRSEntity; alpha: Byte = $C8);
 ```
 Helper methods to debug TRSEntitys.
 *)
-procedure TImage.DrawEntity(const entity: TRSEntity; alpha: Byte = $50);
+procedure TImage.DrawEntity(const entity: TRSEntity; alpha: Byte = $C8);
 var
   me: TPoint;
   atpa: T2DPointArray;
@@ -883,7 +895,7 @@ begin
     Self.DrawTPA(boundsArray[i].Connect());
 end;
 
-procedure TExternalCanvas.DrawEntity(const entity: TRSEntity; alpha: Byte = $32);
+procedure TExternalCanvas.DrawEntity(const entity: TRSEntity; alpha: Byte = $C8);
 var
   me: TPoint;
   atpa: T2DPointArray;

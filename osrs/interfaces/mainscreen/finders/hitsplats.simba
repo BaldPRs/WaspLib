@@ -159,7 +159,7 @@ begin
   splats := [];
   for area in areas do
   begin
-    bounds := area.Bounds();
+    bounds := area.Bounds;
     white := Target.FindColor($E3E3E3, 10.981, bounds);
     white := white.ExcludeBox(Minimap.Bounds);
     black := Target.FindColor($0, 0, bounds);

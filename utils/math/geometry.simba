@@ -183,7 +183,7 @@ type
   end;
   TCuboidArray = array of TCuboid;
 
-function TCuboid.Corners(): TPointArray;
+property TCuboid.Corners: TPointArray;
 begin
   Result := Self.Top.Corners + Self.Bottom.Corners;
   Result := Result.ConvexHull();
@@ -191,23 +191,23 @@ end;
 
 function TCuboid.Polygon(): TPolygon;
 begin
-  Result := Self.Corners();
+  Result := Self.Corners;
 end;
 
-function TCuboid.Center(): TPoint;
+property TCuboid.Center: TPoint;
 begin
   Result := Self.Bottom.Mean + Self.Top.Mean;
   Result := [Result.X div 2, Result.Y div 2];
 end;
 
-function TCuboid.Bounds(): TBox;
+property TCuboid.Bounds: TBox;
 begin
   Result := Self.Top.Bounds.Combine(Self.Bottom.Bounds);
 end;
 
 function TCuboid.Edges(): TPointArray;
 begin
-  Result := Self.Corners().Connect();
+  Result := Self.Corners.Connect();
 end;
 
 function TCuboid.ShapeFill(): TPointArray;

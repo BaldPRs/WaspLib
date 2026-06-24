@@ -218,13 +218,17 @@ var
   i, l, s: Integer;
   weights: TIntegerArray;
 begin
-  if tpa = [] then Exit;
+  if tpa.IsEmpty then
+    Exit;
 
   // Transform the TPA
-  if Self.Grow  > 0 then tpa := tpa.Grow(Self.Grow);
-  if Self.Erode > 0 then tpa := tpa.Erode(Self.Erode);
+  if Self.Grow  > 0 then
+    tpa := tpa.Grow(Self.Grow);
+  if Self.Erode > 0 then
+    tpa := tpa.Erode(Self.Erode);
 
-  if tpa = [] then Exit;
+  if tpa.IsEmpty then
+    Exit;
 
   Result := tpa.Cluster(Self.Distance);
 
@@ -255,7 +259,8 @@ begin
     weights += Length(Result[i]);
   end;
 
-  if Result = [] then Exit;
+  if Result.IsEmpty then
+    Exit;
   Result := Result.Sort(weights); //Sort by size making use of the prev loop.
 end;
 
@@ -291,10 +296,12 @@ begin
     end;
 
     primary := Target.FindColor(Self.ColorClusters[i].Primary, area);
-    if primary = [] then Continue;
+    if primary.IsEmpty then
+      Continue;
 
     secondary := Target.FindColor(Self.ColorClusters[i].Secondary, area);
-    if secondary = [] then Continue;
+    if secondary.IsEmpty then
+      Continue;
 
     Result += primary.PointsNearby(secondary, 0, MainScreen.NormalizeDistance(Self.ColorClusters[i].Distance));
   end;
@@ -336,15 +343,27 @@ var
 begin
   transformer := Self.Transformer.Normalize();
 
-  for area in areas do
+  if polygon then
   begin
-    tmp := Self._FindHelper(area.Bounds());
-    if tmp = [] then Continue;
-    if polygon then
-      tpa += tmp.ExtractPolygon(area)
-    else
+    for area in areas do
+    begin
+      tmp := Self._FindHelper(area.Bounds());
+      if tmp.IsEmpty then
+        Continue;
+      tpa += tmp.ExtractPolygon(area);
+      tmp := [];
+    end;
+  end
+  else
+  begin
+    for area in areas do
+    begin
+      tmp := Self._FindHelper(area.Bounds());
+      if tmp.IsEmpty then
+        Continue;
       tpa += tmp.Intersection(area);
-    tmp := [];
+      tmp := [];
+    end;
   end;
 
   atpa := transformer.Process(tpa);

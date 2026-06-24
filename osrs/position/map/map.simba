@@ -483,7 +483,8 @@ var
   currLoc: TPoint;
   arr: TPointArray;
 begin
-  if angle = $FFFF then angle := Minimap.CompassRadians;
+  if angle = $FFFF then
+    angle := Minimap.CompassRadians;
   vector := Self.Walker.Point2MMVec(me, pt, angle);
   pt := vector.ToPoint();
 

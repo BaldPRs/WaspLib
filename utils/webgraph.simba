@@ -130,7 +130,7 @@ when finding paths.
 For example, this is how you could block the space where wintertodt is so
 you don't get paths through the chasm:
 ```pascal
-Map.Setup([ERSChunk.WINTERTODT]);
+Map.Setup([EChunk.WINTERTODT]);
 Map.Loader.Graph.BlockArea([6478, 34358, 6565, 34445]);
 ```
 *)
@@ -564,7 +564,7 @@ this permanently removes them.
 For example, this is how you could block the space where wintertodt is so
 you don't get paths through the chasm:
 ```pascal
-Map.Setup([ERSChunk.WINTERTODT]);
+Map.Setup([EChunk.WINTERTODT]);
 Map.Loader.Graph.DeleteNodes([6478, 34358, 6565, 34445]);
 ```
 *)

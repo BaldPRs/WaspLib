@@ -1,5 +1,5 @@
 //!PACKAGE EXAMPLE
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 type
   ETemplateState = enum(
@@ -39,7 +39,7 @@ begin
     FormatNumber(Self.Actions / Logger.TimeRunning.Elapsed * HOUR),
     FormatNumber(xp),
     FormatNumber(xp / Logger.TimeRunning.Elapsed * HOUR),
-    ToStr(Stats.GetLevel(ERSSkill.TOTAL))
+    ToStr(Stats.GetLevel(ESkill.TOTAL))
   ];
 end;
 
@@ -55,16 +55,16 @@ begin
     @Self.GetReportValues
   );
 
-  if not RSClient.IsLoggedIn() then
+  if not Client.IsLoggedIn() then
     Login.DoLogin();
 
   StartListeners(300);
 
-  Map.Setup([ERSChunk.VARROCK]);
+  Map.Setup([EChunk.VARROCK]);
 
   Antiban.Zoom.Min := 0;
   Antiban.Zoom.Max := 50;
-  Antiban.Skills := [ERSSkill.TOTAL];
+  Antiban.Skills := [ESkill.TOTAL];
 
   CollectionBox.Setup();
 end;
@@ -83,7 +83,7 @@ begin
   if Self.LevelGoals and Stats.AnyGoalsCompleted() then
     Exit(ETemplateState.MAX_LEVEL);
 
-  if not RSClient.IsLoggedIn() then
+  if not Client.IsLoggedIn() then
     Exit(ETemplateState.LOGIN);
 
   if Chat.LeveledUp() then

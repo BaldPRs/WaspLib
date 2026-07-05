@@ -14,7 +14,7 @@ This tool is also a little bit slow at doing certain things like loading the
 files bytes, adding and removing files/images because Simba is not optimized for
 what this tool does.
 *)
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 var
   HEX_TABLE: TStringArray;

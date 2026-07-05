@@ -3,7 +3,7 @@
 Tests the integrity of several bankpin and bank methods.
 *)
 {$DEFINE WL_TEST}
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 {$ASSERTIONS ON}
 
 function TMouse.Position(): TPoint; override;
@@ -27,8 +27,8 @@ begin
     Target.SetImage(img);
     WaspLibSetup();
 
-    RSClient.Client := ERSClient.RUNELITE;
-    RSClient.Mode := RSClient.GetMode();
+    Client.Client := EClient.RUNELITE;
+    Client.Mode := Client.GetMode();
     SetupInterfaces();
 
     Assert(BankPin.IsOpen());
@@ -49,8 +49,8 @@ begin
     Assert(Bank.InceneratorTooltipVisible() = False);
     Assert(Bank.HasJagexAccountAd() = False);
     Assert(Bank.OpenTab(5));
-    Assert(Bank.ModeButtons[ERSBankModeButton.NOTES].Enabled[False]);
-    Assert(Bank.SetQuantity(ERSItemQuantity.ONE));
+    Assert(Bank.ModeButtons[EBankModeButton.NOTES].Enabled[False]);
+    Assert(Bank.SetQuantity(EItemQuantity.ONE));
     Assert(Bank.Slots.Count() = slots[0]);
     Delete(slots, 0, 1);
     Assert(Bank.Items.Contains('Uncut emerald'));

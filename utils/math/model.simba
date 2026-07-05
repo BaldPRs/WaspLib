@@ -204,7 +204,7 @@ If `mtlFile` is left empty no material data is loaded.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   model: TModel;
 begin
@@ -229,7 +229,7 @@ Scales a model by the `factor`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   img: TImage;
   model: TModel;
@@ -293,7 +293,7 @@ Rotates a model in the X axis by `radians`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   img: TImage;
   model: TModel;
@@ -333,7 +333,7 @@ Offsets a model in the 3D space by `value`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   img: TImage;
   model: TModel;
@@ -391,7 +391,7 @@ It's very useful to get clickboxes of models.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   model: TModel;
   tpa: TPointArray;
@@ -432,7 +432,7 @@ Essentially gives you the model outline.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   model: TModel;
   tpa: TPointArray;
@@ -460,7 +460,7 @@ Draws a model `projection` into a `img`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   img: TImage;
   model: TModel;

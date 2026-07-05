@@ -1,8 +1,8 @@
 //!PACKAGE EXAMPLE
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 var
-  layout: TRSInventoryLayout;
+  layout: TInventoryLayout;
   layoutSelector: TLazComboBox;
 
 procedure TScriptForm.OnStart(sender: TLazObject); override;

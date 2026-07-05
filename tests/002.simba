@@ -3,7 +3,7 @@
 Tests the integrity of several login methods.
 *)
 {$DEFINE WL_TEST}
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 {$ASSERTIONS ON}
 
 const
@@ -21,10 +21,10 @@ begin
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
-    Assert(Login.GetMessage() = ERSLoginMessage.WELCOME);
-    Assert(Login.FindButton(ERSLoginButton.EXISTING_USER));
-    Assert(Login.GetMode() = ERSLoginMode.LEGACY);
+    Assert(Client.IsLoggedIn() = False);
+    Assert(Login.GetMessage() = ELoginMessage.WELCOME);
+    Assert(Login.FindButton(ELoginButton.EXISTING_USER));
+    Assert(Login.GetMode() = ELoginMode.LEGACY);
     Assert(LoginWorldSwitcher.IsOpen() = False);
     Assert(LoginWorldSwitcher.GetCurrent() = 333);
     Assert(Lobby.IsOpen() = False);
@@ -34,37 +34,37 @@ begin
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
-    Assert(Login.GetMessage() = ERSLoginMessage.ENTER_CREDENTIALS);
-    Assert(Login.ClearInput(ERSLoginInput.USERNAME));
-    Assert(Login.ClearInput(ERSLoginInput.PASSWORD));
-    Assert(Login.FindButton(ERSLoginButton.LOGIN));
+    Assert(Client.IsLoggedIn() = False);
+    Assert(Login.GetMessage() = ELoginMessage.ENTER_CREDENTIALS);
+    Assert(Login.ClearInput(ELoginInput.USERNAME));
+    Assert(Login.ClearInput(ELoginInput.PASSWORD));
+    Assert(Login.FindButton(ELoginButton.LOGIN));
 
     img := new TImage(PATH + mode + FILENAME + '-2.png');
     Target.SetImage(img);
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
-    Assert(Login.GetMessage() = ERSLoginMessage.CONNECTING);
-    Assert(Login.InputIsFilled(ERSLoginInput.USERNAME));
-    Assert(Login.InputIsFilled(ERSLoginInput.PASSWORD));
+    Assert(Client.IsLoggedIn() = False);
+    Assert(Login.GetMessage() = ELoginMessage.CONNECTING);
+    Assert(Login.InputIsFilled(ELoginInput.USERNAME));
+    Assert(Login.InputIsFilled(ELoginInput.PASSWORD));
 
     img := new TImage(PATH + mode + FILENAME + '-3.png');
     Target.SetImage(img);
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
-    Assert(Login.GetMessage() = ERSLoginMessage.INCORRECT);
-    Assert(Login.FindButton(ERSLoginButton.RETRY));
+    Assert(Client.IsLoggedIn() = False);
+    Assert(Login.GetMessage() = ELoginMessage.INCORRECT);
+    Assert(Login.FindButton(ELoginButton.RETRY));
 
     img := new TImage(PATH + mode + FILENAME + '-4.png');
     Target.SetImage(img);
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
+    Assert(Client.IsLoggedIn() = False);
     Assert(Lobby.IsOpen());
 
     img := new TImage(PATH + mode + FILENAME + '-5.png');
@@ -72,7 +72,7 @@ begin
 
     WaspLibSetup();
 
-    Assert(RSClient.IsLoggedIn() = False);
+    Assert(Client.IsLoggedIn() = False);
     Assert(LoginWorldSwitcher.IsOpen());
     Assert(LoginWorldSwitcher.Read(0) = 301);
     Assert(LoginWorldSwitcher.Read(10) = 375);

@@ -151,7 +151,7 @@ add controls to it.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 var
   form: TScriptForm;

@@ -7,7 +7,7 @@ Tool to visually see random distributions available in the library in multiple s
 ```{figure} ../../images/distribution_viewer.gif
 ```
 *)
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 const DEFAULT_SHAPE: Integer = 0;
 const DEFAULT_DISTR: Integer = 1;

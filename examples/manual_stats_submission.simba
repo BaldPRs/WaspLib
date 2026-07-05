@@ -7,7 +7,7 @@
 {$DEFINE SCRIPT_ID := 'SCRIPT_UUID'}
 {$DEFINE SCRIPT_REVISION := 'SCRIPT_REVISION'}
 
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 begin
   Sleep(1500);

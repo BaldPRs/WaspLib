@@ -1,6 +1,6 @@
 (*
 # World Fetcher
-Fetches and filters OSRS world information for world selection.
+Fetches and filters world information for world selection.
 
 Credits: Developed by TazE
 Acknowledgements: Thanks to BigAussie for initial world scraper prototype
@@ -329,7 +329,7 @@ begin
       // Skip developer-only locked worlds
       if LOCKED_WORLDS.Contains(worldNum) then
         Continue;
-        
+
       if worldNum > 0 then
       begin
         // Check for duplicates

@@ -30,10 +30,10 @@ the same glyph or not.
 
 Example:
 ```
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
-  WriteLn RSFonts.PLAIN_11.SameGlyph('O', '0');
-  WriteLn RSFonts.QUILL.SameGlyph('O', '0');
+  WriteLn Fonts.PLAIN_11.SameGlyph('O', '0');
+  WriteLn Fonts.QUILL.SameGlyph('O', '0');
 end.
 ```
 *)
@@ -63,10 +63,10 @@ glyphs look the same.
 
 Example:
 ```
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
-  WriteLn RSFonts.PLAIN_11.SameText('I AM lOCO', 'l AM I0C0');
-  WriteLn RSFonts.QUILL.SameText('I AM lOCO', 'l AM I0C0');
+  WriteLn Fonts.PLAIN_11.SameText('I AM lOCO', 'l AM I0C0');
+  WriteLn Fonts.QUILL.SameText('I AM lOCO', 'l AM I0C0');
 end.
 ```
 *)
@@ -95,19 +95,19 @@ know in advance what it should be.
 
 Example:
 ```
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   str: String;
 begin
   str := 'l AM I0C0';
-  WriteLn RSFonts.PLAIN_11.ReplaceAlignedGlyphs(str, 'I AM lOCO');
-  WriteLn RSFonts.QUILL.ReplaceAlignedGlyphs(str, 'I AM lOCO');
+  WriteLn Fonts.PLAIN_11.ReplaceAlignedGlyphs(str, 'I AM lOCO');
+  WriteLn Fonts.QUILL.ReplaceAlignedGlyphs(str, 'I AM lOCO');
 end.
 ```
 This should give you this result:
 ```
 Succesfully compiled in 822.91 milliseconds.
-[00:00:01:0262]:[RSClient]: Client was resized, updating coordinates.
+[00:00:01:0262]:[Client]: Client was resized, updating coordinates.
 I AM lOCO
 l AM I0C0
 Succesfully executed in 537.23 milliseconds.
@@ -143,20 +143,20 @@ don't know exactly what it should be.
 
 For example, here is a way you could use to correct numbers:
 ```
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   str: String;
 begin
   str := '10O0-OOO0-9O092';
   //2nd param has all the valid characters for numbers
-  WriteLn RSFonts.PLAIN_11.NormalizeGlyphs(str, '0123456789');
-  WriteLn RSFonts.QUILL.NormalizeGlyphs(str, '0123456789');
+  WriteLn Fonts.PLAIN_11.NormalizeGlyphs(str, '0123456789');
+  WriteLn Fonts.QUILL.NormalizeGlyphs(str, '0123456789');
 end.
 ```
 This should give you this result:
 ```
 Succesfully compiled in 815.96 milliseconds.
-[00:00:01:0262]:[RSClient]: Client was resized, updating coordinates.
+[00:00:01:0262]:[Client]: Client was resized, updating coordinates.
 1000-0000-90092
 10O0-OOO0-9O092
 Succesfully executed in 525.14 milliseconds.
@@ -319,10 +319,10 @@ Global {ref}`TOCR` variable.
 
 type
 (*
-## TRSFonts
-Record containing pre-loaded RuneScape fonts and common text colors.
+## TFonts
+Record containing pre-loaded game fonts and common text colors.
 *)
-  TRSFonts = record
+  TFonts = record
     SMALL,
     PLAIN_11, PLAIN_12,
     BOLD, BOLD_SHADOW,
@@ -347,7 +347,7 @@ Record containing pre-loaded RuneScape fonts and common text colors.
     const PATH = WLEnv.CacheDir + 'fonts' + PATH_SEP;
   end;
 
-procedure TRSFonts.Load();
+procedure TFonts.Load();
 begin
   Self.SMALL := OCR.Engine.LoadFont(Self.PATH + 'Small', 4);
 
@@ -365,19 +365,19 @@ begin
   Self.VERDANA_15        := OCR.Engine.LoadFont(Self.PATH + 'Verdana 15', 4);
 end;
 
-procedure TRSFonts._UnzipFinished(constref result: TASyncUnzipResult);
+procedure TFonts._UnzipFinished(constref result: TASyncUnzipResult);
 begin
   if not result.Success then
   begin
     DirDelete(Self.PATH, True);
-    raise GetDebugLn('RSFonts', 'Failed to unzip fonts: '  + result.Exception);
+    raise GetDebugLn('Fonts', 'Failed to unzip fonts: '  + result.Exception);
   end;
 
   Self.Load();
   Self.Unzipping := False;
 end;
 
-procedure TRSFonts.WaitUnzipping();
+procedure TFonts.WaitUnzipping();
 begin
   while Self.Unzipping do
   begin
@@ -385,11 +385,11 @@ begin
     if not Self.Timeout.IsFinished then
       Continue;
     DirDelete(Self.PATH, True);
-    raise GetDebugLn('RSFonts', 'Timed out unzipping fonts.');
+    raise GetDebugLn('Fonts', 'Timed out unzipping fonts.');
   end;
 end;
 
-procedure TRSFonts.Setup();
+procedure TFonts.Setup();
 begin
   if DirList(Self.PATH) <> [] then
   begin
@@ -407,7 +407,7 @@ end;
 
 var
 (*
-## RSFonts variable
-Global {ref}`TRSFonts` variable.
+## Fonts variable
+Global {ref}`TFonts` variable.
 *)
-  RSFonts: TRSFonts;
+  Fonts: TFonts;

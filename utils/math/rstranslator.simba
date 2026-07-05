@@ -1,19 +1,19 @@
 (*
 # RSTranslator
-This file is responsible for conversions or internal RuneScape values to values
+This file is responsible for conversions or internal game values to values
 that can be used by Simba and back.
 *)
 
-{$DEFINE WL_RSTRANSLATOR_INCLUDED}
+{$DEFINE WL_TRANSLATOR_INCLUDED}
 {$INCLUDE_ONCE WaspLib/utils.simba}
 
 type
 (*
-## TRSTranslator
-Record responsible for conversions or internal RuneScape values to values
+## TTranslator
+Record responsible for conversions or internal game values to values
 that can be used by Simba and back.
 *)
-  TRSTranslator = record
+  TTranslator = record
     RSMap: record
       const ChunkSide: Int32 = 64;
       const Dimensions: TPoint = [100,200];
@@ -27,16 +27,16 @@ that can be used by Simba and back.
 (*
 ## RSTranslator.MapWidth
 ```pascal
-property TRSTranslator.MapWidth: UInt32;
+property TTranslator.MapWidth: UInt32;
 ```
-Returns the full width in pixels of the OldSchool RuneScape map.
+Returns the full width in pixels of the game map.
 
 Example:
 ```pascal
 WriteLn RSTranslator.MapWidth;
 ```
 *)
-property TRSTranslator.MapWidth: Int32;
+property TTranslator.MapWidth: Int32;
 begin
   Result := Self.RSMap.Scope.Width * Self.MAP_CHUNK_SIZE;
 end;
@@ -44,16 +44,16 @@ end;
 (*
 ## RSTranslator.MapHeight
 ```pascal
-property TRSTranslator.MapHeight: Int32;
+property TTranslator.MapHeight: Int32;
 ```
-Returns the full height in pixels of the OldSchool RuneScape map.
+Returns the full height in pixels of the game map.
 
 Example:
 ```pascal
 WriteLn RSTranslator.MapHeight;
 ```
 *)
-property TRSTranslator.MapHeight: Int32;
+property TTranslator.MapHeight: Int32;
 begin
   Result := Self.RSMap.Scope.Height * Self.MAP_CHUNK_SIZE;
 end;
@@ -62,8 +62,8 @@ end;
 (*
 ## RSTranslator.Global2Chunk
 ```pascal
-function TRSTranslator.Global2Chunk(pt: TPoint): TPoint;
-function TRSTranslator.Global2Chunk(b: TBox): TBox; overload;
+function TTranslator.Global2Chunk(pt: TPoint): TPoint;
+function TTranslator.Global2Chunk(b: TBox): TBox; overload;
 ```
 Converts a "Global" coordinate to a chunk number.
 
@@ -72,14 +72,14 @@ Example:
 WriteLn RSTranslator.Global2Chunk(Point(2000, 2000));
 ```
 *)
-function TRSTranslator.Global2Chunk(pt: TPoint): TPoint;
+function TTranslator.Global2Chunk(pt: TPoint): TPoint;
 begin
   pt.X := pt.X mod Self.MapWidth;
   Result.X := Self.RSMap.Scope.X1 + Floor(pt.X / Self.MAP_CHUNK_SIZE);
   Result.Y := Self.RSMap.Scope.Y2 - Floor(pt.Y / Self.MAP_CHUNK_SIZE);
 end;
 
-function TRSTranslator.Global2Chunk(b: TBox): TBox; overload;
+function TTranslator.Global2Chunk(b: TBox): TBox; overload;
 var
   lo, hi: TPoint;
 begin
@@ -92,8 +92,8 @@ end;
 (*
 ## RSTranslator.Chunk2Coordinate
 ```pascal
-function TRSTranslator.Chunk2Coordinate(p: TPoint): TPoint;
-function TRSTranslator.Chunk2Coordinate(b: TBox): TBox; overload;
+function TTranslator.Chunk2Coordinate(p: TPoint): TPoint;
+function TTranslator.Chunk2Coordinate(b: TBox): TBox; overload;
 ```
 Converts a "Chunk" number to the top left "Global" coordinate of that chunk.
 
@@ -102,7 +102,7 @@ Example:
 WriteLn RSTranslator.Chunk2Coordinate(Point(53, 50));
 ```
 *)
-function TRSTranslator.Chunk2Coordinate(pt: TPoint; plane: Int32 = 0): TPoint;
+function TTranslator.Chunk2Coordinate(pt: TPoint; plane: Int32 = 0): TPoint;
 begin
   Result.X := pt.X * Self.MAP_CHUNK_SIZE;
   Result.Y := (Self.RSMap.Scope.Y2 - pt.Y) * Self.MAP_CHUNK_SIZE;
@@ -110,7 +110,7 @@ begin
     Result.X += Self.MapWidth * plane;
 end;
 
-function TRSTranslator.Chunk2Coordinate(b: TBox; plane: Int32 = 0): TBox; overload;
+function TTranslator.Chunk2Coordinate(b: TBox; plane: Int32 = 0): TBox; overload;
 var
   lo, hi: TPoint;
 begin
@@ -120,14 +120,14 @@ begin
 end;
 
 
-function TRSTranslator.Height2Color(height: Single): Int32;
+function TTranslator.Height2Color(height: Single): Int32;
 const
   H_VALUE = 6048 / $FFFFFF;
 begin
   Result := Round((height / H_VALUE) / 4 * 128);
 end;
 
-function TRSTranslator.Color2Height(color: Int32): Single;
+function TTranslator.Color2Height(color: Int32): Single;
 const
   H_VALUE = 6048 / $FFFFFF;
 begin
@@ -135,19 +135,19 @@ begin
 end;
 
 
-function TRSTranslator.Normalize(pt: TPoint): TPoint;
+function TTranslator.Normalize(pt: TPoint): TPoint;
 begin
   Result := [pt.X - (pt.X mod Self.TILE_SIZE), pt.Y - (pt.Y mod Self.TILE_SIZE) + (Self.TILE_SIZE div 2)];
 end;
 
 
 (*
-## TRSTranslator.GetChunks
+## TTranslator.GetChunks
 ```pascal
-function TRSTranslator.GetChunks(lo, hi: TPoint): TPointArray; static;
+function TTranslator.GetChunks(lo, hi: TPoint): TPointArray; static;
 ```
 Simple methods that will return all chunks in between a `lo` and `hi` chunks.
-This will also fix their order if required, as osrs chunks are oddly numbered
+This will also fix their order if required, as game chunks are oddly numbered
 from bottom to top on the Y axis.
 
 Example:
@@ -157,7 +157,7 @@ WriteLn RSTranslator.GetChunks([20,20], [22,22]);
 //[[20, 20], [20, 21], [20, 22], [21, 20], [21, 21], [21, 22], [22, 20], [22, 21], [22, 22]];
 ```
 *)
-function TRSTranslator.GetChunks(lo, hi: TPoint): TPointArray; static;
+function TTranslator.GetChunks(lo, hi: TPoint): TPointArray; static;
 var
   y, x: Int32;
 begin
@@ -172,6 +172,6 @@ end;
 var
 (*
 ## RSTranslator variable
-Global {ref}`TRSTranslator` variable.
+Global {ref}`TTranslator` variable.
 *)
-  RSTranslator: TRSTranslator;
+  RSTranslator: TTranslator;

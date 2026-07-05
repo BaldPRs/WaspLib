@@ -37,7 +37,7 @@ begin
 end;
 
 
-function TBox.ContainsBox(other: TBox): Boolean;
+function TBox.ContainsBox(const other: TBox): Boolean;
 begin
   Result := InRange(other.X1, Self.X1, Self.X2) and
             InRange(other.X2, Self.X1, Self.X2) and
@@ -46,12 +46,13 @@ begin
 end;
 
 
-function TBox.ContainsQuad(other: TQuad): Boolean;
+function TBox.ContainsQuad(const other: TQuad): Boolean;
 begin
-  Result := Self.Contains(other.Top) and Self.Contains(other.Left) and Self.Contains(other.Bottom) and Self.Contains(other.Right);
+  Result := Self.Contains(other.Top) and Self.Contains(other.Left) and
+            Self.Contains(other.Bottom) and Self.Contains(other.Right);
 end;
 
-function TBox.Overlap(other: TBox): Boolean;
+function TBox.Overlap(const other: TBox): Boolean;
 begin
   Result := (Self.X1 <= other.X2) and (Self.X2 >= other.X1) and
             (Self.Y1 <= other.Y2) and (Self.Y2 >= other.Y1);
@@ -104,6 +105,14 @@ begin
   Result := True;
 end;
 
+
+function TPointArray.CreateFromQuad(quad: TQuad; filled: Boolean): TPointArray; static;
+begin
+  if filled then
+    Result := quad.Corners.Connect().ShapeFill()
+  else
+    Result := quad.Corners;
+end;
 
 function TPointArray.AStar(start, goal: TPoint; diagonalTravel: Boolean = True): TPointArray;
 begin

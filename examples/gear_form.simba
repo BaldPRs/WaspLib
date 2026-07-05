@@ -1,9 +1,9 @@
 //!PACKAGE EXAMPLE
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 var
-  gear1: TRSGearLayout;
-  gear2: TRSGearLayout;
+  gear1: TGearLayout;
+  gear2: TGearLayout;
   mainGear: TLazComboBox;
   specAttack: TLazComboBox;
 

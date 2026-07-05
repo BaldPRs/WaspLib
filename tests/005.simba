@@ -3,7 +3,7 @@
 Tests the integrity of several DepositBox interface methods.
 *)
 {$DEFINE WL_TEST}
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 {$ASSERTIONS ON}
 
 const

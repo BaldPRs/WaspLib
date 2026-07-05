@@ -466,7 +466,7 @@ Sets the username that appears for webhook messages.
 
 Example:
 ```pascal
-MyDiscord.SetUsername('OSRS Bot');
+MyDiscord.SetUsername('Timmy the botter');
 ```
 *)
 procedure TDiscordClient.SetUsername(Username: String);

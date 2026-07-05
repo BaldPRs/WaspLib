@@ -77,7 +77,8 @@ Returns a random point from the array, weighted towards the mean.
 *)
 function TPointArray.RandomMean(): TPoint;
 begin
-  if Length(Self) = 0 then Exit;
+  if Self.IsEmpty then
+    Exit;
   Result := Self.SortFrom(Self.Mean())[RandomLeft(0, High(Self))];
 end;
 

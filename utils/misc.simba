@@ -56,7 +56,7 @@ end;
 ```pascal
 function FormatNumber(n: Double; dec: Byte = 3): String;
 ```
-Truncates a number with a runescape like truncation.
+Truncates a number.
 
 Example:
 ```pascal

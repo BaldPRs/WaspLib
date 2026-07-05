@@ -7,7 +7,7 @@ Useful for creating frame sequences for {ref}`videoplayer` or debugging.
 
 Example usage:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 {$I WaspLib/tools/framerecorder.simba}
 var
   frames: TFrameRecorder;

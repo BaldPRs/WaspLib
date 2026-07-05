@@ -14,11 +14,11 @@ const
 (*
 (TICK)=
 ### TICK const
-Represents a OSRS game tick worth of time (600 milliseconds).
+Represents a game tick worth of time (600 milliseconds).
 
 For example, if you wanted to sleep for 6 game ticks you could do this:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   Sleep(6*TICK);
 end.
@@ -33,7 +33,7 @@ Represents one second worth of time in milliseconds (1000 milliseconds).
 
 For example, if you wanted to sleep for 33 seconds you could do this:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   Sleep(33*SECOND);
 end.
@@ -48,7 +48,7 @@ Represents one minute worth of time in milliseconds (60000 milliseconds).
 
 For example, if you wanted to sleep for 12 minutes you could do this:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   Sleep(12*MINUTE);
 end.
@@ -63,7 +63,7 @@ Represents one hour worth of time in milliseconds (3600000 milliseconds).
 
 For example, if you wanted to sleep for 4 hours you could do this:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   Sleep(4*HOUR);
 end.
@@ -78,7 +78,7 @@ Represents one day worth of time in milliseconds (86400000 milliseconds).
 
 For example, if you wanted to sleep for 7 days you could do this:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   Sleep(7*DAY);
 end.
@@ -98,7 +98,7 @@ Formal date format `YYYY years, M months and D days` for {ref}`TDateTime`
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(DATE_FORMAL);
 end.
@@ -117,7 +117,7 @@ Formal date format `YYYY years, M months and D days` for {ref}`FormatMillisecond
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn FormatMilliseconds(900*DAY, MS_DATE_FORMAL);
 end.
@@ -137,7 +137,7 @@ Short date format `DD/MM/YYYY`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(DT_SHORT_DATE);
 end.
@@ -156,7 +156,7 @@ Short date format `DD/MM/YYYY` for {ref}`FormatMilliseconds`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn FormatMilliseconds(900*DAY, MS_DATE_SHORT);
 end.
@@ -176,7 +176,7 @@ Reversed short date format `YYYY/MM/DD` for {ref}`TDateTime`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(DT_SHORT_DATE_R);
 end.
@@ -195,7 +195,7 @@ Short date format `YYYY/MM/DD` for {ref}`FormatMilliseconds`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn FormatMilliseconds(900*DAY, MS_DATE_SHORT_R);
 end.
@@ -220,7 +220,7 @@ Formal time format `HH hours, MM minutes and SS seconds` for {ref}`TDateTime`.
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(DT_TIME_FORMAL);
 end.
@@ -240,7 +240,7 @@ Formal time format `HH hours, MM minutes and SS seconds` for {ref}`FormatMillise
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn FormatMilliseconds(32*DAY+15*MINUTE+12*SECOND, MS_TIME_FORMAL);
 end.
@@ -260,7 +260,7 @@ Short, 24H time format `HH:MM:SS` for both {ref}`TDateTime` and {ref}`FormatMill
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(TIME_SHORT);
 end.
@@ -281,7 +281,7 @@ Formal time format for minutes and seconds `MM minutes and SS seconds` for
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(DT_MINUTES_FORMAL);
 end.
@@ -301,7 +301,7 @@ Formal time format for minutes and seconds `MM minutes and SS seconds` for
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn FormatMilliseconds(3*HOUR+15*SECOND, MS_MINUTES_FORMAL);
 end.
@@ -322,7 +322,7 @@ Date and time format for file names `YYYY-MM-DD_hh-mm-ss-ms` for both {ref}`TDat
 
 Example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 begin
   WriteLn TDateTime.CreateFromSystem().ToString(FILE_TIME_FORMAT);
 end.
@@ -335,7 +335,7 @@ Which should print something like this:
 This can be useful when you need unique file names and unless you try to create the same file
 twice in the same millisecond this will give you a unique name for it, for example:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 var
   img: TImage;
   filename: String;

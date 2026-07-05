@@ -27,7 +27,7 @@ Use the {ref}`framerecorder` utility to capture frames.
 
 Playing frame sequences:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 {$I Wasplib/tools/videoplayer.simba}
 var
   player: TVideoPlayer;

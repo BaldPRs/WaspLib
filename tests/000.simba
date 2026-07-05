@@ -13,5 +13,5 @@ interaction with the game can be tested through this process.
 Simple compile test.
 *)
 {$DEFINE WL_TEST}
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 

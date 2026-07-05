@@ -84,7 +84,7 @@ Keep in mind that calling this won't do anything until
 
 Here is a short example of how to setup and print reports:
 ```pascal
-{$I WaspLib/osrs.simba}
+{$I WaspLib/main.simba}
 
 function GetReportValues(): TStringArray;
 begin
